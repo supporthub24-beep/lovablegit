@@ -19,18 +19,18 @@ export async function getPlatformSettings() {
   }
   return {
     models: {
-      chat: (out.models?.chat as string) ?? "google/gemini-3.7-flash",
-      image: (out.models?.image as string) ?? "google/gemini-3.1-flash-image",
+      chat: (out['models']?.['chat'] as string) ?? "google/gemini-3.7-flash",
+      image: (out['models']?.['image'] as string) ?? "google/gemini-3.1-flash-image",
     },
     features: {
-      github: out.features?.github !== false,
-      image_generation: out.features?.image_generation !== false,
-      preview: out.features?.preview !== false,
+      github: out['features']?.['github'] !== false,
+      image_generation: out['features']?.['image_generation'] !== false,
+      preview: out['features']?.['preview'] !== false,
     },
     limits: {
-      default_credits: (out.limits?.default_credits as number) ?? 100,
-      chat_cost: (out.limits?.chat_cost as number) ?? 1,
-      image_cost: (out.limits?.image_cost as number) ?? 5,
+      default_credits: (out['limits']?.['default_credits'] as number) ?? 100,
+      chat_cost: (out['limits']?.['chat_cost'] as number) ?? 1,
+      image_cost: (out['limits']?.['image_cost'] as number) ?? 5,
     },
   };
 }
@@ -44,7 +44,7 @@ function gatewayError(status: number, body: string): Error {
 
 export async function chatCompletion(model: string, messages: ChatMessage[]): Promise<string> {
   const body: Record<string, unknown> = { model, messages, stream: true };
-  if (model.startsWith("openai/gpt-5.6")) body.reasoning_effort = "none";
+  if (model.startsWith("openai/gpt-5.6")) body['reasoning_effort'] = "none";
 
   const res = await fetch(`${GATEWAY}/chat/completions`, {
     method: "POST",
@@ -116,9 +116,9 @@ function extractImage(json: unknown): string | null {
     if (!node || typeof node !== "object" || seen.has(node)) return null;
     seen.add(node);
     const obj = node as Record<string, unknown>;
-    if (typeof obj.b64_json === "string") return obj.b64_json;
-    if (typeof obj.image_url === "string") return obj.image_url;
-    if (typeof obj.url === "string" && obj.url.startsWith("data:")) return obj.url;
+    if (typeof obj['b64_json'] === "string") return obj['b64_json'];
+    if (typeof obj['image_url'] === "string") return obj['image_url'];
+    if (typeof obj['url'] === "string" && obj['url'].startsWith("data:")) return obj['url'];
     for (const value of Object.values(obj)) {
       const found = walk(value);
       if (found) return found;
