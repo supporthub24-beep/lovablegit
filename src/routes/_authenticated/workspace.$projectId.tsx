@@ -142,8 +142,8 @@ function Workspace() {
         )}
       </div>
 
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={34} minSize={24}>
+      <ResizablePanelGroup orientation="horizontal" className="flex-1">
+        <ResizablePanel defaultSize="34%" minSize="24%">
           <ChatPanel
             messages={project.data?.messages ?? []}
             busy={busy}
@@ -152,7 +152,7 @@ function Workspace() {
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={66} minSize={30}>
+        <ResizablePanel defaultSize="66%" minSize="30%">
           <Tabs defaultValue="preview" className="flex h-full flex-col gap-0">
             <TabsList className="w-full justify-start rounded-none border-b border-border bg-surface px-2">
               <TabsTrigger value="preview">Preview</TabsTrigger>
