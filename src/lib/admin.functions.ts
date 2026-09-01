@@ -30,9 +30,9 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       supabaseAdmin.from("projects").select("id", { count: "exact", head: true }),
     ]);
 
-    const settingsMap: Record<string, Record<string, unknown>> = {};
+    const settingsMap: Record<string, Record<string, string | number | boolean | null>> = {};
     for (const row of settings.data ?? []) {
-      settingsMap[row.key] = (row.value ?? {}) as Record<string, unknown>;
+      settingsMap[row.key] = (row.value ?? {}) as Record<string, string | number | boolean | null>;
     }
 
     const usageRows = usage.data ?? [];
@@ -55,7 +55,7 @@ export const updatePlatformSetting = createServerFn({ method: "POST" })
     z
       .object({
         key: z.enum(["models", "features", "limits"]),
-        value: z.record(z.string(), z.unknown()),
+        value: z.record(z.string(), z.any()),
       })
       .parse(input),
   )
@@ -70,7 +70,7 @@ export const updatePlatformSetting = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("platform_settings")
       .upsert(
-        { key: data.key, value: data.value, updated_at: new Date().toISOString() },
+        { key: data.key, value: data.value as never, updated_at: new Date().toISOString() },
         { onConflict: "key" },
       );
     if (error) throw new Error(error.message);

@@ -9,9 +9,9 @@ export function parseAiResponse(raw: string): { message: string; files: Generate
   const re = /<lov-file\s+path="([^"]+)"\s*>([\s\S]*?)<\/lov-file>/g;
   let match: RegExpExecArray | null;
   while ((match = re.exec(raw)) !== null) {
-    let content = match[2].replace(/^\r?\n/, "");
+    let content = (match[2] ?? "").replace(/^\r?\n/, "");
     content = content.replace(/^```[a-zA-Z]*\r?\n/, "").replace(/```\s*$/, "");
-    files.push({ path: match[1].trim(), content });
+    files.push({ path: (match[1] ?? "").trim(), content });
   }
   const message = raw.replace(re, "").trim();
   return { message: message || "Updated the project files.", files };
