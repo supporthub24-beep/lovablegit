@@ -3,7 +3,7 @@ import { Terminal, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
-export function AppHeader({ isAdmin }: { isAdmin?: boolean }) {
+export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
   const router = useRouter();
 
   async function signOut() {
