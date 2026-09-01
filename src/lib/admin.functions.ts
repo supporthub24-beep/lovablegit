@@ -12,7 +12,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       .eq("user_id", context.userId);
     const isAdmin = (roles ?? []).some((r) => r.role === "admin");
     if (!isAdmin) throw new Error("Admin access required.");
-    await assertAdmin(context.supabase as never);
+    
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [settings, customers, usage, projects] = await Promise.all([
