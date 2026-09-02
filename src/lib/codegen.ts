@@ -33,16 +33,47 @@ window.supabaseClient = window.supabase.createClient(${JSON.stringify(db.supabas
 export function buildPreviewDocument(files: GeneratedFile[], db?: PreviewDbConfig | null): string {
   const byPath = new Map(files.map((f) => [f.path.replace(/^\.?\//, ""), f.content]));
 
-  const entry = REACT_ENTRIES.find((p) => byPath.has(p));
+  let entry = REACT_ENTRIES.find((p) => byPath.has(p));
+  if (!entry) {
+    // Imported repos may use other entry names (main.tsx at root, src/App.tsx, …).
+    entry = [...byPath.keys()].find((p) =>
+      /^(src\/)?(main|index|entry-client)\.(t|j)sx?$/.test(p),
+    );
+  }
+  if (!entry) {
+    // Fall back to an App component: synthesize a mount entry for it.
+    const app = [...byPath.keys()].find((p) => /^(src\/)?App\.(t|j)sx$/.test(p));
+    if (app) {
+      const synthetic = "src/__preview-entry.jsx";
+      byPath.set(
+        synthetic,
+        `import React from "react";\nimport { createRoot } from "react-dom/client";\nimport App from "${
+          "./" + app.replace(/^src\//, "").replace(/\.(t|j)sx?$/, "")
+        }";\ncreateRoot(document.getElementById("root")).render(React.createElement(App));\n`,
+      );
+      entry = synthetic;
+    }
+  }
   if (entry) return buildReactPreview(byPath, entry, db);
 
-  const html = byPath.get("index.html");
+  const htmlPath = byPath.has("index.html")
+    ? "index.html"
+    : [...byPath.keys()].find((p) => p.endsWith("index.html"));
+  const html = htmlPath ? byPath.get(htmlPath) : undefined;
   if (!html) {
-    return `<!doctype html><html><body style="font-family:system-ui;background:#101317;color:#8b95a5;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><p>No preview yet — ask the AI to build something.</p></body></html>`;
+    const list = [...byPath.keys()].slice(0, 12).map((p) => `<li>${p}</li>`).join("");
+    return `<!doctype html><html><body style="font-family:system-ui;background:#101317;color:#8b95a5;padding:24px;margin:0"><p style="font-size:15px">No renderable entry file found${
+      byPath.size ? " in this project" : " yet — ask the AI to build something"
+    }.</p>${
+      byPath.size
+        ? `<p style="font-size:13px">The preview needs an <code>index.html</code>, <code>src/main.tsx</code> or <code>src/App.tsx</code>. Files loaded:</p><ul style="font-size:12px">${list}</ul><p style="font-size:13px">Ask the AI in chat to create a preview entry file.</p>`
+        : ""
+    }</body></html>`;
   }
+
   let doc = html;
   for (const [path, content] of byPath) {
-    if (path === "index.html") continue;
+    if (path === htmlPath) continue;
     if (path.endsWith(".css")) {
       doc = doc.replace(
         new RegExp(`<link[^>]*href=["']\\.?/?${escapeRe(path)}["'][^>]*>`, "g"),
