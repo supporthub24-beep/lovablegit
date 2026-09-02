@@ -269,6 +269,76 @@ function Dashboard() {
             </div>
           )}
         </div>
+
+        <section className="mt-12">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                <Github className="size-4" /> GitHub repositories
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Import a repository to chat, edit and preview it here.
+              </p>
+            </div>
+            {github.data?.connected && (
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search repositories…"
+                className="w-full sm:w-64"
+              />
+            )}
+          </div>
+
+          {!github.data?.connected ? (
+            <div className="mt-4 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              <Link to="/settings" className="text-primary hover:underline">
+                Connect GitHub
+              </Link>{" "}
+              to see all your repositories here.
+            </div>
+          ) : repos.isLoading ? (
+            <div className="mt-4 rounded-xl border border-border p-8 text-center text-sm text-muted-foreground">
+              Loading repositories…
+            </div>
+          ) : visibleRepos.length === 0 ? (
+            <div className="mt-4 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              No repositories found.
+            </div>
+          ) : (
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {visibleRepos.map((r) => (
+                <div key={r.full_name} className="rounded-xl border border-border bg-card p-4">
+                  <div className="flex items-center gap-2">
+                    <Github className="size-4 text-muted-foreground" />
+                    <h3 className="truncate text-sm font-medium">{r.full_name}</h3>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                    {r.description ?? "No description"}
+                  </p>
+                  <div className="mt-4 flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {r.private ? "Private" : "Public"} · {r.default_branch}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={importMutation.isPending}
+                      onClick={() =>
+                        importMutation.mutate({
+                          full_name: r.full_name,
+                          default_branch: r.default_branch,
+                        })
+                      }
+                    >
+                      {importing === r.full_name ? "Importing…" : "Import & open"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );
