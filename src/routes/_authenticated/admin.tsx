@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Users, FolderGit2, Coins, Github, Save } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
+import { AiProvidersPanel } from "@/components/AiProvidersPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -152,6 +153,8 @@ function AdminPage() {
             <Save className="size-4" /> Save settings
           </Button>
         </section>
+
+        <AiProvidersPanel />
 
         <section className="rounded-xl border border-border bg-card p-5">
           <h2 className="font-medium">Customers</h2>
