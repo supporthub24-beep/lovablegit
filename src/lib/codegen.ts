@@ -73,7 +73,7 @@ export function buildPreviewDocument(files: GeneratedFile[], db?: PreviewDbConfi
 
   let doc = html;
   for (const [path, content] of byPath) {
-    if (path === "index.html") continue;
+    if (path === htmlPath) continue;
     if (path.endsWith(".css")) {
       doc = doc.replace(
         new RegExp(`<link[^>]*href=["']\\.?/?${escapeRe(path)}["'][^>]*>`, "g"),
