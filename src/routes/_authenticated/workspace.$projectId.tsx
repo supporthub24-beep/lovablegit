@@ -99,10 +99,10 @@ function Workspace() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Import failed"),
   });
 
-  async function onSend(prompt: string) {
+  async function onSend(prompt: string, modelId?: string) {
     setBusy(true);
     try {
-      await chat({ data: { projectId, prompt } });
+      await chat({ data: { projectId, prompt, ...(modelId ? { modelId } : {}) } });
       await qc.invalidateQueries({ queryKey: ["project", projectId] });
       await qc.invalidateQueries({ queryKey: ["versions", projectId] });
       await qc.invalidateQueries({ queryKey: ["account"] });
