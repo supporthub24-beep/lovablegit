@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_providers: {
+        Row: {
+          api_key: string
+          base_url: string
+          created_at: string
+          enabled: boolean
+          id: string
+          kind: string
+          label: string
+          models: string[]
+          updated_at: string
+        }
+        Insert: {
+          api_key: string
+          base_url: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          kind?: string
+          label: string
+          models?: string[]
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string
+          base_url?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          kind?: string
+          label?: string
+          models?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_user_connections: {
         Row: {
           account_label: string | null
