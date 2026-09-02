@@ -25,7 +25,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { listProjects, createProject, deleteProject, getMyAccount } from "@/lib/projects.functions";
-import { getGithubStatus, listRepos } from "@/lib/github.functions";
+import {
+  getGithubStatus,
+  listRepos,
+  listRepoTree,
+  importRepoFiles,
+} from "@/lib/github.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -96,6 +101,47 @@ function Dashboard() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Could not create project"),
   });
+
+  const tree = useServerFn(listRepoTree);
+  const importFiles = useServerFn(importRepoFiles);
+  const [importing, setImporting] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  const importMutation = useMutation({
+    mutationFn: async (r: { full_name: string; default_branch: string }) => {
+      setImporting(r.full_name);
+      const project = await create({
+        data: {
+          name: r.full_name.split("/")[1] ?? r.full_name,
+          repo_full_name: r.full_name,
+          repo_branch: r.default_branch || "main",
+        },
+      });
+      const nodes = await tree({
+        data: { repo: r.full_name, branch: r.default_branch || "main" },
+      });
+      const paths = nodes
+        .filter((n) => /\.(html|css|js|jsx|ts|tsx|json|md)$/.test(n.path) && n.size < 120000)
+        .slice(0, 20)
+        .map((n) => n.path);
+      if (paths.length) await importFiles({ data: { projectId: project.id, paths } });
+      return { project, count: paths.length };
+    },
+    onSuccess: ({ project, count }) => {
+      setImporting(null);
+      toast.success(`Imported ${count} file(s). Opening workspace…`);
+      void qc.invalidateQueries({ queryKey: ["projects"] });
+      navigate({ to: "/workspace/$projectId", params: { projectId: project.id } });
+    },
+    onError: (e) => {
+      setImporting(null);
+      toast.error(e instanceof Error ? e.message : "Import failed");
+    },
+  });
+
+  const visibleRepos = (repos.data ?? []).filter((r) =>
+    r.full_name.toLowerCase().includes(search.trim().toLowerCase()),
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -223,6 +269,76 @@ function Dashboard() {
             </div>
           )}
         </div>
+
+        <section className="mt-12">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                <Github className="size-4" /> GitHub repositories
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Import a repository to chat, edit and preview it here.
+              </p>
+            </div>
+            {github.data?.connected && (
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search repositories…"
+                className="w-full sm:w-64"
+              />
+            )}
+          </div>
+
+          {!github.data?.connected ? (
+            <div className="mt-4 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              <Link to="/settings" className="text-primary hover:underline">
+                Connect GitHub
+              </Link>{" "}
+              to see all your repositories here.
+            </div>
+          ) : repos.isLoading ? (
+            <div className="mt-4 rounded-xl border border-border p-8 text-center text-sm text-muted-foreground">
+              Loading repositories…
+            </div>
+          ) : visibleRepos.length === 0 ? (
+            <div className="mt-4 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              No repositories found.
+            </div>
+          ) : (
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {visibleRepos.map((r) => (
+                <div key={r.full_name} className="rounded-xl border border-border bg-card p-4">
+                  <div className="flex items-center gap-2">
+                    <Github className="size-4 text-muted-foreground" />
+                    <h3 className="truncate text-sm font-medium">{r.full_name}</h3>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                    {r.description ?? "No description"}
+                  </p>
+                  <div className="mt-4 flex items-center justify-between gap-2">
+                    <span className="text-xs text-muted-foreground">
+                      {r.private ? "Private" : "Public"} · {r.default_branch}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={importMutation.isPending}
+                      onClick={() =>
+                        importMutation.mutate({
+                          full_name: r.full_name,
+                          default_branch: r.default_branch,
+                        })
+                      }
+                    >
+                      {importing === r.full_name ? "Importing…" : "Import & open"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );
