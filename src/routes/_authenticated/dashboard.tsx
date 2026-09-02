@@ -102,6 +102,47 @@ function Dashboard() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Could not create project"),
   });
 
+  const tree = useServerFn(listRepoTree);
+  const importFiles = useServerFn(importRepoFiles);
+  const [importing, setImporting] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  const importMutation = useMutation({
+    mutationFn: async (r: { full_name: string; default_branch: string }) => {
+      setImporting(r.full_name);
+      const project = await create({
+        data: {
+          name: r.full_name.split("/")[1] ?? r.full_name,
+          repo_full_name: r.full_name,
+          repo_branch: r.default_branch || "main",
+        },
+      });
+      const nodes = await tree({
+        data: { repo: r.full_name, branch: r.default_branch || "main" },
+      });
+      const paths = nodes
+        .filter((n) => /\.(html|css|js|jsx|ts|tsx|json|md)$/.test(n.path) && n.size < 120000)
+        .slice(0, 20)
+        .map((n) => n.path);
+      if (paths.length) await importFiles({ data: { projectId: project.id, paths } });
+      return { project, count: paths.length };
+    },
+    onSuccess: ({ project, count }) => {
+      setImporting(null);
+      toast.success(`Imported ${count} file(s). Opening workspace…`);
+      void qc.invalidateQueries({ queryKey: ["projects"] });
+      navigate({ to: "/workspace/$projectId", params: { projectId: project.id } });
+    },
+    onError: (e) => {
+      setImporting(null);
+      toast.error(e instanceof Error ? e.message : "Import failed");
+    },
+  });
+
+  const visibleRepos = (repos.data ?? []).filter((r) =>
+    r.full_name.toLowerCase().includes(search.trim().toLowerCase()),
+  );
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <AppHeader isAdmin={account.data?.isAdmin} />
