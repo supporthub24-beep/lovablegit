@@ -58,6 +58,15 @@ function Dashboard() {
   const [name, setName] = useState("");
   const [repo, setRepo] = useState<string>("none");
 
+  // Idea typed on the landing page: open the create dialog pre-filled.
+  useEffect(() => {
+    const pending = window.localStorage.getItem("forge:pending-prompt");
+    if (!pending) return;
+    window.localStorage.removeItem("forge:pending-prompt");
+    setName(pending.slice(0, 60));
+    setOpen(true);
+  }, []);
+
   const projects = useQuery({ queryKey: ["projects"], queryFn: () => fetchProjects() });
   const account = useQuery({ queryKey: ["account"], queryFn: () => fetchAccount() });
   const github = useQuery({ queryKey: ["github-status"], queryFn: () => fetchGithub() });
