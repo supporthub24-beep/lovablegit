@@ -42,9 +42,9 @@ export function buildPreviewDocument(files: GeneratedFile[], db?: PreviewDbConfi
     }
   }
   if (db?.supabase_url && db?.supabase_anon_key) {
-    const boot = `<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-window.supabase = createClient(${JSON.stringify(db.supabase_url)}, ${JSON.stringify(db.supabase_anon_key)});
+    const boot = `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.supabaseClient = window.supabase.createClient(${JSON.stringify(db.supabase_url)}, ${JSON.stringify(db.supabase_anon_key)});
 </script>`;
     doc = doc.includes("</head>") ? doc.replace("</head>", `${boot}\n</head>`) : `${boot}\n${doc}`;
   }
