@@ -1,8 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
-import { Users, FolderGit2, Coins, Github, Save } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Users,
+  FolderGit2,
+  Coins,
+  Github,
+  Save,
+  LayoutDashboard,
+  Sparkles,
+  Activity,
+  Settings2,
+  Search,
+  RefreshCw,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
 import { AiProvidersPanel } from "@/components/AiProvidersPanel";
@@ -10,6 +23,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getMyAccount } from "@/lib/projects.functions";
 import {
   getAdminOverview,
@@ -35,6 +51,14 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
+type UsageRow = {
+  kind: string;
+  credits: number | null;
+  model: string | null;
+  created_at: string;
+  user_id: string;
+};
+
 function AdminPage() {
   const qc = useQueryClient();
   const fetchAccount = useServerFn(getMyAccount);
@@ -54,6 +78,8 @@ function AdminPage() {
   const [imagesEnabled, setImagesEnabled] = useState(true);
   const [githubEnabled, setGithubEnabled] = useState(true);
   const [freeCredits, setFreeCredits] = useState(100);
+  const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const s = overview.data?.settings;
@@ -70,18 +96,37 @@ function AdminPage() {
     if (typeof limits?.signup_credits === "number") setFreeCredits(limits.signup_credits);
   }, [overview.data]);
 
+  const customers = overview.data?.customers ?? [];
+  const usage = (overview.data?.usage ?? []) as UsageRow[];
+
+  const filteredCustomers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return customers;
+    return customers.filter((c) => (c.email ?? "").toLowerCase().includes(q));
+  }, [customers, search]);
+
+  const usageByKind = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const u of usage) map.set(u.kind, (map.get(u.kind) ?? 0) + (u.credits ?? 0));
+    return [...map.entries()].sort((a, b) => b[1] - a[1]);
+  }, [usage]);
+
   if (overview.isError) {
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <AppHeader isAdmin={false} />
-        <main className="mx-auto max-w-md flex-1 px-4 py-20 text-center text-sm text-muted-foreground">
-          You do not have administrator access to this platform.
+        <main className="mx-auto max-w-md flex-1 px-4 py-20 text-center">
+          <ShieldCheck className="mx-auto size-10 text-muted-foreground" />
+          <p className="mt-4 text-sm text-muted-foreground">
+            You do not have administrator access to this platform.
+          </p>
         </main>
       </div>
     );
   }
 
   async function persist() {
+    setSaving(true);
     try {
       await saveSetting({ data: { key: "models", value: { chat: chatModel, image: imageModel } } });
       await saveSetting({
@@ -92,110 +137,346 @@ function AdminPage() {
       await qc.invalidateQueries({ queryKey: ["admin-overview"] });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save settings");
+    } finally {
+      setSaving(false);
     }
   }
 
   const totals = overview.data?.totals;
+  const loading = overview.isLoading;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <AppHeader isAdmin={account.data?.isAdmin} />
-      <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Admin console</h1>
+      <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-8">
+        <header className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Admin console</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Manage AI providers, customers, credits and platform features.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => qc.invalidateQueries({ queryKey: ["admin-overview"] })}
+          >
+            <RefreshCw className={`size-4 ${overview.isFetching ? "animate-spin" : ""}`} /> Refresh
+          </Button>
+        </header>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat icon={<Users className="size-4" />} label="Customers" value={totals?.customers ?? 0} />
-          <Stat icon={<FolderGit2 className="size-4" />} label="Projects" value={totals?.projects ?? 0} />
-          <Stat icon={<Coins className="size-4" />} label="Credits used" value={totals?.creditsUsed ?? 0} />
           <Stat
+            loading={loading}
+            icon={<Users className="size-4" />}
+            label="Customers"
+            value={totals?.customers ?? 0}
+          />
+          <Stat
+            loading={loading}
+            icon={<FolderGit2 className="size-4" />}
+            label="Projects"
+            value={totals?.projects ?? 0}
+          />
+          <Stat
+            loading={loading}
+            icon={<Coins className="size-4" />}
+            label="Credits used"
+            value={totals?.creditsUsed ?? 0}
+          />
+          <Stat
+            loading={loading}
             icon={<Github className="size-4" />}
             label="GitHub connector"
-            value={totals?.githubConfigured ? "Ready" : "Not set up"}
+            value={
+              <Badge variant={totals?.githubConfigured ? "default" : "secondary"}>
+                {totals?.githubConfigured ? "Ready" : "Not set up"}
+              </Badge>
+            }
           />
         </div>
 
-        <section className="rounded-xl border border-border bg-card p-5">
-          <h2 className="font-medium">AI configuration</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            These models power chat, code generation and image creation for every customer. No API
-            key is required — requests run through the built-in AI gateway.
-          </p>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="chat-model">Chat / code model</Label>
-              <Input id="chat-model" value={chatModel} onChange={(e) => setChatModel(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="image-model">Image model</Label>
-              <Input id="image-model" value={imageModel} onChange={(e) => setImageModel(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="credits">Signup credits</Label>
-              <Input
-                id="credits"
-                type="number"
-                value={freeCredits}
-                onChange={(e) => setFreeCredits(Number(e.target.value))}
-              />
-            </div>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-6">
-            <label className="flex items-center gap-2 text-sm">
-              <Switch checked={imagesEnabled} onCheckedChange={setImagesEnabled} />
-              Image &amp; logo generation
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <Switch checked={githubEnabled} onCheckedChange={setGithubEnabled} />
-              GitHub integration
-            </label>
-          </div>
-          <Button className="mt-5" onClick={persist}>
-            <Save className="size-4" /> Save settings
-          </Button>
-        </section>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
+            <TabsTrigger value="overview" className="gap-1.5">
+              <LayoutDashboard className="size-4" /> Overview
+            </TabsTrigger>
+            <TabsTrigger value="providers" className="gap-1.5">
+              <Sparkles className="size-4" /> AI providers
+            </TabsTrigger>
+            <TabsTrigger value="customers" className="gap-1.5">
+              <Users className="size-4" /> Customers
+            </TabsTrigger>
+            <TabsTrigger value="usage" className="gap-1.5">
+              <Activity className="size-4" /> Usage
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-1.5">
+              <Settings2 className="size-4" /> Settings
+            </TabsTrigger>
+          </TabsList>
 
-        <AiProvidersPanel />
+          <TabsContent value="overview" className="mt-5 space-y-5">
+            <Section
+              title="Platform health"
+              description="A quick snapshot of the last 200 recorded activity events."
+            >
+              {usageByKind.length === 0 ? (
+                <Empty text="No usage recorded yet." />
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {usageByKind.map(([kind, credits]) => (
+                    <div key={kind} className="rounded-lg border border-border bg-muted/30 p-4">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">{kind}</p>
+                      <p className="mt-1 text-xl font-semibold">{credits} credits</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Section>
 
-        <section className="rounded-xl border border-border bg-card p-5">
-          <h2 className="font-medium">Customers</h2>
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="py-2">Email</th>
-                  <th className="py-2">Joined</th>
-                  <th className="py-2">Credits</th>
-                  <th className="py-2" />
-                </tr>
-              </thead>
-              <tbody>
-                {(overview.data?.customers ?? []).map((c) => (
-                  <CustomerRow
-                    key={c.id}
-                    customer={c}
-                    onSave={async (credits) => {
-                      await saveCredits({ data: { userId: c.id, credits } });
-                      toast.success("Credits updated.");
-                      await qc.invalidateQueries({ queryKey: ["admin-overview"] });
-                    }}
+            <Section title="Newest customers" description="Latest accounts created on the platform.">
+              {loading ? (
+                <Skeleton className="h-24 w-full" />
+              ) : customers.length === 0 ? (
+                <Empty text="No customers yet." />
+              ) : (
+                <ul className="divide-y divide-border text-sm">
+                  {customers.slice(0, 6).map((c) => (
+                    <li key={c.id} className="flex items-center justify-between py-2.5">
+                      <span className="truncate">{c.email ?? c.id.slice(0, 8)}</span>
+                      <span className="shrink-0 text-muted-foreground">
+                        {new Date(c.created_at).toLocaleDateString()} · {c.credits ?? 0} credits
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Section>
+          </TabsContent>
+
+          <TabsContent value="providers" className="mt-5">
+            <AiProvidersPanel />
+          </TabsContent>
+
+          <TabsContent value="customers" className="mt-5">
+            <Section
+              title="Customers"
+              description="Adjust credit balances for individual accounts."
+              action={
+                <div className="relative w-full sm:w-64">
+                  <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search by email"
+                    className="h-9 pl-8"
                   />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                </div>
+              }
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-left text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="py-2">Email</th>
+                      <th className="py-2">Joined</th>
+                      <th className="py-2">Credits</th>
+                      <th className="py-2" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCustomers.map((c) => (
+                      <CustomerRow
+                        key={c.id}
+                        customer={c}
+                        onSave={async (credits) => {
+                          await saveCredits({ data: { userId: c.id, credits } });
+                          toast.success("Credits updated.");
+                          await qc.invalidateQueries({ queryKey: ["admin-overview"] });
+                        }}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+                {filteredCustomers.length === 0 && !loading ? (
+                  <Empty text="No customers match this search." />
+                ) : null}
+              </div>
+            </Section>
+          </TabsContent>
+
+          <TabsContent value="usage" className="mt-5">
+            <Section title="Recent activity" description="Latest AI and platform events.">
+              {usage.length === 0 ? (
+                <Empty text="No activity yet." />
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-left text-xs uppercase text-muted-foreground">
+                      <tr>
+                        <th className="py-2">When</th>
+                        <th className="py-2">Kind</th>
+                        <th className="py-2">Model</th>
+                        <th className="py-2 text-right">Credits</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {usage.slice(0, 60).map((u, i) => (
+                        <tr key={`${u.created_at}-${i}`} className="border-t border-border">
+                          <td className="py-2 text-muted-foreground">
+                            {new Date(u.created_at).toLocaleString()}
+                          </td>
+                          <td className="py-2">
+                            <Badge variant="secondary">{u.kind}</Badge>
+                          </td>
+                          <td className="py-2 text-muted-foreground">{u.model ?? "—"}</td>
+                          <td className="py-2 text-right font-medium">{u.credits ?? 0}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </Section>
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-5 space-y-5">
+            <Section
+              title="Default AI models"
+              description="Used when a customer does not pick a specific model. Requests run through the built-in AI gateway — no API key required."
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="chat-model">Chat / code model</Label>
+                  <Input
+                    id="chat-model"
+                    value={chatModel}
+                    onChange={(e) => setChatModel(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="image-model">Image model</Label>
+                  <Input
+                    id="image-model"
+                    value={imageModel}
+                    onChange={(e) => setImageModel(e.target.value)}
+                  />
+                </div>
+              </div>
+            </Section>
+
+            <Section title="Features & limits" description="Toggle capabilities for all customers.">
+              <div className="space-y-4">
+                <ToggleRow
+                  label="Image & logo generation"
+                  hint="Allow customers to generate images and logos from chat."
+                  checked={imagesEnabled}
+                  onChange={setImagesEnabled}
+                />
+                <ToggleRow
+                  label="GitHub integration"
+                  hint="Allow customers to connect repositories, import and push code."
+                  checked={githubEnabled}
+                  onChange={setGithubEnabled}
+                />
+                <div className="max-w-xs space-y-1.5">
+                  <Label htmlFor="credits">Signup credits</Label>
+                  <Input
+                    id="credits"
+                    type="number"
+                    value={freeCredits}
+                    onChange={(e) => setFreeCredits(Number(e.target.value))}
+                  />
+                </div>
+              </div>
+            </Section>
+
+            <div className="sticky bottom-4 flex justify-end">
+              <Button onClick={persist} disabled={saving}>
+                <Save className="size-4" /> {saving ? "Saving…" : "Save settings"}
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
 }
 
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
+function Section({
+  title,
+  description,
+  action,
+  children,
+}: {
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-xl border border-border bg-card p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-medium">{title}</h2>
+          {description ? (
+            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
+          ) : null}
+        </div>
+        {action}
+      </div>
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
+
+function ToggleRow({
+  label,
+  hint,
+  checked,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <label className="flex items-start justify-between gap-4 rounded-lg border border-border p-3">
+      <span>
+        <span className="block text-sm font-medium">{label}</span>
+        <span className="block text-xs text-muted-foreground">{hint}</span>
+      </span>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </label>
+  );
+}
+
+function Empty({ text }: { text: string }) {
+  return <p className="py-6 text-center text-sm text-muted-foreground">{text}</p>;
+}
+
+function Stat({
+  icon,
+  label,
+  value,
+  loading,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  loading?: boolean;
+}) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
         {icon} {label}
       </div>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
+      {loading ? (
+        <Skeleton className="mt-2 h-8 w-20" />
+      ) : (
+        <div className="mt-2 text-2xl font-semibold">{value}</div>
+      )}
     </div>
   );
 }
@@ -208,6 +489,7 @@ function CustomerRow({
   onSave: (credits: number) => Promise<void>;
 }) {
   const [credits, setCredits] = useState(customer.credits ?? 0);
+  const dirty = credits !== (customer.credits ?? 0);
   return (
     <tr className="border-t border-border">
       <td className="py-2">{customer.email ?? customer.id.slice(0, 8)}</td>
@@ -223,7 +505,7 @@ function CustomerRow({
         />
       </td>
       <td className="py-2 text-right">
-        <Button size="sm" variant="secondary" onClick={() => onSave(credits)}>
+        <Button size="sm" variant={dirty ? "default" : "secondary"} onClick={() => onSave(credits)}>
           Save
         </Button>
       </td>
