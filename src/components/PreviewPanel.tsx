@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { Monitor, Smartphone, RefreshCw, Info } from "lucide-react";
-import { buildPreviewDocument, type GeneratedFile } from "@/lib/codegen";
+import { buildPreviewDocument, type GeneratedFile, type PreviewDbConfig } from "@/lib/codegen";
 import { Button } from "@/components/ui/button";
 
-export function PreviewPanel({ files }: { files: GeneratedFile[] }) {
+export function PreviewPanel({ files, db }: { files: GeneratedFile[]; db?: PreviewDbConfig | null }) {
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const [nonce, setNonce] = useState(0);
-  const doc = useMemo(() => buildPreviewDocument(files), [files]);
+  const doc = useMemo(() => buildPreviewDocument(files, db), [files, db]);
 
   return (
     <div className="flex h-full flex-col bg-background">
