@@ -17,8 +17,10 @@ export function parseAiResponse(raw: string): { message: string; files: Generate
   return { message: message || "Updated the project files.", files };
 }
 
+export type PreviewDbConfig = { supabase_url: string | null; supabase_anon_key: string | null };
+
 /** Build a self-contained HTML document for the sandboxed preview iframe. */
-export function buildPreviewDocument(files: GeneratedFile[]): string {
+export function buildPreviewDocument(files: GeneratedFile[], db?: PreviewDbConfig | null): string {
   const byPath = new Map(files.map((f) => [f.path.replace(/^\.?\//, ""), f.content]));
   const html = byPath.get("index.html");
   if (!html) {
@@ -38,6 +40,13 @@ export function buildPreviewDocument(files: GeneratedFile[]): string {
         `<script>\n${content}\n</script>`,
       );
     }
+  }
+  if (db?.supabase_url && db?.supabase_anon_key) {
+    const boot = `<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+window.supabase = createClient(${JSON.stringify(db.supabase_url)}, ${JSON.stringify(db.supabase_anon_key)});
+</script>`;
+    doc = doc.includes("</head>") ? doc.replace("</head>", `${boot}\n</head>`) : `${boot}\n${doc}`;
   }
   return doc;
 }
