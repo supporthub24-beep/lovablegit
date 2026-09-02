@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Github, Trash2, FolderGit2, Coins } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
@@ -57,6 +57,15 @@ function Dashboard() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [repo, setRepo] = useState<string>("none");
+
+  // Idea typed on the landing page: open the create dialog pre-filled.
+  useEffect(() => {
+    const pending = window.localStorage.getItem("forge:pending-prompt");
+    if (!pending) return;
+    window.localStorage.removeItem("forge:pending-prompt");
+    setName(pending.slice(0, 60));
+    setOpen(true);
+  }, []);
 
   const projects = useQuery({ queryKey: ["projects"], queryFn: () => fetchProjects() });
   const account = useQuery({ queryKey: ["account"], queryFn: () => fetchAccount() });
