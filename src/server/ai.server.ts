@@ -127,3 +127,109 @@ function extractImage(json: unknown): string | null {
   };
   return walk(json);
 }
+
+// ---------------------------------------------------------------------------
+// Custom (admin-configured) AI providers: OpenAI-compatible, Anthropic, Google
+// ---------------------------------------------------------------------------
+
+export type ProviderRow = {
+  id: string;
+  label: string;
+  kind: string;
+  base_url: string;
+  api_key: string;
+  models: string[] | null;
+  enabled: boolean;
+};
+
+/** Resolve "gateway::model" or "<providerId>::model" into a callable target. */
+export async function resolveChatTarget(
+  modelId: string | undefined,
+  fallbackModel: string,
+): Promise<{ provider: ProviderRow | null; model: string }> {
+  if (!modelId || modelId.startsWith("gateway::")) {
+    return { provider: null, model: modelId?.split("::").slice(1).join("::") || fallbackModel };
+  }
+  const [providerId, ...rest] = modelId.split("::");
+  const model = rest.join("::");
+  if (!providerId || !model) return { provider: null, model: fallbackModel };
+
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("ai_providers")
+    .select("id, label, kind, base_url, api_key, models, enabled")
+    .eq("id", providerId)
+    .maybeSingle();
+  if (!data || !data.enabled) throw new Error("That AI model is not available.");
+  return { provider: data as ProviderRow, model };
+}
+
+export async function chatWithTarget(
+  target: { provider: ProviderRow | null; model: string },
+  messages: ChatMessage[],
+): Promise<string> {
+  if (!target.provider) return chatCompletion(target.model, messages);
+  const { provider, model } = target;
+  const base = provider.base_url.replace(/\/+$/, "");
+
+  if (provider.kind === "anthropic") {
+    const system = messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
+    const rest = messages
+      .filter((m) => m.role !== "system")
+      .map((m) => ({ role: m.role, content: m.content }));
+    const res = await fetch(`${base}/messages`, {
+      method: "POST",
+      headers: {
+        "x-api-key": provider.api_key,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ model, system, messages: rest, max_tokens: 8000 }),
+    });
+    const raw = await res.text();
+    if (!res.ok) throw new Error(`AI request failed (${res.status}): ${raw.slice(0, 400)}`);
+    const json = JSON.parse(raw) as { content?: Array<{ text?: string }> };
+    return (json.content ?? []).map((c) => c.text ?? "").join("");
+  }
+
+  if (provider.kind === "google") {
+    const system = messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
+    const contents = messages
+      .filter((m) => m.role !== "system")
+      .map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
+    const res = await fetch(
+      `${base}/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(provider.api_key)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents,
+          ...(system ? { systemInstruction: { parts: [{ text: system }] } } : {}),
+        }),
+      },
+    );
+    const raw = await res.text();
+    if (!res.ok) throw new Error(`AI request failed (${res.status}): ${raw.slice(0, 400)}`);
+    const json = JSON.parse(raw) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
+    return (json.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? "").join("");
+  }
+
+  // OpenAI-compatible (OpenAI, DeepSeek, Groq, xAI, OpenRouter, Together, …)
+  const res = await fetch(`${base}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${provider.api_key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ model, messages }),
+  });
+  const raw = await res.text();
+  if (!res.ok) throw new Error(`AI request failed (${res.status}): ${raw.slice(0, 400)}`);
+  const json = JSON.parse(raw) as { choices?: Array<{ message?: { content?: string } }> };
+  return json.choices?.[0]?.message?.content ?? "";
+}

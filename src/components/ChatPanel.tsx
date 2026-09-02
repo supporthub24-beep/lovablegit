@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listChatModels } from "@/lib/providers.functions";
 import { Send, Sparkles, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -14,11 +17,18 @@ export function ChatPanel({
 }: {
   messages: ChatMsg[];
   busy: boolean;
-  onSend: (prompt: string) => Promise<void>;
+  onSend: (prompt: string, modelId?: string) => Promise<void>;
   onGenerateImage: (prompt: string, kind: "image" | "logo" | "icon" | "banner") => Promise<void>;
 }) {
   const [value, setValue] = useState("");
   const [imageMode, setImageMode] = useState<null | "image" | "logo" | "icon" | "banner">(null);
+  const [modelId, setModelId] = useState<string>("");
+  const fetchModels = useServerFn(listChatModels);
+  const models = useQuery({ queryKey: ["chat-models"], queryFn: () => fetchModels() });
+
+  useEffect(() => {
+    if (!modelId && models.data?.defaultId) setModelId(models.data.defaultId);
+  }, [models.data, modelId]);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,7 +44,7 @@ export function ChatPanel({
         await onGenerateImage(prompt, imageMode);
         setImageMode(null);
       } else {
-        await onSend(prompt);
+        await onSend(prompt, modelId || undefined);
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
@@ -46,6 +56,18 @@ export function ChatPanel({
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
         <Sparkles className="size-4 text-primary" />
         <span className="text-sm font-medium">AI Chat</span>
+        <select
+          aria-label="AI model"
+          value={modelId}
+          onChange={(e) => setModelId(e.target.value)}
+          className="ml-auto max-w-[55%] truncate rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground"
+        >
+          {(models.data?.options ?? []).map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.group} — {o.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto p-4">

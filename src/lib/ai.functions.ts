@@ -10,11 +10,14 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       .object({
         projectId: z.string().uuid(),
         prompt: z.string().min(1).max(8000),
+        modelId: z.string().max(200).optional(),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { chatCompletion, getPlatformSettings } = await import("@/server/ai.server");
+    const { chatWithTarget, resolveChatTarget, getPlatformSettings } = await import(
+      "@/server/ai.server"
+    );
     const settings = await getPlatformSettings();
 
     const { data: project } = await context.supabase
@@ -74,7 +77,8 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       content: data.prompt,
     });
 
-    const raw = await chatCompletion(settings.models.chat, messages);
+    const target = await resolveChatTarget(data.modelId, settings.models.chat);
+    const raw = await chatWithTarget(target, messages);
     const parsed = parseAiResponse(raw);
 
     if (parsed.files.length) {
@@ -110,7 +114,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       user_id: context.userId,
       project_id: data.projectId,
       kind: "chat",
-      model: settings.models.chat,
+      model: target.provider ? `${target.provider.label}/${target.model}` : target.model,
       credits: settings.limits.chat_cost,
     });
     await supabaseAdmin
