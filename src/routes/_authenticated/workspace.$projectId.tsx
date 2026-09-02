@@ -22,6 +22,8 @@ import { getProject, getMyAccount } from "@/lib/projects.functions";
 import { sendChatMessage, generateAsset, listAssets } from "@/lib/ai.functions";
 import { pushProjectToGithub, listRepoTree, importRepoFiles } from "@/lib/github.functions";
 import { getProjectIntegration } from "@/lib/integrations.functions";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 
 export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
   head: () => ({
@@ -43,6 +45,8 @@ export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
 
 function Workspace() {
   const { projectId } = Route.useParams();
+  const isMobile = useIsMobile();
+
   const qc = useQueryClient();
   const fetchProject = useServerFn(getProject);
   const fetchAccount = useServerFn(getMyAccount);
@@ -151,43 +155,80 @@ function Workspace() {
         )}
       </div>
 
-      <ResizablePanelGroup orientation="horizontal" className="flex-1">
-        <ResizablePanel defaultSize="34%" minSize="24%">
-          <ChatPanel
-            messages={project.data?.messages ?? []}
-            busy={busy}
-            onSend={onSend}
-            onGenerateImage={onGenerateImage}
-          />
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize="66%" minSize="30%">
-          <Tabs defaultValue="preview" className="flex h-full flex-col gap-0">
-            <TabsList className="w-full justify-start rounded-none border-b border-border bg-surface px-2">
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-              <TabsTrigger value="code">Code</TabsTrigger>
-              <TabsTrigger value="assets">Assets</TabsTrigger>
-              <TabsTrigger value="history">History</TabsTrigger>
-              <TabsTrigger value="data">Data</TabsTrigger>
-            </TabsList>
-            <TabsContent value="preview" className="m-0 flex-1 overflow-hidden">
-              <PreviewPanel files={files} db={integration.data ?? null} />
-            </TabsContent>
-            <TabsContent value="code" className="m-0 flex-1 overflow-hidden">
-              <CodePanel files={files} />
-            </TabsContent>
-            <TabsContent value="assets" className="m-0 flex-1 overflow-hidden">
-              <AssetPanel assets={assets.data ?? []} />
-            </TabsContent>
-            <TabsContent value="history" className="m-0 flex-1 overflow-hidden">
-              <HistoryPanel projectId={projectId} />
-            </TabsContent>
-            <TabsContent value="data" className="m-0 flex-1 overflow-hidden">
-              <DataPanel projectId={projectId} />
-            </TabsContent>
-          </Tabs>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+      {isMobile ? (
+        <Tabs defaultValue="chat" className="flex min-h-0 flex-1 flex-col gap-0">
+          <TabsList className="w-full justify-start overflow-x-auto rounded-none border-b border-border bg-surface px-2">
+            <TabsTrigger value="chat">Chat</TabsTrigger>
+            <TabsTrigger value="preview">Preview</TabsTrigger>
+            <TabsTrigger value="code">Code</TabsTrigger>
+            <TabsTrigger value="assets">Assets</TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="data">Data</TabsTrigger>
+          </TabsList>
+          <TabsContent value="chat" className="m-0 min-h-0 flex-1 overflow-hidden">
+            <ChatPanel
+              messages={project.data?.messages ?? []}
+              busy={busy}
+              onSend={onSend}
+              onGenerateImage={onGenerateImage}
+            />
+          </TabsContent>
+          <TabsContent value="preview" className="m-0 min-h-0 flex-1 overflow-hidden">
+            <PreviewPanel files={files} db={integration.data ?? null} />
+          </TabsContent>
+          <TabsContent value="code" className="m-0 min-h-0 flex-1 overflow-hidden">
+            <CodePanel files={files} />
+          </TabsContent>
+          <TabsContent value="assets" className="m-0 min-h-0 flex-1 overflow-hidden">
+            <AssetPanel assets={assets.data ?? []} />
+          </TabsContent>
+          <TabsContent value="history" className="m-0 min-h-0 flex-1 overflow-hidden">
+            <HistoryPanel projectId={projectId} />
+          </TabsContent>
+          <TabsContent value="data" className="m-0 min-h-0 flex-1 overflow-hidden">
+            <DataPanel projectId={projectId} />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <ResizablePanelGroup orientation="horizontal" className="flex-1">
+          <ResizablePanel defaultSize="34%" minSize="24%">
+            <ChatPanel
+              messages={project.data?.messages ?? []}
+              busy={busy}
+              onSend={onSend}
+              onGenerateImage={onGenerateImage}
+            />
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize="66%" minSize="30%">
+            <Tabs defaultValue="preview" className="flex h-full flex-col gap-0">
+              <TabsList className="w-full justify-start rounded-none border-b border-border bg-surface px-2">
+                <TabsTrigger value="preview">Preview</TabsTrigger>
+                <TabsTrigger value="code">Code</TabsTrigger>
+                <TabsTrigger value="assets">Assets</TabsTrigger>
+                <TabsTrigger value="history">History</TabsTrigger>
+                <TabsTrigger value="data">Data</TabsTrigger>
+              </TabsList>
+              <TabsContent value="preview" className="m-0 flex-1 overflow-hidden">
+                <PreviewPanel files={files} db={integration.data ?? null} />
+              </TabsContent>
+              <TabsContent value="code" className="m-0 flex-1 overflow-hidden">
+                <CodePanel files={files} />
+              </TabsContent>
+              <TabsContent value="assets" className="m-0 flex-1 overflow-hidden">
+                <AssetPanel assets={assets.data ?? []} />
+              </TabsContent>
+              <TabsContent value="history" className="m-0 flex-1 overflow-hidden">
+                <HistoryPanel projectId={projectId} />
+              </TabsContent>
+              <TabsContent value="data" className="m-0 flex-1 overflow-hidden">
+                <DataPanel projectId={projectId} />
+              </TabsContent>
+            </Tabs>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      )}
+
     </div>
   );
 }
