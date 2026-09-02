@@ -37,9 +37,21 @@ export const listChatModels = createServerFn({ method: "GET" })
     const defaultModel =
       ((settings?.value as { chat?: string } | null)?.chat as string) ?? "google/gemini-3.7-flash";
 
-    const options: { id: string; label: string; group: string }[] = [
-      { id: `gateway::${defaultModel}`, label: `${defaultModel} (built-in)`, group: "Built-in AI" },
-    ];
+    // Built-in Lovable AI gateway models — always available, no API key needed.
+    const builtIn = [
+      defaultModel,
+      "google/gemini-3.7-flash",
+      "google/gemini-3.1-pro-preview",
+      "google/gemini-3.1-flash-lite",
+      "openai/gpt-5.5",
+      "openai/gpt-5.4-mini",
+    ].filter((m, i, arr) => arr.indexOf(m) === i);
+
+    const options: { id: string; label: string; group: string }[] = builtIn.map((m, i) => ({
+      id: `gateway::${m}`,
+      label: i === 0 ? `${m} (default)` : m,
+      group: "Built-in AI",
+    }));
     for (const p of providers ?? []) {
       for (const m of (p.models ?? []) as string[]) {
         options.push({ id: `${p.id}::${m}`, label: `${m}`, group: p.label });
