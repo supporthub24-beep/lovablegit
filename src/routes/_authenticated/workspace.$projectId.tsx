@@ -22,6 +22,8 @@ import { getProject, getMyAccount } from "@/lib/projects.functions";
 import { sendChatMessage, generateAsset, listAssets } from "@/lib/ai.functions";
 import { pushProjectToGithub, listRepoTree, importRepoFiles } from "@/lib/github.functions";
 import { getProjectIntegration } from "@/lib/integrations.functions";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 
 export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
   head: () => ({
