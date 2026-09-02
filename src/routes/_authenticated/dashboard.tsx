@@ -25,7 +25,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { listProjects, createProject, deleteProject, getMyAccount } from "@/lib/projects.functions";
-import { getGithubStatus, listRepos } from "@/lib/github.functions";
+import {
+  getGithubStatus,
+  listRepos,
+  listRepoTree,
+  importRepoFiles,
+} from "@/lib/github.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
