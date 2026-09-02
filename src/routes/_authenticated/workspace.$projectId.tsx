@@ -45,6 +45,8 @@ export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
 
 function Workspace() {
   const { projectId } = Route.useParams();
+  const isMobile = useIsMobile();
+
   const qc = useQueryClient();
   const fetchProject = useServerFn(getProject);
   const fetchAccount = useServerFn(getMyAccount);
