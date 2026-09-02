@@ -9,6 +9,8 @@ import { ChatPanel } from "@/components/ChatPanel";
 import { PreviewPanel } from "@/components/PreviewPanel";
 import { CodePanel } from "@/components/CodePanel";
 import { AssetPanel } from "@/components/AssetPanel";
+import { HistoryPanel } from "@/components/HistoryPanel";
+import { DataPanel } from "@/components/DataPanel";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
@@ -19,6 +21,7 @@ import {
 import { getProject, getMyAccount } from "@/lib/projects.functions";
 import { sendChatMessage, generateAsset, listAssets } from "@/lib/ai.functions";
 import { pushProjectToGithub, listRepoTree, importRepoFiles } from "@/lib/github.functions";
+import { getProjectIntegration } from "@/lib/integrations.functions";
 
 export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
   head: () => ({
@@ -44,6 +47,7 @@ function Workspace() {
   const fetchProject = useServerFn(getProject);
   const fetchAccount = useServerFn(getMyAccount);
   const fetchAssets = useServerFn(listAssets);
+  const fetchIntegration = useServerFn(getProjectIntegration);
   const chat = useServerFn(sendChatMessage);
   const image = useServerFn(generateAsset);
   const push = useServerFn(pushProjectToGithub);
@@ -56,6 +60,10 @@ function Workspace() {
     queryFn: () => fetchProject({ data: { id: projectId } }),
   });
   const account = useQuery({ queryKey: ["account"], queryFn: () => fetchAccount() });
+  const integration = useQuery({
+    queryKey: ["integration", projectId],
+    queryFn: () => fetchIntegration({ data: { projectId } }),
+  });
   const assets = useQuery({
     queryKey: ["assets", projectId],
     queryFn: () => fetchAssets({ data: { projectId } }),
@@ -92,6 +100,7 @@ function Workspace() {
     try {
       await chat({ data: { projectId, prompt } });
       await qc.invalidateQueries({ queryKey: ["project", projectId] });
+      await qc.invalidateQueries({ queryKey: ["versions", projectId] });
       await qc.invalidateQueries({ queryKey: ["account"] });
     } finally {
       setBusy(false);
@@ -158,15 +167,23 @@ function Workspace() {
               <TabsTrigger value="preview">Preview</TabsTrigger>
               <TabsTrigger value="code">Code</TabsTrigger>
               <TabsTrigger value="assets">Assets</TabsTrigger>
+              <TabsTrigger value="history">History</TabsTrigger>
+              <TabsTrigger value="data">Data</TabsTrigger>
             </TabsList>
             <TabsContent value="preview" className="m-0 flex-1 overflow-hidden">
-              <PreviewPanel files={files} />
+              <PreviewPanel files={files} db={integration.data ?? null} />
             </TabsContent>
             <TabsContent value="code" className="m-0 flex-1 overflow-hidden">
               <CodePanel files={files} />
             </TabsContent>
             <TabsContent value="assets" className="m-0 flex-1 overflow-hidden">
               <AssetPanel assets={assets.data ?? []} />
+            </TabsContent>
+            <TabsContent value="history" className="m-0 flex-1 overflow-hidden">
+              <HistoryPanel projectId={projectId} />
+            </TabsContent>
+            <TabsContent value="data" className="m-0 flex-1 overflow-hidden">
+              <DataPanel projectId={projectId} />
             </TabsContent>
           </Tabs>
         </ResizablePanel>

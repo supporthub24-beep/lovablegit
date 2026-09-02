@@ -78,6 +78,13 @@ export const sendChatMessage = createServerFn({ method: "POST" })
     const parsed = parseAiResponse(raw);
 
     if (parsed.files.length) {
+      // Snapshot the pre-change state so the user can roll back later.
+      await context.supabase.from("project_versions").insert({
+        project_id: data.projectId,
+        user_id: context.userId,
+        label: data.prompt.slice(0, 80),
+        files: (files ?? []) as unknown as never,
+      });
       const { error } = await context.supabase.from("project_files").upsert(
         parsed.files.map((f) => ({
           project_id: data.projectId,
