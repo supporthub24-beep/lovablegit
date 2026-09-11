@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -101,13 +102,16 @@ const spendSchema = z.object({
   reason: z.string().trim().min(1).max(120),
 });
 
-export const getCreditOverview = createServerFn({ method: "GET" }).handler(
+export const getCreditOverview = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(
   async (): Promise<{
     wallet: CreditWallet;
     ledger: CreditLedgerEntry[];
     purchases: CreditPurchase[];
   }> => {
-    const { supabase, userId } = await requireSupabaseAuth();
+    const { supabase: typedSupabase, userId } = context;
+    const supabase = typedSupabase as SupabaseClient<any>;
 
     const [walletResult, ledgerResult, purchasesResult] = await Promise.all([
       supabase
@@ -149,14 +153,14 @@ export const getCreditOverview = createServerFn({ method: "GET" }).handler(
         lifetimePurchased: walletResult.data?.lifetime_purchased ?? 0,
         lifetimeSpent: walletResult.data?.lifetime_spent ?? 0,
       },
-      ledger: (ledgerResult.data ?? []).map((row) => ({
+      ledger: (ledgerResult.data ?? []).map((row: RawLedgerRow) => ({
         id: row.id,
         delta: row.delta,
         reason: row.reason,
         balanceAfter: row.balance_after,
         createdAt: row.created_at,
       })),
-      purchases: (purchasesResult.data ?? []).map((row) => ({
+      purchases: (purchasesResult.data ?? []).map((row: RawPurchaseRow) => ({
         id: row.id,
         packId: row.pack_id,
         credits: row.credits,
@@ -171,15 +175,16 @@ export const getCreditOverview = createServerFn({ method: "GET" }).handler(
 );
 
 export const purchaseCredits = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ packId: packIdSchema }).parse(data))
-  .handler(async ({ data }): Promise<{ purchase: CreditPurchase; balance: number }> => {
+  .handler(async ({ data, context }): Promise<{ purchase: CreditPurchase; balance: number }> => {
     const pack = CREDIT_PACKS.find((entry) => entry.id === data.packId);
 
     if (!pack) {
       throw new Error("Unknown credit pack");
     }
 
-    const { supabase } = await requireSupabaseAuth();
+    const supabase = context.supabase as SupabaseClient<any>;
 
     const { data: purchase, error } = await supabase
       .rpc("grant_credit_purchase", {
@@ -218,9 +223,10 @@ export const purchaseCredits = createServerFn({ method: "POST" })
   });
 
 export const spendCredits = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => spendSchema.parse(data))
-  .handler(async ({ data }): Promise<{ balance: number }> => {
-    const { supabase } = await requireSupabaseAuth();
+  .handler(async ({ data, context }): Promise<{ balance: number }> => {
+    const supabase = context.supabase as SupabaseClient<any>;
 
     const { data: balance, error } = await supabase.rpc("spend_credits", {
       p_amount: data.amount,

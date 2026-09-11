@@ -17,12 +17,10 @@ import {
   ShieldCheck,
   KeyRound,
   CheckCircle2,
-  Database,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
 import { AiProvidersPanel } from "@/components/AiProvidersPanel";
-import { DataPanel } from "@/components/DataPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -219,9 +217,6 @@ function AdminPage() {
             <TabsTrigger value="usage" className="gap-1.5">
               <Activity className="size-4" /> Usage
             </TabsTrigger>
-            <TabsTrigger value="data" className="gap-1.5">
-              <Database className="size-4" /> Data
-            </TabsTrigger>
             <TabsTrigger value="settings" className="gap-1.5">
               <Settings2 className="size-4" /> Settings
             </TabsTrigger>
@@ -354,10 +349,6 @@ function AdminPage() {
                 </div>
               )}
             </Section>
-          </TabsContent>
-
-          <TabsContent value="data" className="mt-5">
-            <DataPanel />
           </TabsContent>
 
           <TabsContent value="settings" className="mt-5 space-y-5">
