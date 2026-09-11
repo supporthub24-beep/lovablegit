@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="lovablegit">
+  <defs>
+    <linearGradient id="lovablegitFaviconMark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="currentColor" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0.6" />
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 14v24a10 10 0 0 0 10 10h6" />
+    <circle cx="18" cy="12" r="5" fill="currentColor" stroke="none" />
+    <circle cx="36" cy="48" r="5" fill="currentColor" stroke="none" />
+    <path d="M42 22a10 10 0 0 1 10 10v6" />
+    <circle cx="52" cy="40" r="5" fill="currentColor" stroke="none" />
+  </g>
+  <path
+    d="M28 30c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8-8-3.6-8-8Z"
+    fill="url(#lovablegitFaviconMark)"
+  />
+</svg>

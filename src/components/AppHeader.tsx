@@ -1,9 +1,10 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Terminal, LogOut, Coins } from "lucide-react";
+import { LogOut, Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { LovableGitLogo } from "@/components/LovableGitLogo";
 import { getCreditOverview } from "@/lib/payments.functions";
 
 export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
@@ -26,12 +27,10 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
       <div className="flex items-center gap-6">
         <Link
           to="/dashboard"
+          aria-label="lovablegit home"
           className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
-          <span className="flex size-7 items-center justify-center rounded bg-primary text-primary-foreground">
-            <Terminal className="size-4" aria-hidden="true" />
-          </span>
-          <span className="font-semibold tracking-tight">Forge</span>
+          <LovableGitLogo className="h-7 w-auto text-foreground" />
         </Link>
         <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
           <Link

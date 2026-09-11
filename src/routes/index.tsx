@@ -19,6 +19,7 @@ import {
   Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LovableGitLogo } from "@/components/LovableGitLogo";
 import {
   Accordion,
   AccordionContent,
@@ -29,13 +30,16 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Forge — Chat with AI, generate code, preview instantly" },
+      { title: "lovablegit — Chat with AI, generate code, preview instantly" },
       {
         name: "description",
         content:
-          "Connect your GitHub account, describe what you want, and Forge writes the code, shows a live preview and commits it back — powered by AI.",
+          "Connect your GitHub account, describe what you want, and lovablegit writes the code, shows a live preview and commits it back — powered by AI.",
       },
-      { property: "og:title", content: "Forge — Chat with AI, generate code, preview instantly" },
+      {
+        property: "og:title",
+        content: "lovablegit — Chat with AI, generate code, preview instantly",
+      },
       {
         property: "og:description",
         content: "GitHub-connected AI development workspace with live preview and image generation.",
@@ -223,12 +227,10 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
           <Link
             to="/"
+            aria-label="lovablegit home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-              <Terminal className="size-4" />
-            </span>
-            <span className="text-lg font-semibold tracking-tight">Forge</span>
+            <LovableGitLogo className="h-7 w-auto text-foreground" />
           </Link>
           <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
             <a
@@ -275,7 +277,10 @@ function Landing() {
           <div className="pointer-events-none absolute -right-24 top-40 size-72 rounded-full bg-[color-mix(in_oklch,var(--color-highlight)_12%,transparent)] blur-3xl" />
           <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6 md:py-28">
             <Reveal>
-              <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur">
+              <LovableGitLogo className="mx-auto h-10 w-auto text-foreground sm:h-12" />
+            </Reveal>
+            <Reveal delay={40}>
+              <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur">
                 <Github className="size-3" /> Connect your own GitHub account — no setup needed
               </p>
             </Reveal>
@@ -305,7 +310,7 @@ function Landing() {
                     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) start();
                   }}
                   rows={3}
-                  placeholder="Ask Forge to create a landing page for my bakery…"
+                  placeholder="Ask lovablegit to create a landing page for my bakery…"
                   className="w-full resize-none rounded-xl bg-transparent px-3 py-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:outline-none"
                 />
                 <div className="flex items-center justify-between gap-2 px-1 pb-1">
@@ -352,7 +357,7 @@ function Landing() {
                   <span className="size-2.5 rounded-full bg-highlight/70" />
                   <span className="size-2.5 rounded-full bg-primary/60" />
                   <span className="ml-3 truncate rounded-md bg-background/60 px-2 py-1 text-xs text-muted-foreground">
-                    preview.forge.app
+                    preview.lovablegit.app
                   </span>
                 </div>
                 <div className="grid gap-4 p-5 text-left sm:grid-cols-[1.1fr_1fr]">
@@ -390,7 +395,7 @@ function Landing() {
         <section aria-label="Trusted by" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
             <p className="text-center font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Teams ship faster with Forge
+              Teams ship faster with lovablegit
             </p>
             <div className="relative mt-5 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
               <div className="marquee-track flex w-max items-center gap-12">
@@ -471,7 +476,7 @@ function Landing() {
         </section>
 
         {/* Stats */}
-        <section aria-label="Forge in numbers" className="border-b border-border bg-surface">
+        <section aria-label="lovablegit in numbers" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
             <dl className="grid grid-cols-2 gap-8 sm:grid-cols-4">
               {STATS.map((stat, index) => (
@@ -512,7 +517,7 @@ function Landing() {
                 <Step
                   n={1}
                   title="Describe your idea"
-                  body="Write what you want in plain language. Forge asks for anything it needs and starts writing code."
+                  body="Write what you want in plain language. lovablegit asks for anything it needs and starts writing code."
                 />
               </Reveal>
               <Reveal delay={60}>
@@ -538,65 +543,79 @@ function Landing() {
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <Reveal className="mx-auto max-w-2xl text-center">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
-                <Wand2 className="size-3" /> Made with Forge
+                <Wand2 className="size-3" /> Showcase
               </span>
               <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                From prompt to preview in minutes
+                Made with lovablegit
               </h2>
               <p className="mt-3 text-muted-foreground">
-                A look at the kinds of apps the workspace produces — built from chat, previewed
-                live, then pushed to GitHub.
+                A few of the things people built in a single session — from marketing pages to
+                internal tools.
               </p>
             </Reveal>
-
-            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               <Reveal delay={0}>
                 <ShowcaseCard
-                  label="Marketing site"
-                  title="Coffee shop landing"
-                  accent="from-primary/25"
+                  label="Marketing"
+                  title="Coffee shop landing page"
+                  accent="from-primary/20"
                 />
               </Reveal>
               <Reveal delay={60}>
                 <ShowcaseCard
                   label="Portfolio"
-                  title="Designer portfolio"
-                  accent="from-primary/20"
+                  title="Developer portfolio with dark mode"
+                  accent="from-highlight/20"
                 />
               </Reveal>
               <Reveal delay={120}>
                 <ShowcaseCard
                   label="SaaS"
-                  title="Pricing with 3 plans"
+                  title="Three-tier pricing page"
                   accent="from-primary/15"
                 />
               </Reveal>
-              <Reveal delay={180}>
-                <ShowcaseCard
-                  label="Dashboard"
-                  title="Analytics overview"
-                  accent="from-primary/10"
-                />
-              </Reveal>
             </div>
+          </div>
+        </section>
 
-            <div className="mt-12 grid gap-6 sm:grid-cols-3">
+        {/* Why lovablegit */}
+        <section aria-label="Why lovablegit" className="border-b border-border">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+            <Reveal className="mx-auto max-w-2xl text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+                <ShieldCheck className="size-3" /> Built to trust
+              </span>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+                Your code stays yours
+              </h2>
+              <p className="mt-3 text-muted-foreground">
+                Everything runs against your own accounts, so there is nothing to migrate later.
+              </p>
+            </Reveal>
+            <div className="mt-12 grid gap-4 sm:grid-cols-2">
               <Reveal delay={0}>
                 <Point
-                  icon={<ShieldCheck className="size-4 text-primary" />}
-                  text="Your GitHub token is encrypted and never shared"
+                  icon={<Check className="size-4 text-primary" />}
+                  text="Generated files are committed to your own GitHub repository, not locked inside a hosted editor."
                 />
               </Reveal>
               <Reveal delay={60}>
                 <Point
                   icon={<Check className="size-4 text-primary" />}
-                  text="Preview only — we never host or expose your app"
+                  text="Previews run in a sandbox and are never published, so you can experiment freely."
                 />
               </Reveal>
               <Reveal delay={120}>
                 <Point
                   icon={<Check className="size-4 text-primary" />}
-                  text="Free starter credits on every new account"
+                  text="Bring your own Supabase project and query real data from the app you just generated."
+                />
+              </Reveal>
+              <Reveal delay={180}>
+                <Point
+                  icon={<Check className="size-4 text-primary" />}
+                  text="Every AI edit is versioned, so you can roll back to any earlier state with one click."
                 />
               </Reveal>
             </div>
@@ -604,42 +623,44 @@ function Landing() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="border-b border-border">
+        <section id="faq" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
-            <Reveal>
-              <h2 className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+            <Reveal className="text-center">
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                 Frequently asked questions
               </h2>
+              <p className="mt-3 text-muted-foreground">
+                Everything you might want to know before your first prompt.
+              </p>
             </Reveal>
-            <Reveal delay={80}>
-              <Accordion type="single" collapsible className="mt-8">
-                <AccordionItem value="q1">
-                  <AccordionTrigger>Do I need to know how to code?</AccordionTrigger>
+            <Reveal delay={60}>
+              <Accordion type="single" collapsible className="mt-10 w-full">
+                <AccordionItem value="github">
+                  <AccordionTrigger>Do I need a GitHub account?</AccordionTrigger>
                   <AccordionContent>
-                    No. Describe what you want in everyday language. The code is always visible if
-                    you want to learn or edit it, but it is not required.
+                    Yes — lovablegit commits the generated code into your own repository, so
+                    connecting an account is how you keep ownership of everything it writes.
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="q2">
-                  <AccordionTrigger>Is my app hosted here?</AccordionTrigger>
+                <AccordionItem value="preview">
+                  <AccordionTrigger>Is the preview hosted publicly?</AccordionTrigger>
                   <AccordionContent>
-                    No. Forge shows a temporary sandboxed preview only. To publish, push the code to
-                    your GitHub repository and deploy it wherever you like.
+                    No. Previews render in a sandbox for you only. When you are happy with the
+                    result, you push the files to GitHub and deploy them wherever you like.
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="q3">
-                  <AccordionTrigger>Which AI models can I use?</AccordionTrigger>
+                <AccordionItem value="credits">
+                  <AccordionTrigger>How do credits work?</AccordionTrigger>
                   <AccordionContent>
-                    The built-in gateway works out of the box, and your workspace administrator can
-                    add more providers such as OpenAI, Claude, Gemini or DeepSeek. You pick the
-                    model in chat.
+                    Each AI message consumes credits based on the model you choose. New accounts
+                    start with free credits, and you can top up any time from the Credits page.
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="q4">
-                  <AccordionTrigger>What happens to my GitHub access?</AccordionTrigger>
+                <AccordionItem value="database">
+                  <AccordionTrigger>Can it use my own database?</AccordionTrigger>
                   <AccordionContent>
-                    You authorise Forge yourself, tokens are stored encrypted, and you can disconnect
-                    at any time from Settings.
+                    Yes. Connect your own Supabase project and the generated app can query real
+                    data during preview.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -649,28 +670,23 @@ function Landing() {
 
         {/* Final CTA */}
         <section className="grid-noise relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_100%,color-mix(in_oklch,var(--color-primary)_16%,transparent),transparent)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_100%,color-mix(in_oklch,var(--color-primary)_16%,transparent),transparent)]" />
           <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
             <Reveal>
-              <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                Ready to build your first app?
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                Start building with <span className="text-gradient">lovablegit</span>
               </h2>
-            </Reveal>
-            <Reveal delay={60}>
-              <p className="mt-3 text-muted-foreground">
-                Start with a sentence. Forge handles the files, the preview and the commit.
+              <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+                Describe your idea, watch it come to life, and push it to your own repository.
               </p>
-            </Reveal>
-            <Reveal delay={120}>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Button asChild size="lg">
                   <Link to="/auth">
-                    <Sparkles className="size-4" /> Start building free
-                    <ArrowRight className="size-4" />
+                    Get started free <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline">
-                  <a href="#how">See how it works</a>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="/auth">Sign in</Link>
                 </Button>
               </div>
             </Reveal>
@@ -679,40 +695,17 @@ function Landing() {
       </main>
 
       <footer className="border-t border-border bg-surface">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
-          <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Terminal className="size-3.5" />
-            </span>
-            <span className="font-semibold tracking-tight text-foreground">Forge</span>
-          </div>
-          <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#features"
-              className="rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Features
-            </a>
-            <a
-              href="#how"
-              className="rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              How it works
-            </a>
-            <a
-              href="#showcase"
-              className="rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Showcase
-            </a>
-            <a
-              href="#faq"
-              className="rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              FAQ
-            </a>
-          </nav>
-          <p className="text-xs">© {new Date().getFullYear()} Forge. Preview only — you own the code.</p>
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
+          <Link
+            to="/"
+            aria-label="lovablegit home"
+            className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          >
+            <LovableGitLogo className="h-6 w-auto text-foreground" />
+          </Link>
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} lovablegit. Built for people who ship.
+          </p>
         </div>
       </footer>
     </div>
