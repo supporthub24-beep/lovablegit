@@ -123,3 +123,90 @@ export const adminExists = createServerFn({ method: "GET" }).handler(async () =>
     .eq("role", "admin");
   return { exists: (count ?? 0) > 0 };
 });
+
+/* ---- Built-in provider API keys (OpenAI / Google Gemini) ---- */
+
+const KEY_PROVIDERS = {
+  openai: {
+    label: "OpenAI",
+    kind: "openai_compatible" as const,
+    base_url: "https://api.openai.com/v1",
+    models: ["gpt-4o", "gpt-4o-mini"],
+  },
+  google: {
+    label: "Google Gemini",
+    kind: "google" as const,
+    base_url: "https://generativelanguage.googleapis.com/v1beta",
+    models: ["gemini-2.0-flash", "gemini-1.5-pro"],
+  },
+};
+
+async function assertAdminRole(context: { supabase: any; userId: string }) {
+  const { data: roles } = await context.supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", context.userId);
+  if (!(roles ?? []).some((r: { role: string }) => r.role === "admin"))
+    throw new Error("Admin access required.");
+}
+
+export const getAiKeyStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdminRole(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("ai_providers")
+      .select("label, api_key, updated_at");
+    const rows = data ?? [];
+    return (Object.keys(KEY_PROVIDERS) as Array<keyof typeof KEY_PROVIDERS>).map((provider) => {
+      const meta = KEY_PROVIDERS[provider];
+      const row = rows.find((r) => r.label === meta.label);
+      return {
+        provider,
+        label: meta.label,
+        configured: Boolean(row?.api_key),
+        updatedAt: (row?.updated_at as string | null) ?? null,
+      };
+    });
+  });
+
+export const saveAiKey = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        provider: z.enum(["openai", "google"]),
+        apiKey: z.string().min(10).max(500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdminRole(context as never);
+    const meta = KEY_PROVIDERS[data.provider];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: existing } = await supabaseAdmin
+      .from("ai_providers")
+      .select("id")
+      .eq("label", meta.label)
+      .maybeSingle();
+
+    if (existing) {
+      const { error } = await supabaseAdmin
+        .from("ai_providers")
+        .update({ api_key: data.apiKey.trim(), updated_at: new Date().toISOString() } as never)
+        .eq("id", existing.id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabaseAdmin.from("ai_providers").insert({
+        label: meta.label,
+        kind: meta.kind,
+        base_url: meta.base_url,
+        api_key: data.apiKey.trim(),
+        models: meta.models,
+        enabled: true,
+      } as never);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
