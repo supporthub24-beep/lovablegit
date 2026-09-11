@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -16,19 +17,20 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    const supabase = context.supabase as SupabaseClient<any>;
     const { chatWithTarget, resolveChatTarget, getPlatformSettings } = await import(
       "@/server/ai.server"
     );
     const settings = await getPlatformSettings();
 
-    const { data: project } = await context.supabase
+    const { data: project } = await supabase
       .from("projects")
       .select("id, name, repo_full_name, repo_branch")
       .eq("id", data.projectId)
       .maybeSingle();
     if (!project) throw new Error("Project not found");
 
-    const { data: wallet } = await context.supabase
+    const { data: wallet } = await supabase
       .from("credit_wallets")
       .select("balance")
       .eq("user_id", context.userId)
@@ -39,13 +41,13 @@ export const sendChatMessage = createServerFn({ method: "POST" })
     }
 
     const [{ data: history }, { data: files }] = await Promise.all([
-      context.supabase
+      supabase
         .from("chat_messages")
         .select("role, content")
         .eq("project_id", data.projectId)
         .order("created_at")
         .limit(40),
-      context.supabase
+      supabase
         .from("project_files")
         .select("path, content")
         .eq("project_id", data.projectId),
@@ -72,7 +74,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       { role: "user" as const, content: data.prompt },
     ];
 
-    await context.supabase.from("chat_messages").insert({
+    await supabase.from("chat_messages").insert({
       project_id: data.projectId,
       user_id: context.userId,
       role: "user",
@@ -85,13 +87,13 @@ export const sendChatMessage = createServerFn({ method: "POST" })
 
     if (parsed.files.length) {
       // Snapshot the pre-change state so the user can roll back later.
-      await context.supabase.from("project_versions").insert({
+      await supabase.from("project_versions").insert({
         project_id: data.projectId,
         user_id: context.userId,
         label: data.prompt.slice(0, 80),
         files: (files ?? []) as unknown as never,
       });
-      const { error } = await context.supabase.from("project_files").upsert(
+      const { error } = await supabase.from("project_files").upsert(
         parsed.files.map((f) => ({
           project_id: data.projectId,
           user_id: context.userId,
@@ -104,7 +106,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
     }
 
-    await context.supabase.from("chat_messages").insert({
+    await supabase.from("chat_messages").insert({
       project_id: data.projectId,
       user_id: context.userId,
       role: "assistant",
@@ -120,7 +122,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       credits: settings.limits.chat_cost,
     });
 
-    const { error: spendError } = await context.supabase.rpc("spend_credits", {
+    const { error: spendError } = await supabase.rpc("spend_credits", {
       p_amount: settings.limits.chat_cost,
       p_reason: "chat",
       p_metadata: { project_id: data.projectId },
@@ -142,13 +144,14 @@ export const generateAsset = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    const supabase = context.supabase as SupabaseClient<any>;
     const { generateImage, getPlatformSettings } = await import("@/server/ai.server");
     const settings = await getPlatformSettings();
     if (!settings.features.image_generation) {
       throw new Error("Image generation is disabled by the administrator.");
     }
 
-    const { data: wallet } = await context.supabase
+    const { data: wallet } = await supabase
       .from("credit_wallets")
       .select("balance")
       .eq("user_id", context.userId)
@@ -170,7 +173,7 @@ export const generateAsset = createServerFn({ method: "POST" })
       `${styleHint[data.kind]} ${data.prompt}`,
     );
 
-    const { data: asset, error } = await context.supabase
+    const { data: asset, error } = await supabase
       .from("assets")
       .insert({
         project_id: data.projectId ?? null,
@@ -192,7 +195,7 @@ export const generateAsset = createServerFn({ method: "POST" })
       credits: settings.limits.image_cost,
     });
 
-    const { error: spendError } = await context.supabase.rpc("spend_credits", {
+    const { error: spendError } = await supabase.rpc("spend_credits", {
       p_amount: settings.limits.image_cost,
       p_reason: "image_generation",
       p_metadata: { project_id: data.projectId ?? null, kind: data.kind },

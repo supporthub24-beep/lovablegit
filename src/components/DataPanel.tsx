@@ -159,11 +159,8 @@ export function DataPanel({ projectId }: { projectId: string }) {
     }
 
     const rows = (data ?? []) as Record<string, unknown>[];
-    const columns = rows.length
-      ? Object.keys(rows[0])
-      : ((await client.from(table).select("*").limit(1)) as { data: unknown }).data
-        ? Object.keys(((data ?? [])[0] ?? {}) as Record<string, unknown>)
-        : [];
+    const firstRow = rows[0];
+    const columns = firstRow ? Object.keys(firstRow) : [];
     setQuery({ status: "ready", columns, rows });
   }
 
