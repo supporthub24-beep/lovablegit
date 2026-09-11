@@ -105,7 +105,7 @@ const spendSchema = z.object({
 export const getCreditOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(
-  async (): Promise<{
+  async ({ context }): Promise<{
     wallet: CreditWallet;
     ledger: CreditLedgerEntry[];
     purchases: CreditPurchase[];
