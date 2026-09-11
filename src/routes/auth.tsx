@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Terminal } from "lucide-react";
+import { Terminal, ArrowLeft, Sparkles, ShieldCheck, GitBranch } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -28,6 +28,24 @@ export const Route = createFileRoute("/auth")({
   }),
   component: AuthPage,
 });
+
+const HIGHLIGHTS = [
+  {
+    icon: <Sparkles className="size-4 text-primary" />,
+    title: "Describe it, ship it",
+    body: "Chat with AI and get real files with a live preview, instantly.",
+  },
+  {
+    icon: <GitBranch className="size-4 text-primary" />,
+    title: "Your GitHub, your repos",
+    body: "Push commits back to your own account — no lock-in, ever.",
+  },
+  {
+    icon: <ShieldCheck className="size-4 text-primary" />,
+    title: "Versioned and reversible",
+    body: "Every AI edit is snapshotted, so you can roll back in one click.",
+  },
+];
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -80,67 +98,119 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 grid-noise">
-      <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-2xl">
-        <Link to="/" className="mb-6 flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded bg-primary text-primary-foreground">
-            <Terminal className="size-4" />
-          </span>
-          <span className="text-lg font-semibold tracking-tight">Forge</span>
-        </Link>
-        <h1 className="text-xl font-semibold">
-          {mode === "signin" ? "Sign in to your workspace" : "Create your workspace"}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Connect GitHub, chat with AI, ship faster.
-        </p>
+    <div className="grid-noise relative min-h-screen bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--color-primary)_16%,transparent),transparent)]" />
 
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-          </div>
-          <Button type="submit" className="w-full" disabled={busy}>
-            {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-6 sm:py-10">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="flex size-8 items-center justify-center rounded bg-primary text-primary-foreground">
+              <Terminal className="size-4" />
+            </span>
+            <span className="text-lg font-semibold tracking-tight">Forge</span>
+          </Link>
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/">
+              <ArrowLeft className="size-4" /> Back to home
+            </Link>
           </Button>
-        </form>
-
-        <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" />
-          or
-          <span className="h-px flex-1 bg-border" />
         </div>
 
-        <Button variant="secondary" className="w-full" onClick={google}>
-          Continue with Google
-        </Button>
+        <div className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[1.1fr_minmax(0,1fr)] lg:gap-16 lg:py-16">
+          <div className="hidden lg:block">
+            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+              <Sparkles className="size-3 text-primary" /> Free credits included · no credit card
+            </p>
+            <h2 className="mt-6 text-balance text-4xl font-semibold tracking-tight xl:text-5xl">
+              Your AI development workspace, ready in seconds.
+            </h2>
+            <p className="mt-4 max-w-lg text-pretty text-muted-foreground">
+              Sign in to connect GitHub, describe what you want to build, and watch Forge write the
+              code, preview it live, and commit it back to your repository.
+            </p>
+            <ul className="mt-10 space-y-5">
+              {HIGHLIGHTS.map((item) => (
+                <li key={item.title} className="flex gap-3">
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-card">
+                    {item.icon}
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium">{item.title}</p>
+                    <p className="text-sm text-muted-foreground">{item.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-5 w-full text-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-        >
-          {mode === "signin" ? "No account? Create one" : "Already have an account? Sign in"}
-        </button>
+          <div className="mx-auto w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl sm:p-7">
+            <div className="lg:hidden">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-1 text-xs text-muted-foreground">
+                <Sparkles className="size-3 text-primary" /> Free credits included
+              </span>
+            </div>
+            <h1 className="mt-4 text-xl font-semibold tracking-tight lg:mt-0">
+              {mode === "signin" ? "Sign in to your workspace" : "Create your workspace"}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Connect GitHub, chat with AI, ship faster.
+            </p>
+
+            <form onSubmit={submit} className="mt-6 space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={busy}>
+                {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+              </Button>
+            </form>
+
+            <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              or
+              <span className="h-px flex-1 bg-border" />
+            </div>
+
+            <Button variant="secondary" className="w-full" onClick={google}>
+              Continue with Google
+            </Button>
+
+            <button
+              type="button"
+              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+              className="mt-5 w-full text-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              {mode === "signin" ? "No account? Create one" : "Already have an account? Sign in"}
+            </button>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-muted-foreground lg:text-left">
+          By continuing you agree to keep your own GitHub credentials secure. Forge never stores your
+          repository tokens in plain text.
+        </p>
       </div>
     </div>
   );
