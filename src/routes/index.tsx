@@ -549,30 +549,29 @@ function Landing() {
                 Made with lovablegit
               </h2>
               <p className="mt-3 text-muted-foreground">
-                A few of the things people built in a single session — from marketing pages to
-                internal tools.
+                Real projects generated from a single prompt — then pushed to GitHub and shipped.
               </p>
             </Reveal>
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               <Reveal delay={0}>
                 <ShowcaseCard
-                  label="Marketing"
-                  title="Coffee shop landing page"
-                  accent="from-primary/20"
+                  label="Landing page"
+                  title="Bakery storefront with online orders"
+                  accent="from-primary/25"
                 />
               </Reveal>
               <Reveal delay={60}>
                 <ShowcaseCard
-                  label="Portfolio"
-                  title="Developer portfolio with dark mode"
-                  accent="from-highlight/20"
+                  label="Dashboard"
+                  title="Analytics dashboard with live charts"
+                  accent="from-highlight/25"
                 />
               </Reveal>
               <Reveal delay={120}>
                 <ShowcaseCard
-                  label="SaaS"
-                  title="Three-tier pricing page"
-                  accent="from-primary/15"
+                  label="Portfolio"
+                  title="Developer portfolio with dark mode"
+                  accent="from-primary/20"
                 />
               </Reveal>
             </div>
@@ -580,45 +579,60 @@ function Landing() {
         </section>
 
         {/* Why lovablegit */}
-        <section aria-label="Why lovablegit" className="border-b border-border">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-            <Reveal className="mx-auto max-w-2xl text-center">
+        <section className="border-b border-border">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center">
+            <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
-                <ShieldCheck className="size-3" /> Built to trust
+                <ShieldCheck className="size-3" /> Built for real work
               </span>
               <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
                 Your code stays yours
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Everything runs against your own accounts, so there is nothing to migrate later.
+                lovablegit never locks you in. Everything it writes lives in your own GitHub
+                repository, ready to run anywhere.
               </p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                <Point
+                  icon={<Check className="size-4 text-primary" />}
+                  text="Commits land in your own repository, under your account."
+                />
+                <Point
+                  icon={<Check className="size-4 text-primary" />}
+                  text="Standard React and HTML output — no proprietary runtime."
+                />
+                <Point
+                  icon={<Check className="size-4 text-primary" />}
+                  text="Bring your own Supabase project for real data."
+                />
+                <Point
+                  icon={<Check className="size-4 text-primary" />}
+                  text="Roll back any AI edit with a single click."
+                />
+              </div>
             </Reveal>
-            <div className="mt-12 grid gap-4 sm:grid-cols-2">
-              <Reveal delay={0}>
-                <Point
-                  icon={<Check className="size-4 text-primary" />}
-                  text="Generated files are committed to your own GitHub repository, not locked inside a hosted editor."
-                />
-              </Reveal>
-              <Reveal delay={60}>
-                <Point
-                  icon={<Check className="size-4 text-primary" />}
-                  text="Previews run in a sandbox and are never published, so you can experiment freely."
-                />
-              </Reveal>
-              <Reveal delay={120}>
-                <Point
-                  icon={<Check className="size-4 text-primary" />}
-                  text="Bring your own Supabase project and query real data from the app you just generated."
-                />
-              </Reveal>
-              <Reveal delay={180}>
-                <Point
-                  icon={<Check className="size-4 text-primary" />}
-                  text="Every AI edit is versioned, so you can roll back to any earlier state with one click."
-                />
-              </Reveal>
-            </div>
+            <Reveal delay={80}>
+              <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
+                <div className="flex items-center gap-2 border-b border-border bg-surface px-4 py-2.5">
+                  <Terminal className="size-4 text-muted-foreground" />
+                  <span className="font-mono text-xs text-muted-foreground">git log --oneline</span>
+                </div>
+                <div className="space-y-3 p-5 font-mono text-xs text-muted-foreground">
+                  <p>
+                    <span className="text-primary">a1f9c2e</span> feat: add pricing section
+                  </p>
+                  <p>
+                    <span className="text-primary">7d3b810</span> fix: responsive nav on mobile
+                  </p>
+                  <p>
+                    <span className="text-primary">c04e5aa</span> feat: connect Supabase auth
+                  </p>
+                  <p>
+                    <span className="text-primary">9b2d17f</span> chore: initial scaffold
+                  </p>
+                </div>
+              </div>
+            </Reveal>
           </div>
         </section>
 
@@ -630,37 +644,39 @@ function Landing() {
                 Frequently asked questions
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Everything you might want to know before your first prompt.
+                Everything you need to know before you start building.
               </p>
             </Reveal>
-            <Reveal delay={60}>
+            <Reveal delay={80}>
               <Accordion type="single" collapsible className="mt-10 w-full">
                 <AccordionItem value="github">
                   <AccordionTrigger>Do I need a GitHub account?</AccordionTrigger>
                   <AccordionContent>
-                    Yes — lovablegit commits the generated code into your own repository, so
-                    connecting an account is how you keep ownership of everything it writes.
+                    Yes — lovablegit commits the generated code into your own repository, so you
+                    connect your GitHub account once and keep full ownership of everything it
+                    writes.
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="preview">
+                <AccordionItem value="hosting">
                   <AccordionTrigger>Is the preview hosted publicly?</AccordionTrigger>
                   <AccordionContent>
-                    No. Previews render in a sandbox for you only. When you are happy with the
-                    result, you push the files to GitHub and deploy them wherever you like.
+                    No. The preview runs in a sandbox for you only. When you are ready to share your
+                    app, you deploy it yourself from your repository.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="stack">
+                  <AccordionTrigger>What stack does it generate?</AccordionTrigger>
+                  <AccordionContent>
+                    React with TypeScript and Tailwind CSS by default, or plain HTML when you ask
+                    for something simpler. You can also connect your own Supabase project for real
+                    data.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="credits">
                   <AccordionTrigger>How do credits work?</AccordionTrigger>
                   <AccordionContent>
-                    Each AI message consumes credits based on the model you choose. New accounts
-                    start with free credits, and you can top up any time from the Credits page.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="database">
-                  <AccordionTrigger>Can it use my own database?</AccordionTrigger>
-                  <AccordionContent>
-                    Yes. Connect your own Supabase project and the generated app can query real
-                    data during preview.
+                    New accounts start with free credits. Each AI message uses a small amount, and
+                    you can top up any time from the Credits page — no subscription required.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -669,17 +685,18 @@ function Landing() {
         </section>
 
         {/* Final CTA */}
-        <section className="grid-noise relative overflow-hidden">
+        <section className="relative overflow-hidden">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_100%,color-mix(in_oklch,var(--color-primary)_16%,transparent),transparent)]" />
           <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
             <Reveal>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                Start building with <span className="text-gradient">lovablegit</span>
+                Start building in seconds
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-                Describe your idea, watch it come to life, and push it to your own repository.
+                Describe your idea, watch it come to life, and push it to GitHub — all from one
+                chat.
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <div className="mt-8 flex flex-wrap justify-center gap-3">
                 <Button asChild size="lg">
                   <Link to="/auth">
                     Get started free <ArrowRight className="size-4" />
@@ -704,7 +721,7 @@ function Landing() {
             <LovableGitLogo className="h-6 w-auto text-foreground" />
           </Link>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} lovablegit. Built for people who ship.
+            © {new Date().getFullYear()} lovablegit. Built with AI, owned by you.
           </p>
         </div>
       </footer>
