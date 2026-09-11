@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { parseAiResponse, SYSTEM_PROMPT } from "./codegen";
 
@@ -27,13 +28,14 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!project) throw new Error("Project not found");
 
-    const { data: profile } = await context.supabase
-      .from("profiles")
-      .select("credits")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if ((profile?.credits ?? 0) < settings.limits.chat_cost) {
-      throw new Error("You are out of credits. Please contact the administrator.");
+    const { data: wallet } = await context.supabase
+      .from("credit_wallets")
+      .select("balance")
+      .eq("user_id", context.userId)
+      .maybeSingle<{ balance: number | null }>();
+    const balance = wallet?.balance ?? 0;
+    if (balance < settings.limits.chat_cost) {
+      throw new Error("You are out of credits. Top up on the Credits & payments page.");
     }
 
     const [{ data: history }, { data: files }] = await Promise.all([
@@ -117,10 +119,13 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       model: target.provider ? `${target.provider.label}/${target.model}` : target.model,
       credits: settings.limits.chat_cost,
     });
-    await supabaseAdmin
-      .from("profiles")
-      .update({ credits: Math.max(0, (profile?.credits ?? 0) - settings.limits.chat_cost) })
-      .eq("id", context.userId);
+
+    const { error: spendError } = await context.supabase.rpc("spend_credits", {
+      p_amount: settings.limits.chat_cost,
+      p_reason: "chat",
+      p_metadata: { project_id: data.projectId },
+    });
+    if (spendError) throw new Error(spendError.message);
 
     return { message: parsed.message, changedFiles: parsed.files.map((f) => f.path) };
   });
@@ -143,13 +148,14 @@ export const generateAsset = createServerFn({ method: "POST" })
       throw new Error("Image generation is disabled by the administrator.");
     }
 
-    const { data: profile } = await context.supabase
-      .from("profiles")
-      .select("credits")
-      .eq("id", context.userId)
-      .maybeSingle();
-    if ((profile?.credits ?? 0) < settings.limits.image_cost) {
-      throw new Error("You are out of credits. Please contact the administrator.");
+    const { data: wallet } = await context.supabase
+      .from("credit_wallets")
+      .select("balance")
+      .eq("user_id", context.userId)
+      .maybeSingle<{ balance: number | null }>();
+    const balance = wallet?.balance ?? 0;
+    if (balance < settings.limits.image_cost) {
+      throw new Error("You are out of credits. Top up on the Credits & payments page.");
     }
 
     const styleHint: Record<string, string> = {
@@ -185,10 +191,13 @@ export const generateAsset = createServerFn({ method: "POST" })
       model: settings.models.image,
       credits: settings.limits.image_cost,
     });
-    await supabaseAdmin
-      .from("profiles")
-      .update({ credits: Math.max(0, (profile?.credits ?? 0) - settings.limits.image_cost) })
-      .eq("id", context.userId);
+
+    const { error: spendError } = await context.supabase.rpc("spend_credits", {
+      p_amount: settings.limits.image_cost,
+      p_reason: "image_generation",
+      p_metadata: { project_id: data.projectId ?? null, kind: data.kind },
+    });
+    if (spendError) throw new Error(spendError.message);
 
     return asset;
   });

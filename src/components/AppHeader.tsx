@@ -1,10 +1,20 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { Terminal, LogOut } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Terminal, LogOut, Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { getCreditOverview } from "@/lib/payments.functions";
 
 export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
   const router = useRouter();
+  const fetchCredits = useServerFn(getCreditOverview);
+  const credits = useQuery({
+    queryKey: ["credit-overview"],
+    queryFn: () => fetchCredits(),
+    retry: false,
+    staleTime: 30_000,
+  });
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -29,6 +39,13 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
             Projects
           </Link>
           <Link
+            to="/payments"
+            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
+          >
+            Credits
+          </Link>
+          <Link
             to="/settings"
             className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
@@ -46,10 +63,22 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           )}
         </nav>
       </div>
-      <Button variant="ghost" size="sm" onClick={signOut}>
-        <LogOut className="size-4" />
-        Sign out
-      </Button>
+      <div className="flex items-center gap-2">
+        <Link to="/payments" aria-label="Credit balance and top up">
+          <span className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
+            <Coins className="size-3.5" aria-hidden="true" />
+            {credits.isPending
+              ? "…"
+              : credits.isError
+                ? "—"
+                : `${credits.data?.wallet.balance ?? 0} credits`}
+          </span>
+        </Link>
+        <Button variant="ghost" size="sm" onClick={signOut}>
+          <LogOut className="size-4" />
+          Sign out
+        </Button>
+      </div>
     </header>
   );
 }

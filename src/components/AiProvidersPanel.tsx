@@ -67,6 +67,15 @@ export function AiProvidersPanel() {
       </p>
 
       <div className="mt-4 space-y-2">
+        {providers.isPending && (
+          <p className="text-sm text-muted-foreground">Loading providers…</p>
+        )}
+        {providers.isError && (
+          <p className="text-sm text-destructive">
+            Could not load providers:{" "}
+            {providers.error instanceof Error ? providers.error.message : "unknown error"}
+          </p>
+        )}
         {(providers.data ?? []).map((p) => (
           <div
             key={p.id}
@@ -103,9 +112,16 @@ export function AiProvidersPanel() {
                 size="sm"
                 variant="ghost"
                 onClick={async () => {
-                  await remove({ data: { id: p.id } });
-                  await qc.invalidateQueries({ queryKey: ["ai-providers"] });
-                  await qc.invalidateQueries({ queryKey: ["chat-models"] });
+                  try {
+                    await remove({ data: { id: p.id } });
+                    toast.success("Provider removed.");
+                    await qc.invalidateQueries({ queryKey: ["ai-providers"] });
+                    await qc.invalidateQueries({ queryKey: ["chat-models"] });
+                  } catch (error) {
+                    toast.error(
+                      error instanceof Error ? error.message : "Could not remove provider",
+                    );
+                  }
                 }}
               >
                 <Trash2 className="size-4" />
@@ -113,7 +129,7 @@ export function AiProvidersPanel() {
             </div>
           </div>
         ))}
-        {(providers.data ?? []).length === 0 && (
+        {!providers.isPending && !providers.isError && (providers.data ?? []).length === 0 && (
           <p className="text-sm text-muted-foreground">No custom providers yet.</p>
         )}
       </div>

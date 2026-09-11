@@ -56,12 +56,21 @@ export function ChatPanel({
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
         <Sparkles className="size-4 text-primary" />
         <span className="text-sm font-medium">AI Chat</span>
+        <label htmlFor="chat-model-select" className="sr-only">
+          AI model
+        </label>
         <select
-          aria-label="AI model"
+          id="chat-model-select"
           value={modelId}
           onChange={(e) => setModelId(e.target.value)}
-          className="ml-auto max-w-[55%] truncate rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground"
+          disabled={models.isPending || (models.data?.options ?? []).length === 0}
+          className="ml-auto max-w-[55%] truncate rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground disabled:opacity-60"
         >
+          {(models.data?.options ?? []).length === 0 && (
+            <option value="">
+              {models.isError ? "Models unavailable" : "No AI provider configured"}
+            </option>
+          )}
           {(models.data?.options ?? []).map((o) => (
             <option key={o.id} value={o.id}>
               {o.group} — {o.label}
@@ -69,6 +78,13 @@ export function ChatPanel({
           ))}
         </select>
       </div>
+
+      {models.isError && (
+        <div className="border-b border-border bg-destructive/10 px-4 py-2 text-xs text-destructive">
+          Could not load AI models. Check that an OpenAI or Google Gemini API key is saved in the
+          admin console.
+        </div>
+      )}
 
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.length === 0 && (
@@ -103,6 +119,7 @@ export function ChatPanel({
             <button
               key={kind}
               type="button"
+              aria-pressed={imageMode === kind}
               onClick={() => setImageMode(imageMode === kind ? null : kind)}
               className={
                 imageMode === kind
@@ -110,13 +127,17 @@ export function ChatPanel({
                   : "flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
               }
             >
-              <ImageIcon className="size-3" />
+              <ImageIcon className="size-3" aria-hidden="true" />
               {kind}
             </button>
           ))}
         </div>
         <div className="flex items-end gap-2">
+          <label htmlFor="chat-prompt" className="sr-only">
+            {imageMode ? `Describe the ${imageMode} to generate` : "Message the AI"}
+          </label>
           <Textarea
+            id="chat-prompt"
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {
@@ -131,8 +152,8 @@ export function ChatPanel({
             }
             className="min-h-[60px] resize-none bg-background"
           />
-          <Button size="icon" onClick={submit} disabled={busy}>
-            <Send className="size-4" />
+          <Button size="icon" onClick={submit} disabled={busy} aria-label="Send message">
+            <Send className="size-4" aria-hidden="true" />
           </Button>
         </div>
       </div>

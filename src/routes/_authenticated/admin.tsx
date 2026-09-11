@@ -15,10 +15,14 @@ import {
   Search,
   RefreshCw,
   ShieldCheck,
+  KeyRound,
+  CheckCircle2,
+  Database,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
 import { AiProvidersPanel } from "@/components/AiProvidersPanel";
+import { DataPanel } from "@/components/DataPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +35,8 @@ import {
   getAdminOverview,
   updatePlatformSetting,
   setCustomerCredits,
+  saveAiKey,
+  getAiKeyStatus,
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -153,7 +159,7 @@ function AdminPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Admin console</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Manage AI providers, customers, credits and platform features.
+              Manage AI keys, providers, customers, credits and platform features.
             </p>
           </div>
           <Button
@@ -201,6 +207,9 @@ function AdminPage() {
             <TabsTrigger value="overview" className="gap-1.5">
               <LayoutDashboard className="size-4" /> Overview
             </TabsTrigger>
+            <TabsTrigger value="keys" className="gap-1.5">
+              <KeyRound className="size-4" /> API keys
+            </TabsTrigger>
             <TabsTrigger value="providers" className="gap-1.5">
               <Sparkles className="size-4" /> AI providers
             </TabsTrigger>
@@ -209,6 +218,9 @@ function AdminPage() {
             </TabsTrigger>
             <TabsTrigger value="usage" className="gap-1.5">
               <Activity className="size-4" /> Usage
+            </TabsTrigger>
+            <TabsTrigger value="data" className="gap-1.5">
+              <Database className="size-4" /> Data
             </TabsTrigger>
             <TabsTrigger value="settings" className="gap-1.5">
               <Settings2 className="size-4" /> Settings
@@ -252,6 +264,10 @@ function AdminPage() {
                 </ul>
               )}
             </Section>
+          </TabsContent>
+
+          <TabsContent value="keys" className="mt-5">
+            <AiKeysPanel />
           </TabsContent>
 
           <TabsContent value="providers" className="mt-5">
@@ -340,10 +356,14 @@ function AdminPage() {
             </Section>
           </TabsContent>
 
+          <TabsContent value="data" className="mt-5">
+            <DataPanel />
+          </TabsContent>
+
           <TabsContent value="settings" className="mt-5 space-y-5">
             <Section
               title="Default AI models"
-              description="Used when a customer does not pick a specific model. Requests run through the built-in AI gateway — no API key required."
+              description="Used when a customer does not pick a specific model. Requests use the API keys saved in the API keys tab."
             >
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
@@ -400,6 +420,125 @@ function AdminPage() {
         </Tabs>
       </main>
     </div>
+  );
+}
+
+type ProviderKeyStatus = {
+  provider: "openai" | "google";
+  label: string;
+  configured: boolean;
+  updatedAt: string | null;
+};
+
+function AiKeysPanel() {
+  const qc = useQueryClient();
+  const fetchStatus = useServerFn(getAiKeyStatus);
+  const saveKey = useServerFn(saveAiKey);
+
+  const status = useQuery({
+    queryKey: ["ai-key-status"],
+    queryFn: () => fetchStatus(),
+    retry: false,
+  });
+
+  const [values, setValues] = useState<Record<"openai" | "google", string>>({
+    openai: "",
+    google: "",
+  });
+  const [savingProvider, setSavingProvider] = useState<"openai" | "google" | null>(null);
+
+  const rows: ProviderKeyStatus[] = status.data ?? [
+    { provider: "openai", label: "OpenAI", configured: false, updatedAt: null },
+    { provider: "google", label: "Google Gemini", configured: false, updatedAt: null },
+  ];
+
+  async function submit(provider: "openai" | "google") {
+    const apiKey = values[provider].trim();
+    if (!apiKey) {
+      toast.error("Enter an API key before saving.");
+      return;
+    }
+    setSavingProvider(provider);
+    try {
+      await saveKey({ data: { provider, apiKey } });
+      toast.success("API key saved server-side. It is never sent to the browser again.");
+      setValues((prev) => ({ ...prev, [provider]: "" }));
+      await qc.invalidateQueries({ queryKey: ["ai-key-status"] });
+      await qc.invalidateQueries({ queryKey: ["chat-models"] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save the API key");
+    } finally {
+      setSavingProvider(null);
+    }
+  }
+
+  return (
+    <Section
+      title="AI provider API keys"
+      description="Keys are stored server-side only and are never returned to the browser. Chat and image generation use these keys; without them the workspace shows a clear setup error instead of placeholder output."
+    >
+      {status.isPending ? (
+        <div className="space-y-3">
+          {[0, 1].map((index) => (
+            <Skeleton key={index} className="h-24 w-full" />
+          ))}
+        </div>
+      ) : status.isError ? (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          Could not load API key status:{" "}
+          {status.error instanceof Error ? status.error.message : "unknown error"}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {rows.map((row) => (
+            <div key={row.provider} className="rounded-lg border border-border p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{row.label}</span>
+                  {row.configured ? (
+                    <Badge variant="default" className="gap-1">
+                      <CheckCircle2 className="size-3" /> Connected
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">Not configured</Badge>
+                  )}
+                </div>
+                {row.updatedAt ? (
+                  <span className="text-xs text-muted-foreground">
+                    Updated {new Date(row.updatedAt).toLocaleString()}
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="flex-1 space-y-1.5">
+                  <Label htmlFor={`key-${row.provider}`}>
+                    {row.configured ? "Replace API key" : "API key"}
+                  </Label>
+                  <Input
+                    id={`key-${row.provider}`}
+                    type="password"
+                    autoComplete="off"
+                    placeholder={row.configured ? "••••••••  (leave blank to keep)" : "Paste the key"}
+                    value={values[row.provider]}
+                    onChange={(e) =>
+                      setValues((prev) => ({ ...prev, [row.provider]: e.target.value }))
+                    }
+                  />
+                </div>
+                <Button
+                  onClick={() => submit(row.provider)}
+                  disabled={savingProvider === row.provider}
+                >
+                  <Save className="size-4" />
+                  {savingProvider === row.provider ? "Saving…" : "Save key"}
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Section>
   );
 }
 
