@@ -16,6 +16,7 @@ import {
   Layers,
   Rocket,
   Wand2,
+  Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -126,6 +127,85 @@ function Reveal({
   );
 }
 
+function Feature({
+  icon,
+  title,
+  body,
+}: {
+  icon: ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <article className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5">
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_10%,transparent)] opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="relative">
+        <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border bg-surface shadow-sm transition-colors duration-300 group-hover:border-primary/40 group-hover:bg-primary/5">
+          {icon}
+        </span>
+        <h3 className="mt-4 text-base font-semibold tracking-tight">{title}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
+      </div>
+    </article>
+  );
+}
+
+function Step({ n, title, body }: { n: number; title: string; body: string }) {
+  return (
+    <li className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5">
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <span className="inline-flex size-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary ring-1 ring-inset ring-primary/20">
+        {n}
+      </span>
+      <h3 className="mt-4 text-base font-semibold tracking-tight">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
+    </li>
+  );
+}
+
+function ShowcaseCard({
+  label,
+  title,
+  accent,
+}: {
+  label: string;
+  title: string;
+  accent: string;
+}) {
+  return (
+    <article className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5">
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div
+        className={`relative h-32 overflow-hidden bg-gradient-to-br ${accent} to-transparent`}
+      >
+        <div className="absolute inset-0 grid-noise opacity-60" />
+        <div className="absolute inset-x-4 bottom-4 space-y-1.5">
+          <div className="h-2.5 w-20 rounded-full bg-foreground/20" />
+          <div className="h-2.5 w-28 rounded-full bg-foreground/10" />
+        </div>
+      </div>
+      <div className="p-5">
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+          {label}
+        </span>
+        <h3 className="mt-2 text-base font-semibold tracking-tight">{title}</h3>
+      </div>
+    </article>
+  );
+}
+
+function Point({ icon, text }: { icon: ReactNode; text: string }) {
+  return (
+    <div className="flex items-start gap-3 rounded-xl border border-border bg-card/60 p-4 transition-colors duration-300 hover:border-primary/40">
+      <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-inset ring-primary/20">
+        {icon}
+      </span>
+      <p className="text-sm leading-relaxed text-muted-foreground">{text}</p>
+    </div>
+  );
+}
+
 function Landing() {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState("");
@@ -141,7 +221,10 @@ function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
-          <Link to="/" className="flex items-center gap-2">
+          <Link
+            to="/"
+            className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
             <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
               <Terminal className="size-4" />
             </span>
@@ -150,25 +233,25 @@ function Landing() {
           <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
             <a
               href="#how"
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               How it works
             </a>
             <a
               href="#features"
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Features
             </a>
             <a
               href="#showcase"
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Showcase
             </a>
             <a
               href="#faq"
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               FAQ
             </a>
@@ -192,12 +275,12 @@ function Landing() {
           <div className="pointer-events-none absolute -right-24 top-40 size-72 rounded-full bg-[color-mix(in_oklch,var(--color-highlight)_12%,transparent)] blur-3xl" />
           <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6 md:py-28">
             <Reveal>
-              <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+              <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur">
                 <Github className="size-3" /> Connect your own GitHub account — no setup needed
               </p>
             </Reveal>
             <Reveal delay={60}>
-              <h1 className="mt-6 text-balance text-4xl font-semibold tracking-tight sm:text-5xl md:text-7xl">
+              <h1 className="mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl md:text-7xl">
                 Build an app by simply <span className="text-gradient">describing it</span>
               </h1>
             </Reveal>
@@ -210,7 +293,7 @@ function Landing() {
 
             {/* Prompt box */}
             <Reveal delay={180}>
-              <div className="glow-primary mx-auto mt-9 max-w-2xl rounded-2xl border border-border bg-card p-2 text-left shadow-lg transition-colors focus-within:border-primary/50">
+              <div className="glow-primary mx-auto mt-9 max-w-2xl rounded-2xl border border-border bg-card p-2 text-left shadow-lg transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-xl focus-within:shadow-primary/10">
                 <label htmlFor="idea" className="sr-only">
                   Describe what you want to build
                 </label>
@@ -223,12 +306,21 @@ function Landing() {
                   }}
                   rows={3}
                   placeholder="Ask Forge to create a landing page for my bakery…"
-                  className="w-full resize-none rounded-xl bg-transparent px-3 py-3 text-sm outline-none placeholder:text-muted-foreground"
+                  className="w-full resize-none rounded-xl bg-transparent px-3 py-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:outline-none"
                 />
                 <div className="flex items-center justify-between gap-2 px-1 pb-1">
-                  <span className="hidden text-xs text-muted-foreground sm:block">
-                    Free credits included · no credit card
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label="Dictate your idea with voice"
+                      className="inline-flex size-8 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <Mic className="size-4" />
+                    </button>
+                    <span className="hidden text-xs text-muted-foreground sm:block">
+                      Free credits included · no credit card
+                    </span>
+                  </div>
                   <Button onClick={start} className="ml-auto">
                     <Sparkles className="size-4" /> Start building
                     <ArrowRight className="size-4" />
@@ -244,7 +336,7 @@ function Landing() {
                     key={idea}
                     type="button"
                     onClick={() => setPrompt(idea)}
-                    className="rounded-full border border-border bg-card/60 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
+                    className="rounded-full border border-border bg-card/60 px-3 py-1.5 text-xs text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {idea}
                   </button>
@@ -566,135 +658,63 @@ function Landing() {
             </Reveal>
             <Reveal delay={60}>
               <p className="mt-3 text-muted-foreground">
-                Create a free account and see your idea running in under a minute.
+                Start with a sentence. Forge handles the files, the preview and the commit.
               </p>
             </Reveal>
             <Reveal delay={120}>
-              <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Button asChild size="lg">
                   <Link to="/auth">
-                    Start building free <ArrowRight className="size-4" />
+                    <Sparkles className="size-4" /> Start building free
+                    <ArrowRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <Link to="/auth">Sign in</Link>
+                  <a href="#how">See how it works</a>
                 </Button>
               </div>
-            </Reveal>
-            <Reveal delay={180}>
-              <p className="mt-4 text-xs text-muted-foreground">
-                Free starter credits · no credit card required
-              </p>
             </Reveal>
           </div>
         </section>
       </main>
 
       <footer className="border-t border-border bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-                <Terminal className="size-4" />
-              </span>
-              <span className="text-base font-semibold tracking-tight">Forge</span>
-            </div>
-            <nav
-              aria-label="Footer"
-              className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground"
-            >
-              <a href="#features" className="transition-colors hover:text-foreground">
-                Features
-              </a>
-              <a href="#how" className="transition-colors hover:text-foreground">
-                How it works
-              </a>
-              <a href="#showcase" className="transition-colors hover:text-foreground">
-                Showcase
-              </a>
-              <a href="#faq" className="transition-colors hover:text-foreground">
-                FAQ
-              </a>
-            </nav>
-            <div className="flex items-center gap-3">
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/auth">Sign in</Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link to="/auth">Get started</Link>
-              </Button>
-            </div>
-          </div>
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-sm text-muted-foreground">
-            <span>© {new Date().getFullYear()} Forge — AI development workspace.</span>
-            <span className="inline-flex items-center gap-2">
-              <ShieldCheck className="size-4 text-primary" />
-              GitHub access is encrypted and reversible any time.
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Terminal className="size-3.5" />
             </span>
+            <span className="font-semibold tracking-tight text-foreground">Forge</span>
           </div>
+          <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="#features"
+              className="rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Features
+            </a>
+            <a
+              href="#how"
+              className="rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              How it works
+            </a>
+            <a
+              href="#showcase"
+              className="rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Showcase
+            </a>
+            <a
+              href="#faq"
+              className="rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              FAQ
+            </a>
+          </nav>
+          <p className="text-xs">© {new Date().getFullYear()} Forge. Preview only — you own the code.</p>
         </div>
       </footer>
     </div>
-  );
-}
-
-function Step({ n, title, body }: { n: number; title: string; body: string }) {
-  return (
-    <li className="h-full rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg">
-      <span className="flex size-9 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
-        {n}
-      </span>
-      <h3 className="mt-4 text-lg font-medium tracking-tight">{title}</h3>
-      <p className="mt-2 text-sm text-muted-foreground">{body}</p>
-    </li>
-  );
-}
-
-function Point({ icon, text }: { icon: ReactNode; text: string }) {
-  return (
-    <div className="flex items-start gap-2.5 text-sm text-muted-foreground">
-      <span className="mt-0.5">{icon}</span>
-      {text}
-    </div>
-  );
-}
-
-function Feature({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
-  return (
-    <article className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg">
-      <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-      <span className="icon-tile flex size-10 items-center justify-center rounded-xl transition-colors duration-200">
-        {icon}
-      </span>
-      <h3 className="mt-4 font-medium tracking-tight">{title}</h3>
-      <p className="mt-2 text-sm text-muted-foreground">{body}</p>
-    </article>
-  );
-}
-
-function ShowcaseCard({
-  label,
-  title,
-  accent,
-}: {
-  label: string;
-  title: string;
-  accent: string;
-}) {
-  return (
-    <article className="group h-full overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg">
-      <div className={`relative h-32 overflow-hidden bg-gradient-to-br ${accent} to-transparent`}>
-        <div className="absolute inset-4 rounded-lg border border-border/60 bg-background/40 backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.02]" />
-        <div className="absolute inset-x-6 top-8 space-y-2">
-          <div className="h-3 w-20 rounded-full bg-muted-foreground/30" />
-          <div className="h-3 w-28 rounded-full bg-muted-foreground/20" />
-          <div className="mt-3 h-6 w-16 rounded-md bg-primary/70" />
-        </div>
-      </div>
-      <div className="p-4">
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-        <h3 className="mt-1 text-sm font-medium tracking-tight">{title}</h3>
-      </div>
-    </article>
   );
 }

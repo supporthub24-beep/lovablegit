@@ -24,30 +24,33 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4">
       <div className="flex items-center gap-6">
-        <Link to="/dashboard" className="flex items-center gap-2">
+        <Link
+          to="/dashboard"
+          className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        >
           <span className="flex size-7 items-center justify-center rounded bg-primary text-primary-foreground">
-            <Terminal className="size-4" />
+            <Terminal className="size-4" aria-hidden="true" />
           </span>
           <span className="font-semibold tracking-tight">Forge</span>
         </Link>
-        <nav className="flex items-center gap-1 text-sm">
+        <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
           <Link
             to="/dashboard"
-            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
           >
             Projects
           </Link>
           <Link
             to="/payments"
-            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
           >
             Credits
           </Link>
           <Link
             to="/settings"
-            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
           >
             Settings
@@ -55,7 +58,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           {isAdmin && (
             <Link
               to="/admin"
-              className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
             >
               Admin
@@ -64,8 +67,12 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
         </nav>
       </div>
       <div className="flex items-center gap-2">
-        <Link to="/payments" aria-label="Credit balance and top up">
-          <span className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
+        <Link
+          to="/payments"
+          aria-label="Credit balance and top up"
+          className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        >
+          <span className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground">
             <Coins className="size-3.5" aria-hidden="true" />
             {credits.isPending
               ? "…"
@@ -75,7 +82,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           </span>
         </Link>
         <Button variant="ghost" size="sm" onClick={signOut}>
-          <LogOut className="size-4" />
+          <LogOut className="size-4" aria-hidden="true" />
           Sign out
         </Button>
       </div>
