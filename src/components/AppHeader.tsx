@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LovableGitLogo } from "@/components/LovableGitLogo";
 import { AdminLogo } from "@/components/AdminLogo";
+import { ProjectDrawer } from "@/components/ProjectDrawer";
 import { getCreditOverview } from "@/lib/payments.functions";
 
 export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
@@ -25,7 +26,8 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4">
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 sm:gap-6">
+        <ProjectDrawer />
         <Link
           to="/dashboard"
           aria-label="lovablegit home"

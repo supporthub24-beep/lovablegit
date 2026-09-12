@@ -275,34 +275,30 @@ function Landing() {
 
       <main>
         {/* Hero */}
-        <section className="grid-noise relative overflow-hidden border-b border-border">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--color-primary)_18%,transparent),transparent)]" />
-          <div className="pointer-events-none absolute -left-24 top-24 size-72 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_14%,transparent)] blur-3xl" />
-          <div className="pointer-events-none absolute -right-24 top-40 size-72 rounded-full bg-[color-mix(in_oklch,var(--color-highlight)_12%,transparent)] blur-3xl" />
-          <div className="relative mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20 md:py-28">
+        <section className="relative overflow-hidden border-b border-border bg-background">
+          {/* Lovable-style gradient wash */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%]">
+            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_120%,#ff7a18_0%,#ff2d7a_38%,#a855f7_62%,#2563eb_82%,transparent_100%)] opacity-90 blur-[2px]" />
+            <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent" />
+          </div>
+
+          <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 sm:py-28">
             <Reveal>
-              <LovableGitLogo className="mx-auto h-10 w-auto text-foreground sm:h-12" />
-            </Reveal>
-            <Reveal delay={40}>
-              <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur">
-                <Github className="size-3" /> Connect your own GitHub account — no setup needed
-              </p>
-            </Reveal>
-            <Reveal delay={60}>
-              <h1 className="mx-auto mt-7 max-w-4xl text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                Build an app by simply <span className="text-gradient">describing it</span>
-              </h1>
-            </Reveal>
-            <Reveal delay={120}>
-              <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Chat with AI, watch the code appear, and see a live preview instantly. When you like
-                it, push straight to your GitHub repository.
+              <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs text-foreground shadow-sm backdrop-blur">
+                <Github className="size-3.5" /> Connect all your tools
+                <ArrowRight className="size-3.5" />
               </p>
             </Reveal>
 
+            <Reveal delay={60}>
+              <h1 className="mx-auto mt-8 max-w-2xl text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
+                What&apos;s on your mind?
+              </h1>
+            </Reveal>
+
             {/* Prompt box */}
-            <Reveal delay={180}>
-              <div className="glow-primary mx-auto mt-10 max-w-2xl rounded-2xl border border-border bg-card p-2 text-left shadow-lg transition-all duration-300 focus-within:border-primary/50 focus-within:shadow-xl focus-within:shadow-primary/10">
+            <Reveal delay={140}>
+              <div className="mx-auto mt-8 max-w-2xl rounded-3xl border border-border bg-card/90 p-3 text-left shadow-2xl backdrop-blur transition-all duration-300 focus-within:border-primary/50">
                 <label htmlFor="idea" className="sr-only">
                   Describe what you want to build
                 </label>
@@ -313,39 +309,43 @@ function Landing() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) start();
                   }}
-                  rows={3}
-                  placeholder="Ask lovablegit to create a landing page for my bakery…"
-                  className="w-full resize-none rounded-xl bg-transparent px-3 py-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:outline-none"
+                  rows={2}
+                  placeholder="Create a landing page about…"
+                  className="w-full resize-none rounded-2xl bg-transparent px-3 py-3 text-base outline-none placeholder:text-muted-foreground focus-visible:outline-none"
                 />
                 <div className="flex items-center justify-between gap-2 px-1 pb-1">
-                  <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label="Add attachment"
+                    className="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <Wand2 className="size-4" />
+                  </button>
+                  <div className="flex items-center gap-1">
                     <button
                       type="button"
                       aria-label="Dictate your idea with voice"
-                      className="inline-flex size-8 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <Mic className="size-4" />
                     </button>
-                    <span className="hidden text-xs text-muted-foreground sm:block">
-                      Free credits included · no credit card
-                    </span>
+                    <Button onClick={start} size="sm" className="rounded-full">
+                      <Sparkles className="size-4" /> Start
+                      <ArrowRight className="size-4" />
+                    </Button>
                   </div>
-                  <Button onClick={start} className="ml-auto">
-                    <Sparkles className="size-4" /> Start building
-                    <ArrowRight className="size-4" />
-                  </Button>
                 </div>
               </div>
             </Reveal>
 
-            <Reveal delay={240}>
+            <Reveal delay={200}>
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {IDEAS.map((idea) => (
                   <button
                     key={idea}
                     type="button"
                     onClick={() => setPrompt(idea)}
-                    className="rounded-full border border-border bg-card/60 px-3 py-1.5 text-xs text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="rounded-full border border-border bg-card/70 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {idea}
                   </button>
@@ -353,47 +353,10 @@ function Landing() {
               </div>
             </Reveal>
 
-            {/* Hero preview mock */}
-            <Reveal delay={300}>
-              <div className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl sm:mt-16">
-                <div className="flex items-center gap-2 border-b border-border bg-surface px-4 py-2.5">
-                  <span className="size-2.5 rounded-full bg-destructive/70" />
-                  <span className="size-2.5 rounded-full bg-highlight/70" />
-                  <span className="size-2.5 rounded-full bg-primary/60" />
-                  <span className="ml-3 truncate rounded-md bg-background/60 px-2 py-1 text-xs text-muted-foreground">
-                    preview.lovablegit.app
-                  </span>
-                </div>
-                <div className="grid gap-4 p-5 text-left sm:grid-cols-[1.1fr_1fr]">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <MessageSquareCode className="size-4 text-primary" />
-                      AI chat
-                    </div>
-                    <div className="rounded-lg border border-border bg-background/60 p-3 text-xs text-muted-foreground">
-                      Create a hero with a headline, subtitle and a primary call-to-action button.
-                    </div>
-                    <div className="rounded-lg border border-primary/40 bg-primary/5 p-3 text-xs text-foreground">
-                      Done — I added{" "}
-                      <span className="font-medium text-primary">Hero.tsx</span> and wired the CTA
-                      to your router.
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-border bg-background/60 p-4">
-                    <div className="h-3 w-24 rounded-full bg-muted-foreground/30" />
-                    <div className="mt-2 h-3 w-40 rounded-full bg-muted-foreground/20" />
-                    <div className="mt-4 h-8 w-28 rounded-lg bg-primary/80" />
-                    <div className="mt-6 grid grid-cols-3 gap-2">
-                      <div className="h-12 rounded-md bg-muted-foreground/15" />
-                      <div className="h-12 rounded-md bg-muted-foreground/15" />
-                      <div className="h-12 rounded-md bg-muted-foreground/15" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
+            <div className="h-40 sm:h-56" />
           </div>
         </section>
+
 
         {/* Trusted-by marquee */}
         <section aria-label="Trusted by" className="border-b border-border bg-surface">
