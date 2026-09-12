@@ -93,3 +93,15 @@ export const getMyAccount = createServerFn({ method: "GET" })
       usage: usage.data ?? [],
     };
   });
+
+export const getConnectedProjects = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("projects")
+      .select("id, name, repo_full_name, repo_branch, updated_at, status")
+      .eq("user_id", context.userId)
+      .order("updated_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data;
+  });
