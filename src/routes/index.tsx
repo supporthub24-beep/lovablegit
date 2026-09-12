@@ -141,15 +141,17 @@ function Feature({
   body: string;
 }) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 sm:p-7">
       <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_10%,transparent)] opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
       <div className="relative flex flex-1 flex-col">
         <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border bg-surface shadow-sm transition-colors duration-300 group-hover:border-primary/40 group-hover:bg-primary/5">
           {icon}
         </span>
-        <h3 className="mt-5 text-base font-semibold tracking-tight text-balance">{title}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground text-pretty">{body}</p>
+        <h3 className="mt-5 text-base font-semibold tracking-tight text-balance sm:text-lg">
+          {title}
+        </h3>
+        <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground text-pretty">{body}</p>
       </div>
     </article>
   );
@@ -157,13 +159,15 @@ function Feature({
 
 function Step({ n, title, body }: { n: number; title: string; body: string }) {
   return (
-    <li className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5">
+    <li className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 sm:p-7">
       <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <span className="inline-flex size-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary ring-1 ring-inset ring-primary/20">
         {n}
       </span>
-      <h3 className="mt-5 text-base font-semibold tracking-tight text-balance">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground text-pretty">{body}</p>
+      <h3 className="mt-5 text-base font-semibold tracking-tight text-balance sm:text-lg">
+        {title}
+      </h3>
+      <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground text-pretty">{body}</p>
     </li>
   );
 }
@@ -189,7 +193,7 @@ function ShowcaseCard({
           <div className="h-2.5 w-28 rounded-full bg-foreground/10" />
         </div>
       </div>
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
           {label}
         </span>
@@ -275,7 +279,7 @@ function Landing() {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--color-primary)_18%,transparent),transparent)]" />
           <div className="pointer-events-none absolute -left-24 top-24 size-72 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_14%,transparent)] blur-3xl" />
           <div className="pointer-events-none absolute -right-24 top-40 size-72 rounded-full bg-[color-mix(in_oklch,var(--color-highlight)_12%,transparent)] blur-3xl" />
-          <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6 md:py-28">
+          <div className="relative mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20 md:py-28">
             <Reveal>
               <LovableGitLogo className="mx-auto h-10 w-auto text-foreground sm:h-12" />
             </Reveal>
@@ -351,7 +355,7 @@ function Landing() {
 
             {/* Hero preview mock */}
             <Reveal delay={300}>
-              <div className="mx-auto mt-16 max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+              <div className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl sm:mt-16">
                 <div className="flex items-center gap-2 border-b border-border bg-surface px-4 py-2.5">
                   <span className="size-2.5 rounded-full bg-destructive/70" />
                   <span className="size-2.5 rounded-full bg-highlight/70" />
@@ -415,7 +419,7 @@ function Landing() {
 
         {/* Capabilities */}
         <section id="features" className="border-b border-border">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <Reveal className="mx-auto max-w-2xl text-center">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Layers className="size-3" /> Capabilities
@@ -500,7 +504,7 @@ function Landing() {
 
         {/* How it works */}
         <section id="how" className="border-b border-border">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <Reveal className="mx-auto max-w-2xl text-center">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Rocket className="size-3" /> How it works
@@ -531,7 +535,7 @@ function Landing() {
                 <Step
                   n={3}
                   title="Push to GitHub"
-                  body="Connect your account and commit the generated project straight to a repository you own."
+                  body="Connect your account and commit the generated project straight into a repository you own."
                 />
               </Reveal>
             </ol>
@@ -540,7 +544,7 @@ function Landing() {
 
         {/* Showcase */}
         <section id="showcase" className="border-b border-border bg-surface">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
             <Reveal className="mx-auto max-w-2xl text-center">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Wand2 className="size-3" /> Showcase
@@ -549,28 +553,28 @@ function Landing() {
                 Made with a single prompt
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                A few of the shapes people build first — landing pages, dashboards and storefronts.
+                Real projects generated from chat, then refined with follow-up messages.
               </p>
             </Reveal>
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               <Reveal delay={0} className="h-full">
                 <ShowcaseCard
-                  label="Landing"
-                  title="Coffee shop homepage"
+                  label="Landing page"
+                  title="Coffee shop with online ordering"
                   accent="from-primary/25"
                 />
               </Reveal>
               <Reveal delay={60} className="h-full">
                 <ShowcaseCard
                   label="Dashboard"
-                  title="Analytics with charts"
+                  title="Analytics with live charts"
                   accent="from-highlight/25"
                 />
               </Reveal>
               <Reveal delay={120} className="h-full">
                 <ShowcaseCard
-                  label="Storefront"
-                  title="Product catalog"
+                  label="Portfolio"
+                  title="Personal site with dark mode"
                   accent="from-primary/20"
                 />
               </Reveal>
@@ -580,41 +584,41 @@ function Landing() {
 
         {/* Why lovablegit */}
         <section className="border-b border-border">
-          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center">
             <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
-                <ShieldCheck className="size-3" /> Built for real projects
+                <ShieldCheck className="size-3" /> Built for real work
               </span>
               <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
                 Your code stays yours
               </h2>
-              <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-                lovablegit never locks you in. Every project lives in a GitHub repository you own,
-                with a full commit history you can clone, review and deploy anywhere.
+              <p className="mt-3 text-pretty text-muted-foreground">
+                Everything lovablegit generates lands in your own GitHub repository. No lock-in, no
+                hidden hosting, no surprises.
               </p>
               <ul className="mt-8 space-y-3">
                 <li className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-inset ring-primary/20">
-                    <Check className="size-3" />
+                  <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-1 ring-inset ring-primary/20">
+                    <Check className="size-3 text-primary" />
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    Standard React, TypeScript and Tailwind output — no proprietary runtime.
+                    Commit history you control, on your own account.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-inset ring-primary/20">
-                    <Check className="size-3" />
+                  <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-1 ring-inset ring-primary/20">
+                    <Check className="size-3 text-primary" />
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    Bring your own Supabase project and query real data from the preview.
+                    Bring your own Supabase project for real data.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-inset ring-primary/20">
-                    <Check className="size-3" />
+                  <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-1 ring-inset ring-primary/20">
+                    <Check className="size-3 text-primary" />
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    Roll back any AI edit with one click — every change is snapshotted.
+                    Roll back any AI edit with a single click.
                   </span>
                 </li>
               </ul>
@@ -623,19 +627,19 @@ function Landing() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <Point
                   icon={<Terminal className="size-4 text-primary" />}
-                  text="Read and edit the generated source directly in the code tab."
+                  text="Read and edit the generated code directly in the workspace."
                 />
                 <Point
                   icon={<GitBranch className="size-4 text-primary" />}
-                  text="Commit messages are written for you, so history stays readable."
-                />
-                <Point
-                  icon={<History className="size-4 text-primary" />}
-                  text="Compare versions side by side before you restore an older one."
+                  text="Branch, commit and push without leaving the chat."
                 />
                 <Point
                   icon={<Database className="size-4 text-primary" />}
-                  text="Wire tables and queries without leaving the chat."
+                  text="Query real data from your own Supabase project."
+                />
+                <Point
+                  icon={<History className="size-4 text-primary" />}
+                  text="Every version is snapshotted and restorable."
                 />
               </div>
             </Reveal>
@@ -644,50 +648,43 @@ function Landing() {
 
         {/* FAQ */}
         <section id="faq" className="border-b border-border bg-surface">
-          <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20">
             <Reveal className="text-center">
               <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
                 Frequently asked questions
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                Everything you need to know before your first prompt.
+                Everything you need to know before you start building.
               </p>
             </Reveal>
             <Reveal delay={80}>
               <Accordion type="single" collapsible className="mt-10 w-full">
                 <AccordionItem value="github">
-                  <AccordionTrigger>Do I need my own GitHub account?</AccordionTrigger>
+                  <AccordionTrigger>Do I need a GitHub account?</AccordionTrigger>
                   <AccordionContent>
-                    Yes. lovablegit connects to your GitHub account so every project is committed to
-                    a repository you own. You can import existing files or start from scratch.
+                    Yes. lovablegit connects to your own GitHub account so every project you build
+                    lives in a repository you control.
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="stack">
-                  <AccordionTrigger>What stack does it generate?</AccordionTrigger>
+                <AccordionItem value="hosting">
+                  <AccordionTrigger>Does lovablegit host my app?</AccordionTrigger>
                   <AccordionContent>
-                    React with TypeScript and Tailwind CSS by default, or plain HTML when you ask for
-                    something simpler. The output is standard code you can run anywhere.
+                    No. The preview runs in a sandbox so you can see your changes instantly. When
+                    you are ready to ship, deploy the repository with any host you like.
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="preview">
-                  <AccordionTrigger>Is the preview hosted?</AccordionTrigger>
+                <AccordionItem value="database">
+                  <AccordionTrigger>Can I connect my own database?</AccordionTrigger>
                   <AccordionContent>
-                    No. The preview runs in a sandbox inside your browser while you work. Deploying
-                    is up to you, from the repository lovablegit commits to.
+                    Yes. Plug your own Supabase project into the preview and query real data from
+                    the generated app.
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="data">
-                  <AccordionTrigger>Can I connect a database?</AccordionTrigger>
+                <AccordionItem value="rollback">
+                  <AccordionTrigger>What if I do not like a change?</AccordionTrigger>
                   <AccordionContent>
-                    Yes. Plug your own Supabase project into the preview and the generated app can
-                    query real data during development.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="cost">
-                  <AccordionTrigger>How much does it cost to start?</AccordionTrigger>
-                  <AccordionContent>
-                    You get free credits when you sign up and no credit card is required to try your
-                    first project.
+                    Every AI edit is snapshotted. Open the version history and restore any earlier
+                    version with one click.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -696,26 +693,26 @@ function Landing() {
         </section>
 
         {/* Final CTA */}
-        <section className="grid-noise relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_100%,color-mix(in_oklch,var(--color-primary)_16%,transparent),transparent)]" />
+        <section className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_100%,color-mix(in_oklch,var(--color-primary)_16%,transparent),transparent)]" />
           <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
             <Reveal>
               <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                Start building in the next minute
+                Start building in seconds
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
-                Describe your idea, watch it come to life, and push it to GitHub when you are happy.
+                Describe your idea, watch it come to life, and push it to GitHub — all in one
+                workspace.
               </p>
-              <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Button asChild size="lg">
                   <Link to="/auth">
                     <Sparkles className="size-4" /> Get started free
+                    <ArrowRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline">
-                  <a href="#how">
-                    See how it works <ArrowRight className="size-4" />
-                  </a>
+                  <a href="#how">See how it works</a>
                 </Button>
               </div>
             </Reveal>
@@ -723,32 +720,18 @@ function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-background">
+      <footer className="border-t border-border bg-surface">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
-          <LovableGitLogo className="h-6 w-auto text-foreground" />
+          <Link
+            to="/"
+            aria-label="lovablegit home"
+            className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <LovableGitLogo className="h-6 w-auto text-foreground" />
+          </Link>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} lovablegit. Built for people who ship.
           </p>
-          <nav aria-label="Footer" className="flex items-center gap-4 text-xs">
-            <a
-              href="#features"
-              className="text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Features
-            </a>
-            <a
-              href="#faq"
-              className="text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              FAQ
-            </a>
-            <Link
-              to="/auth"
-              className="text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Sign in
-            </Link>
-          </nav>
         </div>
       </footer>
     </div>
