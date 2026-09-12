@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+import "@/styles.css";
   Outlet,
   Link,
   createRootRouteWithContext,
