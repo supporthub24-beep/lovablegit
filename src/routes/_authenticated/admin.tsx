@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
+import { AdminLogo } from "@/components/AdminLogo";
 import { AiProvidersPanel } from "@/components/AiProvidersPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -154,11 +155,14 @@ function AdminPage() {
       <AppHeader isAdmin={account.data?.isAdmin} />
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-8">
         <header className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Admin console</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage AI keys, providers, customers, credits and platform features.
-            </p>
+          <div className="flex items-center gap-3">
+            <AdminLogo showWordmark={false} label="Admin console" className="shrink-0" />
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">Admin console</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Manage AI keys, providers, customers, credits and platform features.
+              </p>
+            </div>
           </div>
           <Button
             variant="outline"

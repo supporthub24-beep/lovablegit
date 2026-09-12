@@ -5,6 +5,7 @@ import { LogOut, Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LovableGitLogo } from "@/components/LovableGitLogo";
+import { AdminLogo } from "@/components/AdminLogo";
 import { getCreditOverview } from "@/lib/payments.functions";
 
 export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
@@ -66,6 +67,15 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
         </nav>
       </div>
       <div className="flex items-center gap-2">
+        {isAdmin && (
+          <Link
+            to="/admin"
+            aria-label="Admin console"
+            className="hidden items-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface sm:inline-flex"
+          >
+            <AdminLogo showWordmark={false} label="" className="text-foreground" />
+          </Link>
+        )}
         <Link
           to="/payments"
           aria-label="Credit balance and top up"
