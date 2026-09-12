@@ -357,7 +357,6 @@ function Landing() {
           </div>
         </section>
 
-
         {/* Trusted-by marquee */}
         <section aria-label="Trusted by" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -380,6 +379,46 @@ function Landing() {
           </div>
         </section>
 
+        {/* How it works */}
+        <section id="how" className="border-b border-border">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+            <Reveal className="mx-auto max-w-2xl text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+                <Rocket className="size-3" /> How it works
+              </span>
+              <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                Three simple steps
+              </h2>
+              <p className="mt-3 text-pretty text-muted-foreground">
+                No installs, no configuration. If you can write a message, you can build an app.
+              </p>
+            </Reveal>
+            <ol className="mt-12 grid gap-5 md:grid-cols-3">
+              <Reveal delay={0} className="h-full">
+                <Step
+                  n={1}
+                  title="Connect GitHub"
+                  body="Link your GitHub account to create a new repository or import an existing project."
+                />
+              </Reveal>
+              <Reveal delay={60} className="h-full">
+                <Step
+                  n={2}
+                  title="Chat with AI"
+                  body="Describe what you want in plain language. The AI writes code, generates assets, and updates files."
+                />
+              </Reveal>
+              <Reveal delay={120} className="h-full">
+                <Step
+                  n={3}
+                  title="Preview & commit"
+                  body="See a live preview instantly. When ready, commit and push the generated code to your repository."
+                />
+              </Reveal>
+            </ol>
+          </div>
+        </section>
+
         {/* Capabilities */}
         <section id="features" className="border-b border-border">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
@@ -398,23 +437,23 @@ function Landing() {
             <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               <Reveal delay={0} className="h-full">
                 <Feature
+                  icon={<GitBranch className="size-5 text-primary" />}
+                  title="GitHub integration"
+                  body="Import existing files, let the AI edit them, and push commits back to your own account."
+                />
+              </Reveal>
+              <Reveal delay={60} className="h-full">
+                <Feature
                   icon={<MessageSquareCode className="size-5 text-primary" />}
                   title="AI chat that writes code"
                   body="Every message returns real files, versioned inside your project. Pick the AI model you prefer."
                 />
               </Reveal>
-              <Reveal delay={60} className="h-full">
+              <Reveal delay={120} className="h-full">
                 <Feature
                   icon={<MonitorPlay className="size-5 text-primary" />}
                   title="Instant live preview"
                   body="Multi-file React or plain HTML renders in a sandbox while you work. Nothing is hosted — preview only."
-                />
-              </Reveal>
-              <Reveal delay={120} className="h-full">
-                <Feature
-                  icon={<GitBranch className="size-5 text-primary" />}
-                  title="Your GitHub, your repos"
-                  body="Import existing files, let the AI edit them, and push commits back to your own account."
                 />
               </Reveal>
               <Reveal delay={0} className="h-full">
@@ -462,46 +501,6 @@ function Landing() {
                 </Reveal>
               ))}
             </dl>
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section id="how" className="border-b border-border">
-          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-            <Reveal className="mx-auto max-w-2xl text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
-                <Rocket className="size-3" /> How it works
-              </span>
-              <h2 className="mt-4 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                Three simple steps
-              </h2>
-              <p className="mt-3 text-pretty text-muted-foreground">
-                No installs, no configuration. If you can write a message, you can build an app.
-              </p>
-            </Reveal>
-            <ol className="mt-12 grid gap-5 md:grid-cols-3">
-              <Reveal delay={0} className="h-full">
-                <Step
-                  n={1}
-                  title="Describe your idea"
-                  body="Write what you want in plain language. lovablegit asks for anything it needs and starts writing code."
-                />
-              </Reveal>
-              <Reveal delay={60} className="h-full">
-                <Step
-                  n={2}
-                  title="See it live"
-                  body="A sandboxed preview updates as files are generated. Switch to the code tab any time to read it."
-                />
-              </Reveal>
-              <Reveal delay={120} className="h-full">
-                <Step
-                  n={3}
-                  title="Push to GitHub"
-                  body="Connect your account and commit the generated project straight into a repository you own."
-                />
-              </Reveal>
-            </ol>
           </div>
         </section>
 
