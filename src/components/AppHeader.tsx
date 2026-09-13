@@ -25,7 +25,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
   }
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4">
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-surface/80 px-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
       <div className="flex items-center gap-3 sm:gap-6">
         <ProjectDrawer />
         <Link
@@ -35,33 +35,33 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
         >
           <LovableGitLogo className="h-7 w-auto text-foreground" />
         </Link>
-        <nav aria-label="Primary" className="flex items-center gap-1 text-sm">
+        <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
           <Link
             to="/dashboard"
-            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
+            className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            activeProps={{ className: "rounded-md px-3 py-1.5 bg-accent text-foreground" }}
           >
             Projects
           </Link>
           <Link
             to="/payments"
-            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
+            className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            activeProps={{ className: "rounded-md px-3 py-1.5 bg-accent text-foreground" }}
           >
             Credits
           </Link>
           <Link
             to="/settings"
-            className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
+            className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            activeProps={{ className: "rounded-md px-3 py-1.5 bg-accent text-foreground" }}
           >
             Settings
           </Link>
           {isAdmin && (
             <Link
               to="/admin"
-              className="rounded px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              activeProps={{ className: "rounded px-3 py-1.5 bg-secondary text-foreground" }}
+              className="rounded-md px-3 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              activeProps={{ className: "rounded-md px-3 py-1.5 bg-accent text-foreground" }}
             >
               Admin
             </Link>
@@ -83,7 +83,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           aria-label="Credit balance and top up"
           className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
-          <span className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground">
+          <span className="flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-3 py-1 text-xs text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-foreground">
             <Coins className="size-3.5" aria-hidden="true" />
             {credits.isPending
               ? "…"
