@@ -1,10 +1,25 @@
-# GitHub ChatGenius
+# SupportHub24
 
-আমরা একটি প্রজেক্ট তৈরি করতে চাচ্ছি যেরকম প্রজেক্টটি হবে Lowable যেভাবে chatting option টি থাকে interface এবং preview option গুলো, সেরকম একটি interface থাকবে। তবে GitHub এর সাথে যেই connect করে customer রা GitHub এর সাথে connect করে সেখান থেকে chatting করতে পারবে এবং code generate করতে পারবে। Lowable যেভাবে কাজ করে সেই mechanism এ কাজ করবে, এরকম একটি project। এবং যেই preview টা দেখানো হবে সেটা যখন তারা connect করবে সেই সময়ের জন্য। এটা কিন্তু host হবে না, শুধু preview টা দেখানো হবে। এবং সেখান থেকে chatting থেকে image generate, logo এবং ইত্যাদি সবকিছু add করা যাবে। যেমন Gemini, ChatGPT API ব্যবহার করা হবে। Admin panel থেকে connect করে দেওয়া হবে এবং customer রা সেটা ব্যবহার করতে পারবে।
-
-This project was built with [Lovable](https://lovable.dev).
+SupportHub24 হলো একটি AI-powered customer support ও code workspace। Lovable-এর মতো interface-এ chat, live preview, image ও logo generation — সব একসাথে, আর GitHub connect করে customer রা নিজেদের repository থেকে সরাসরি chat করে code generate করতে পারে।
 
 **Live app**: https://lovablegit.lovable.app
+
+## Features
+
+- **Chat workspace** — Lovable-এর মতো chat interface, প্রতিটি project আলাদা workspace-এ।
+- **Live preview** — GitHub connect করার পর project-এর preview দেখা যায়। এটা host হয় না, শুধু preview।
+- **GitHub connect** — customer রা নিজের GitHub account connect করে repository থেকে chat ও code generate করতে পারে।
+- **Image ও logo generation** — chat থেকেই image, logo এবং অন্যান্য asset generate করা যায় (Gemini, ChatGPT API)।
+- **Admin panel** — admin API key connect করে দেন, customer রা সেটা ব্যবহার করেন।
+- **Credits** — chat ও image generation-এর জন্য credit wallet, top-up এবং ledger।
+
+## Brand
+
+SupportHub24-এর logo mark একটি chat bubble-এর ভেতরে hub node — customer support আর hub, দুটো ধারণাই একসাথে। Mark ও wordmark দুটোই theme token ব্যবহার করে, তাই light ও dark দুই theme-এ contrast ঠিক থাকে।
+
+- `public/generated/project-logo-1789312916931.png` — primary logo (header, README, favicon-এর base)
+- `public/favicon.svg` — browser favicon
+- `src/components/SupportHubLogo.tsx` — header-এ ব্যবহৃত theme-aware logo
 
 ## Build with Lovable
 
@@ -24,3 +39,12 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Scripts
+
+```sh
+npm run dev        # start the dev server
+npm run build      # production build
+npm run preview    # preview the production build
+npm run lint       # eslint
+npm run format     # prettier --write .

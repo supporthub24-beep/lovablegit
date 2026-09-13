@@ -9,7 +9,7 @@ type LovableGitLogoProps = {
 export function LovableGitLogo({
   className,
   showWordmark = true,
-  title = "lovablegit",
+  title = "SupportHub24",
 }: LovableGitLogoProps) {
   return (
     <svg
@@ -22,7 +22,7 @@ export function LovableGitLogo({
       <title>{title}</title>
       <defs>
         <linearGradient
-          id="lovablegitLogoMark"
+          id="supportHubLogoMark"
           x1="0"
           y1="0"
           x2="1"
@@ -39,15 +39,14 @@ export function LovableGitLogo({
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M20 12v26a10 10 0 0 0 10 10h6" />
-        <circle cx="20" cy="10" r="4" fill="currentColor" stroke="none" />
-        <circle cx="38" cy="48" r="4" fill="currentColor" stroke="none" />
-        <path d="M44 20a10 10 0 0 1 10 10v6" />
-        <circle cx="54" cy="40" r="4" fill="currentColor" stroke="none" />
+        <path d="M14 16h28a8 8 0 0 1 8 8v10a8 8 0 0 1-8 8H28l-10 8v-8h-4a8 8 0 0 1-8-8V24a8 8 0 0 1 8-8Z" />
+        <circle cx="22" cy="29" r="3" fill="currentColor" stroke="none" />
+        <circle cx="32" cy="29" r="3" fill="currentColor" stroke="none" />
+        <circle cx="42" cy="29" r="3" fill="currentColor" stroke="none" />
       </g>
       <path
-        d="M30 30c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7Z"
-        fill="url(#lovablegitLogoMark)"
+        d="M28 22c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7Z"
+        fill="url(#supportHubLogoMark)"
       />
       {showWordmark ? (
         <text
@@ -59,7 +58,7 @@ export function LovableGitLogo({
           fontWeight="600"
           letterSpacing="-0.5"
         >
-          lovablegit
+          SupportHub24
         </text>
       ) : null}
     </svg>
