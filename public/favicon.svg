@@ -1,22 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lovable Git">
-  <title>Lovable Git</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SupportHub24">
+  <title>SupportHub24</title>
   <defs>
-    <linearGradient id="lovableGitFavicon" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#7c3aed" />
-      <stop offset="100%" stop-color="#2563eb" />
+    <linearGradient id="sh24Plate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#0ea5e9" />
     </linearGradient>
   </defs>
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#lovableGitFavicon)" />
-  <g fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M32 12c-5 0-8.5 3.4-8.5 7.6 0 2.5.9 4.2 2.5 5.9-3.4.9-5.9 3.4-5.9 7.6v2.5" />
-    <path d="M32 12c5 0 8.5 3.4 8.5 7.6 0 2.5-.9 4.2-2.5 5.9 3.4.9 5.9 3.4 5.9 7.6v2.5" />
-    <path d="M20 40h24" />
-  </g>
-  <circle cx="32" cy="20" r="3" fill="#ffffff" />
-  <circle cx="20" cy="40" r="3.4" fill="#ffffff" />
-  <circle cx="44" cy="40" r="3.4" fill="#ffffff" />
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#sh24Plate)" />
   <path
-    d="M32 28c-3 0-5.2 2.2-5.2 5.2 0 1.7.9 3 2.2 3.9L32 43.5l3-6.4c1.3-.9 2.2-2.2 2.2-3.9 0-3-2.2-5.2-5.2-5.2Z"
-    fill="#ffffff"
+    d="M32 12 50 18.6v12.2c0 9.2-6.2 17.2-18 21.2-11.8-4-18-12-18-21.2V18.6L32 12Z"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="4"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M24 32.5 30 38.5 41 27"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="4.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
   />
 </svg>

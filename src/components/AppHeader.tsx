@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { LogOut, Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LovableGitLogo } from "@/components/LovableGitLogo";
 import { AdminLogo } from "@/components/AdminLogo";
 import { ProjectDrawer } from "@/components/ProjectDrawer";
 import { getCreditOverview } from "@/lib/payments.functions";
@@ -30,10 +29,18 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
         <ProjectDrawer />
         <Link
           to="/dashboard"
-          aria-label="Lovable Git home"
+          aria-label="SupportHub24 home"
           className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
-          <LovableGitLogo className="h-7 w-auto text-foreground" />
+          <img
+            src="/generated/supporthub24-logo-1789314077899.png"
+            alt=""
+            aria-hidden="true"
+            className="h-7 w-7 shrink-0 object-contain"
+          />
+          <span className="text-sm font-semibold tracking-tight text-foreground">
+            SupportHub24
+          </span>
         </Link>
         <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
           <Link
