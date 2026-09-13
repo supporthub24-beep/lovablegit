@@ -214,6 +214,86 @@ function Point({ icon, text }: { icon: ReactNode; text: string }) {
   );
 }
 
+const FAQ_ITEMS = [
+  {
+    value: "github",
+    question: "Do I need a GitHub account?",
+    answer:
+      "Yes. lovablegit connects to your own GitHub account so every project you build lives in a repository you control.",
+  },
+  {
+    value: "hosting",
+    question: "Does lovablegit host my app?",
+    answer:
+      "No. The preview runs in a sandbox so you can see your changes instantly. When you are ready to ship, deploy the repository with any host you like.",
+  },
+  {
+    value: "database",
+    question: "Can I connect my own database?",
+    answer:
+      "Yes. Plug your own Supabase project into the preview and query real data from the generated app.",
+  },
+  {
+    value: "rollback",
+    question: "What if I do not like a change?",
+    answer:
+      "Every AI edit is snapshotted. Open the version history and restore any earlier version with one click.",
+  },
+];
+
+function FaqItem({
+  value,
+  question,
+  answer,
+  index,
+}: {
+  value: string;
+  question: string;
+  answer: string;
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || typeof IntersectionObserver === "undefined") {
+      setShown(true);
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShown(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setShown(true);
+            observer.disconnect();
+          }
+        }
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: shown ? `${index * 90}ms` : "0ms" }}
+      className={`faq-item ${shown ? "faq-item-in" : ""}`}
+    >
+      <AccordionItem value={value}>
+        <AccordionTrigger>{question}</AccordionTrigger>
+        <AccordionContent>{answer}</AccordionContent>
+      </AccordionItem>
+    </div>
+  );
+}
+
 function Landing() {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState("");
@@ -619,38 +699,17 @@ function Landing() {
                 Everything you need to know before you start building.
               </p>
             </Reveal>
-            <Reveal delay={80}>
-              <Accordion type="single" collapsible className="mt-10 w-full">
-                <AccordionItem value="github">
-                  <AccordionTrigger>Do I need a GitHub account?</AccordionTrigger>
-                  <AccordionContent>
-                    Yes. lovablegit connects to your own GitHub account so every project you build
-                    lives in a repository you control.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="hosting">
-                  <AccordionTrigger>Does lovablegit host my app?</AccordionTrigger>
-                  <AccordionContent>
-                    No. The preview runs in a sandbox so you can see your changes instantly. When
-                    you are ready to ship, deploy the repository with any host you like.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="database">
-                  <AccordionTrigger>Can I connect my own database?</AccordionTrigger>
-                  <AccordionContent>
-                    Yes. Plug your own Supabase project into the preview and query real data from
-                    the generated app.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="rollback">
-                  <AccordionTrigger>What if I do not like a change?</AccordionTrigger>
-                  <AccordionContent>
-                    Every AI edit is snapshotted. Open the version history and restore any earlier
-                    version with one click.
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </Reveal>
+            <Accordion type="single" collapsible className="mt-10 w-full">
+              {FAQ_ITEMS.map((item, index) => (
+                <FaqItem
+                  key={item.value}
+                  value={item.value}
+                  question={item.question}
+                  answer={item.answer}
+                  index={index}
+                />
+              ))}
+            </Accordion>
           </div>
         </section>
 
