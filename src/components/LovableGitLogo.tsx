@@ -9,7 +9,7 @@ type LovableGitLogoProps = {
 export function LovableGitLogo({
   className,
   showWordmark = true,
-  title = "SupportHub24",
+  title = "Lovable Git",
 }: LovableGitLogoProps) {
   return (
     <svg
@@ -21,15 +21,9 @@ export function LovableGitLogo({
     >
       <title>{title}</title>
       <defs>
-        <linearGradient
-          id="supportHubLogoMark"
-          x1="0"
-          y1="0"
-          x2="1"
-          y2="1"
-        >
-          <stop offset="0%" stopColor="currentColor" stopOpacity="0.95" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0.6" />
+        <linearGradient id="lovableGitMark" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0.65" />
         </linearGradient>
       </defs>
       <g
@@ -39,14 +33,16 @@ export function LovableGitLogo({
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M14 16h28a8 8 0 0 1 8 8v10a8 8 0 0 1-8 8H28l-10 8v-8h-4a8 8 0 0 1-8-8V24a8 8 0 0 1 8-8Z" />
-        <circle cx="22" cy="29" r="3" fill="currentColor" stroke="none" />
-        <circle cx="32" cy="29" r="3" fill="currentColor" stroke="none" />
-        <circle cx="42" cy="29" r="3" fill="currentColor" stroke="none" />
+        <path d="M32 8c-6 0-10 4-10 9 0 3 1 5 3 7-4 1-7 4-7 9v3" />
+        <path d="M32 8c6 0 10 4 10 9 0 3-1 5-3 7 4 1 7 4 7 9v3" />
+        <circle cx="32" cy="17" r="3.5" fill="currentColor" stroke="none" />
+        <circle cx="18" cy="40" r="4" fill="currentColor" stroke="none" />
+        <circle cx="46" cy="40" r="4" fill="currentColor" stroke="none" />
+        <path d="M18 40h28" />
       </g>
       <path
-        d="M28 22c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7Z"
-        fill="url(#supportHubLogoMark)"
+        d="M32 26c-3.5 0-6 2.5-6 6 0 2 1 3.5 2.5 4.5L32 44l3.5-7.5C37 35.5 38 34 38 32c0-3.5-2.5-6-6-6Z"
+        fill="url(#lovableGitMark)"
       />
       {showWordmark ? (
         <text
@@ -58,7 +54,7 @@ export function LovableGitLogo({
           fontWeight="600"
           letterSpacing="-0.5"
         >
-          SupportHub24
+          Lovable Git
         </text>
       ) : null}
     </svg>

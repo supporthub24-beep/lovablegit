@@ -30,7 +30,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
         <ProjectDrawer />
         <Link
           to="/dashboard"
-          aria-label="SupportHub24 home"
+          aria-label="Lovable Git home"
           className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           <LovableGitLogo className="h-7 w-auto text-foreground" />
