@@ -29,17 +29,17 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
         <ProjectDrawer />
         <Link
           to="/dashboard"
-          aria-label="SupportHub24 home"
+          aria-label="Lovable Git home"
           className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           <img
-            src="/generated/18a5b797-05e-supporthub24-logo.jpg"
+            src="/generated/lovable-git-logo-1789313316959.png"
             alt=""
             aria-hidden="true"
             className="h-7 w-7 shrink-0 rounded-md object-contain"
           />
           <span className="text-sm font-bold tracking-tight text-foreground">
-            SupportHub24
+            Lovable Git
           </span>
         </Link>
         <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">

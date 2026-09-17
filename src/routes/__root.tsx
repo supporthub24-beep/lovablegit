@@ -86,13 +86,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SupportHub24 — AI development workspace" },
+      { title: "Lovable Git — AI development workspace" },
       {
         name: "description",
         content:
           "Chat with AI, generate code, preview instantly and push to your own GitHub repository.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:title", content: "Lovable Git — AI development workspace" },
+      {
+        property: "og:description",
+        content:
+          "Chat with AI, generate code, preview instantly and push to your own GitHub repository.",
+      },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -102,8 +108,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
       },
-      { rel: "icon", href: "/generated/18a5b797-05e-supporthub24-logo.jpg", type: "image/jpeg" },
-      { rel: "apple-touch-icon", href: "/generated/18a5b797-05e-supporthub24-logo.jpg" },
+      { rel: "icon", href: "/generated/lovable-git-logo-1789313316959.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/generated/lovable-git-logo-1789313316959.png" },
     ],
   }),
   shellComponent: RootShell,
