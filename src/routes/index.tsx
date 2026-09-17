@@ -175,29 +175,41 @@ function Step({ n, title, body }: { n: number; title: string; body: string }) {
 function ShowcaseCard({
   label,
   title,
+  description,
+  image,
+  imageAlt,
   accent,
 }: {
   label: string;
   title: string;
+  description: string;
+  image: string;
+  imageAlt: string;
   accent: string;
 }) {
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:-translate-y-1.5 hover:border-primary hover:shadow-2xl hover:shadow-primary/20 focus-within:border-primary focus-within:shadow-2xl focus-within:shadow-primary/20">
       <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div
-        className={`relative h-32 overflow-hidden bg-gradient-to-br ${accent} to-transparent`}
+        className={`relative aspect-[16/10] overflow-hidden bg-gradient-to-br ${accent} to-transparent`}
       >
-        <div className="absolute inset-0 grid-noise opacity-60" />
-        <div className="absolute inset-x-4 bottom-4 space-y-1.5">
-          <div className="h-2.5 w-20 rounded-full bg-foreground/20" />
-          <div className="h-2.5 w-28 rounded-full bg-foreground/10" />
-        </div>
+        <img
+          src={image}
+          alt={imageAlt}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-card/80 via-card/10 to-transparent" />
       </div>
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
           {label}
         </span>
         <h3 className="mt-2 text-lg font-bold tracking-tight text-balance">{title}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground text-pretty">
+          {description}
+        </p>
       </div>
     </article>
   );
@@ -607,6 +619,9 @@ function Landing() {
                 <ShowcaseCard
                   label="Landing page"
                   title="Coffee shop with online ordering"
+                  description="A warm storefront with a menu, opening hours and an order form — built from one prompt, then tuned with follow-ups."
+                  image="/showcase-coffee-shop.jpg"
+                  imageAlt="Preview of a coffee shop landing page with a menu and order form"
                   accent="from-primary/25"
                 />
               </Reveal>
@@ -614,6 +629,9 @@ function Landing() {
                 <ShowcaseCard
                   label="Dashboard"
                   title="Analytics with live charts"
+                  description="A metrics dashboard with charts, filters and a data table, wired to a real Supabase project."
+                  image="/showcase-analytics-dashboard.jpg"
+                  imageAlt="Preview of an analytics dashboard with charts and a data table"
                   accent="from-highlight/25"
                 />
               </Reveal>
@@ -621,6 +639,9 @@ function Landing() {
                 <ShowcaseCard
                   label="Portfolio"
                   title="Personal site with dark mode"
+                  description="A personal portfolio with project cards, a contact form and a dark mode that follows the visitor's system theme."
+                  image="/showcase-portfolio.jpg"
+                  imageAlt="Preview of a personal portfolio site shown in dark mode"
                   accent="from-primary/20"
                 />
               </Reveal>
