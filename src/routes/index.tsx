@@ -319,8 +319,8 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
+      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
             to="/"
             aria-label="lovablegit home"
@@ -331,25 +331,25 @@ function Landing() {
           <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
             <a
               href="#how"
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-full px-3.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               How it works
             </a>
             <a
               href="#features"
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-full px-3.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Features
             </a>
             <a
               href="#showcase"
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-full px-3.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Showcase
             </a>
             <a
               href="#faq"
-              className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-full px-3.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               FAQ
             </a>
@@ -374,23 +374,23 @@ function Landing() {
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent" />
           </div>
 
-          <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 sm:py-28">
+          <div className="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 sm:py-32">
             <Reveal>
-              <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs text-foreground shadow-sm backdrop-blur">
+              <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur">
                 <Github className="size-3.5" /> Connect all your tools
                 <ArrowRight className="size-3.5" />
               </p>
             </Reveal>
 
             <Reveal delay={60}>
-              <h1 className="mx-auto mt-8 max-w-3xl text-balance text-4xl font-bold uppercase leading-[0.95] tracking-tighter sm:text-6xl lg:text-7xl">
+              <h1 className="mx-auto mt-8 max-w-3xl text-balance text-4xl font-bold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
                 What&apos;s on your <span className="text-gradient">mind?</span>
               </h1>
             </Reveal>
 
             {/* Prompt box */}
             <Reveal delay={140}>
-              <div className="glow-primary mx-auto mt-10 max-w-2xl rounded-3xl border-2 border-border bg-card/95 p-3 text-left shadow-2xl backdrop-blur transition-all duration-300 focus-within:border-primary focus-within:shadow-[0_0_0_4px_color-mix(in_oklch,var(--color-primary)_25%,transparent)]">
+              <div className="glow-primary mx-auto mt-10 max-w-2xl rounded-3xl border border-border bg-card/95 p-3 text-left shadow-xl shadow-foreground/5 backdrop-blur transition-all duration-300 focus-within:border-primary/60 focus-within:shadow-[0_0_0_4px_color-mix(in_oklch,var(--color-primary)_18%,transparent)]">
                 <label htmlFor="idea" className="sr-only">
                   Describe what you want to build
                 </label>
@@ -421,11 +421,7 @@ function Landing() {
                     >
                       <Mic className="size-4" />
                     </button>
-                    <Button
-                      onClick={start}
-                      size="sm"
-                      className="rounded-full font-semibold uppercase tracking-wide"
-                    >
+                    <Button onClick={start} size="sm" className="rounded-full font-semibold">
                       <Sparkles className="size-4" /> Start
                       <ArrowRight className="size-4" />
                     </Button>
@@ -441,7 +437,7 @@ function Landing() {
                     key={idea}
                     type="button"
                     onClick={() => setPrompt(idea)}
-                    className="rounded-full border border-border bg-card/70 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/10 hover:text-foreground hover:shadow-[0_0_20px_-4px_color-mix(in_oklch,var(--color-primary)_60%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="rounded-full border border-border bg-card/70 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/10 hover:text-foreground hover:shadow-lg hover:shadow-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {idea}
                   </button>
@@ -457,7 +453,7 @@ function Landing() {
         <section aria-label="Trusted by" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
             <p className="text-center font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Teams ship faster with lovablegit
+              Teams ship faster with SupportHub24
             </p>
             <div className="relative mt-5 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
               <div className="marquee-track flex w-max items-center gap-12">
@@ -482,7 +478,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Rocket className="size-3" /> How it works
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold uppercase tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
                 Three simple steps
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -522,7 +518,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Layers className="size-3" /> Capabilities
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold uppercase tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
                 Everything in one workspace
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -607,7 +603,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Wand2 className="size-3" /> Showcase
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold uppercase tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
                 Made with a single prompt
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -656,7 +652,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <ShieldCheck className="size-3" /> Built for real work
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold uppercase tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
                 Your code stays yours
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -717,7 +713,7 @@ function Landing() {
         <section id="faq" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20">
             <Reveal className="text-center">
-              <h2 className="text-balance text-3xl font-bold uppercase tracking-tight sm:text-5xl">
+              <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl">
                 Frequently asked questions
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -743,7 +739,7 @@ function Landing() {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_100%,color-mix(in_oklch,var(--color-primary)_16%,transparent),transparent)]" />
           <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
             <Reveal>
-              <h2 className="text-balance text-4xl font-bold uppercase tracking-tighter sm:text-6xl">
+              <h2 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl">
                 Start building in <span className="text-gradient">seconds</span>
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
@@ -751,18 +747,13 @@ function Landing() {
                 workspace.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <Button asChild size="lg" className="font-semibold uppercase tracking-wide">
+                <Button asChild size="lg" className="font-semibold">
                   <Link to="/auth">
                     <Sparkles className="size-4" /> Get started free
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="font-semibold uppercase tracking-wide"
-                >
+                <Button asChild size="lg" variant="outline" className="font-semibold">
                   <a href="#how">See how it works</a>
                 </Button>
               </div>
@@ -781,7 +772,7 @@ function Landing() {
             <LovableGitLogo className="h-6 w-auto text-foreground" />
           </Link>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} lovablegit. Built for people who ship.
+            © {new Date().getFullYear()} SupportHub24. Built for people who ship.
           </p>
         </div>
       </footer>

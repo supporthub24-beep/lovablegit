@@ -158,23 +158,36 @@ function AdminPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
           {/* Main content */}
           <div className="lg:col-span-3">
-            <header className="flex flex-wrap items-end justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <AdminLogo showWordmark={false} label="Admin console" className="shrink-0" />
-                <div>
-                  <h1 className="text-2xl font-semibold tracking-tight">Admin console</h1>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Manage AI keys, providers, customers, credits and platform features.
-                  </p>
+            <header className="relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-card p-6 shadow-2xl shadow-primary/10 sm:p-8">
+              <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+              <div className="pointer-events-none absolute -right-24 -top-24 size-64 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_22%,transparent)] blur-3xl" />
+              <div className="relative flex flex-wrap items-end justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <span className="inline-flex size-14 shrink-0 items-center justify-center rounded-2xl border-2 border-primary/50 bg-primary/10 shadow-lg shadow-primary/20">
+                    <AdminLogo showWordmark={false} label="Admin console" className="shrink-0" />
+                  </span>
+                  <div>
+                    <span className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-primary">
+                      Restricted area
+                    </span>
+                    <h1 className="mt-1 text-3xl font-bold uppercase tracking-tighter sm:text-4xl">
+                      Admin console
+                    </h1>
+                    <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
+                      Manage AI keys, providers, customers, credits and platform features.
+                    </p>
+                  </div>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-2 border-primary/40 font-bold uppercase tracking-wide"
+                  onClick={() => qc.invalidateQueries({ queryKey: ["admin-overview"] })}
+                >
+                  <RefreshCw className={`size-4 ${overview.isFetching ? "animate-spin" : ""}`} />{" "}
+                  Refresh
+                </Button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => qc.invalidateQueries({ queryKey: ["admin-overview"] })}
-              >
-                <RefreshCw className={`size-4 ${overview.isFetching ? "animate-spin" : ""}`} /> Refresh
-              </Button>
             </header>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -209,23 +222,41 @@ function AdminPage() {
             </div>
 
             <Tabs defaultValue="overview" className="mt-6 w-full">
-              <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1">
-                <TabsTrigger value="overview" className="gap-1.5">
+              <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-xl border-2 border-border bg-surface p-1.5">
+                <TabsTrigger
+                  value="overview"
+                  className="gap-1.5 rounded-lg font-bold uppercase tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30"
+                >
                   <LayoutDashboard className="size-4" /> Overview
                 </TabsTrigger>
-                <TabsTrigger value="keys" className="gap-1.5">
+                <TabsTrigger
+                  value="keys"
+                  className="gap-1.5 rounded-lg font-bold uppercase tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30"
+                >
                   <KeyRound className="size-4" /> API keys
                 </TabsTrigger>
-                <TabsTrigger value="providers" className="gap-1.5">
+                <TabsTrigger
+                  value="providers"
+                  className="gap-1.5 rounded-lg font-bold uppercase tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30"
+                >
                   <Sparkles className="size-4" /> AI providers
                 </TabsTrigger>
-                <TabsTrigger value="customers" className="gap-1.5">
+                <TabsTrigger
+                  value="customers"
+                  className="gap-1.5 rounded-lg font-bold uppercase tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30"
+                >
                   <Users className="size-4" /> Customers
                 </TabsTrigger>
-                <TabsTrigger value="usage" className="gap-1.5">
+                <TabsTrigger
+                  value="usage"
+                  className="gap-1.5 rounded-lg font-bold uppercase tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30"
+                >
                   <Activity className="size-4" /> Usage
                 </TabsTrigger>
-                <TabsTrigger value="settings" className="gap-1.5">
+                <TabsTrigger
+                  value="settings"
+                  className="gap-1.5 rounded-lg font-bold uppercase tracking-wide data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30"
+                >
                   <Settings2 className="size-4" /> Settings
                 </TabsTrigger>
               </TabsList>
@@ -240,9 +271,15 @@ function AdminPage() {
                   ) : (
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {usageByKind.map(([kind, credits]) => (
-                        <div key={kind} className="rounded-lg border border-border bg-muted/30 p-4">
-                          <p className="text-xs uppercase tracking-wide text-muted-foreground">{kind}</p>
-                          <p className="mt-1 text-xl font-semibold">{credits} credits</p>
+                        <div
+                          key={kind}
+                          className="rounded-xl border-2 border-border bg-surface p-4 transition-colors hover:border-primary/60"
+                        >
+                          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                            {kind}
+                          </p>
+                          <p className="mt-1.5 text-2xl font-bold tracking-tighter">{credits}</p>
+                          <p className="text-xs text-muted-foreground">credits</p>
                         </div>
                       ))}
                     </div>
@@ -411,7 +448,11 @@ function AdminPage() {
                 </Section>
 
                 <div className="sticky bottom-4 flex justify-end">
-                  <Button onClick={persist} disabled={saving}>
+                  <Button
+                    onClick={persist}
+                    disabled={saving}
+                    className="font-bold uppercase tracking-wide"
+                  >
                     <Save className="size-4" /> {saving ? "Saving…" : "Save settings"}
                   </Button>
                 </div>
@@ -560,17 +601,17 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-border bg-card p-5">
+    <section className="rounded-2xl border-2 border-border bg-card p-5 shadow-sm transition-colors hover:border-primary/40 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-medium">{title}</h2>
+          <h2 className="text-lg font-bold uppercase tracking-tight">{title}</h2>
           {description ? (
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
+            <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{description}</p>
           ) : null}
         </div>
         {action}
       </div>
-      <div className="mt-4">{children}</div>
+      <div className="mt-5">{children}</div>
     </section>
   );
 }
@@ -587,10 +628,10 @@ function ToggleRow({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex items-start justify-between gap-4 rounded-lg border border-border p-3">
+    <label className="flex items-start justify-between gap-4 rounded-xl border-2 border-border bg-surface p-4 transition-colors hover:border-primary/50 focus-within:border-primary">
       <span>
-        <span className="block text-sm font-medium">{label}</span>
-        <span className="block text-xs text-muted-foreground">{hint}</span>
+        <span className="block text-sm font-bold uppercase tracking-wide">{label}</span>
+        <span className="mt-0.5 block text-xs text-muted-foreground">{hint}</span>
       </span>
       <Switch checked={checked} onCheckedChange={onChange} />
     </label>
@@ -613,14 +654,15 @@ function Stat({
   loading?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+    <div className="group relative overflow-hidden rounded-2xl border-2 border-border bg-card p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl hover:shadow-primary/20">
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
         {icon} {label}
       </div>
       {loading ? (
-        <Skeleton className="mt-2 h-8 w-20" />
+        <Skeleton className="mt-2.5 h-9 w-20" />
       ) : (
-        <div className="mt-2 text-2xl font-semibold">{value}</div>
+        <div className="mt-2.5 text-3xl font-bold tracking-tighter">{value}</div>
       )}
     </div>
   );
@@ -636,12 +678,12 @@ function CustomerRow({
   const [credits, setCredits] = useState(customer.credits ?? 0);
   const dirty = credits !== (customer.credits ?? 0);
   return (
-    <tr className="border-t border-border">
-      <td className="py-2">{customer.email ?? customer.id.slice(0, 8)}</td>
-      <td className="py-2 text-muted-foreground">
+    <tr className="border-t border-border transition-colors hover:bg-surface">
+      <td className="py-2.5 font-medium">{customer.email ?? customer.id.slice(0, 8)}</td>
+      <td className="py-2.5 text-muted-foreground">
         {new Date(customer.created_at).toLocaleDateString()}
       </td>
-      <td className="py-2">
+      <td className="py-2.5">
         <Input
           type="number"
           value={credits}
@@ -649,8 +691,13 @@ function CustomerRow({
           className="h-8 w-24"
         />
       </td>
-      <td className="py-2 text-right">
-        <Button size="sm" variant={dirty ? "default" : "secondary"} onClick={() => onSave(credits)}>
+      <td className="py-2.5 text-right">
+        <Button
+          size="sm"
+          variant={dirty ? "default" : "secondary"}
+          className="font-bold uppercase tracking-wide"
+          onClick={() => onSave(credits)}
+        >
           Save
         </Button>
       </td>

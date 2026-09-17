@@ -146,16 +146,21 @@ function Dashboard() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <AppHeader isAdmin={account.data?.isAdmin} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-12">
+        <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+              Workspace
+            </span>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+              Projects
+            </h1>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground text-pretty">
               Chat with AI, generate code, preview instantly, push to GitHub.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-sm font-medium text-muted-foreground shadow-sm">
               <Coins className="size-4 text-highlight" />
               {account.data?.profile?.credits ?? 0} credits
             </span>
@@ -221,20 +226,23 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {(projects.data ?? []).map((p) => (
             <div
               key={p.id}
-              className="group rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/60"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl hover:shadow-primary/15 focus-within:border-primary focus-within:shadow-xl focus-within:shadow-primary/15"
             >
+              <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <Link
                 to="/workspace/$projectId"
                 params={{ projectId: p.id }}
-                className="block space-y-2"
+                className="block space-y-2.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
               >
-                <div className="flex items-center gap-2">
-                  <FolderGit2 className="size-4 text-primary" />
-                  <h2 className="truncate font-medium">{p.name}</h2>
+                <div className="flex items-center gap-2.5">
+                  <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-border bg-surface transition-colors duration-300 group-hover:border-primary group-hover:bg-primary/10">
+                    <FolderGit2 className="size-4 text-primary" />
+                  </span>
+                  <h2 className="truncate font-semibold tracking-tight">{p.name}</h2>
                 </div>
                 <p className="truncate text-xs text-muted-foreground">
                   {p.repo_full_name ? (
@@ -246,13 +254,14 @@ function Dashboard() {
                   )}
                 </p>
               </Link>
-              <div className="mt-4 flex items-center justify-between">
+              <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-3">
                 <span className="text-xs text-muted-foreground">
                   {new Date(p.updated_at).toLocaleDateString()}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label={`Delete project ${p.name}`}
                   onClick={async () => {
                     await remove({ data: { id: p.id } });
                     void qc.invalidateQueries({ queryKey: ["projects"] });
@@ -264,19 +273,19 @@ function Dashboard() {
             </div>
           ))}
           {projects.isSuccess && (projects.data ?? []).length === 0 && (
-            <div className="col-span-full rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+            <div className="col-span-full rounded-2xl border border-dashed border-border bg-card/40 p-12 text-center text-sm text-muted-foreground">
               No projects yet. Create your first one to start chatting with the AI.
             </div>
           )}
         </div>
 
-        <section className="mt-12">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <section className="mt-14">
+          <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-                <Github className="size-4" /> GitHub repositories
+              <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight">
+                <Github className="size-5 text-primary" /> GitHub repositories
               </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1.5 text-sm text-muted-foreground">
                 Import a repository to chat, edit and preview it here.
               </p>
             </div>
@@ -285,38 +294,46 @@ function Dashboard() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search repositories…"
+                aria-label="Search repositories"
                 className="w-full sm:w-64"
               />
             )}
           </div>
 
           {!github.data?.connected ? (
-            <div className="mt-4 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            <div className="mt-5 rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
               <Link to="/settings" className="text-primary hover:underline">
                 Connect GitHub
               </Link>{" "}
               to see all your repositories here.
             </div>
           ) : repos.isLoading ? (
-            <div className="mt-4 rounded-xl border border-border p-8 text-center text-sm text-muted-foreground">
+            <div className="mt-5 rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
               Loading repositories…
             </div>
           ) : visibleRepos.length === 0 ? (
-            <div className="mt-4 rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            <div className="mt-5 rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
               No repositories found.
             </div>
           ) : (
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {visibleRepos.map((r) => (
-                <div key={r.full_name} className="rounded-xl border border-border bg-card p-4">
-                  <div className="flex items-center gap-2">
-                    <Github className="size-4 text-muted-foreground" />
-                    <h3 className="truncate text-sm font-medium">{r.full_name}</h3>
+                <div
+                  key={r.full_name}
+                  className="group flex flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl hover:shadow-primary/15 focus-within:border-primary focus-within:shadow-xl focus-within:shadow-primary/15"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-border bg-surface transition-colors duration-300 group-hover:border-primary group-hover:bg-primary/10">
+                      <Github className="size-4 text-primary" />
+                    </span>
+                    <h3 className="truncate text-sm font-semibold tracking-tight">
+                      {r.full_name}
+                    </h3>
                   </div>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                  <p className="mt-2.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
                     {r.description ?? "No description"}
                   </p>
-                  <div className="mt-4 flex items-center justify-between gap-2">
+                  <div className="mt-5 flex items-center justify-between gap-2 border-t border-border/60 pt-3">
                     <span className="text-xs text-muted-foreground">
                       {r.private ? "Private" : "Public"} · {r.default_branch}
                     </span>
