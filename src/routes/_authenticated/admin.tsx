@@ -79,8 +79,8 @@ function AdminPage() {
     retry: false,
   });
 
-  const [chatModel, setChatModel] = useState("google/gemini-3.7-flash");
-  const [imageModel, setImageModel] = useState("google/gemini-3.1-flash-image");
+  const [chatModel, setChatModel] = useState("");
+  const [imageModel, setImageModel] = useState("");
   const [imagesEnabled, setImagesEnabled] = useState(true);
   const [githubEnabled, setGithubEnabled] = useState(true);
   const [freeCredits, setFreeCredits] = useState(100);
@@ -93,8 +93,9 @@ function AdminPage() {
     const models = s["models"] as { chat?: string; image?: string } | undefined;
     const features = s["features"] as { images?: boolean; github?: boolean } | undefined;
     const limits = s["limits"] as { signup_credits?: number } | undefined;
-    if (models?.chat) setChatModel(models.chat);
-    if (models?.image) setImageModel(models.image);
+    // Only reflect what the administrator actually saved — never invent a default.
+    setChatModel(models?.chat ?? "");
+    setImageModel(models?.image ?? "");
     if (features) {
       setImagesEnabled(features.images !== false);
       setGithubEnabled(features.github !== false);
@@ -132,15 +133,26 @@ function AdminPage() {
   }
 
   async function persist() {
+    const chat = chatModel.trim();
+    const image = imageModel.trim();
+    if (!chat) {
+      toast.error("Enter the chat / code model before saving.");
+      return;
+    }
+    if (!image) {
+      toast.error("Enter the image model before saving.");
+      return;
+    }
     setSaving(true);
     try {
-      await saveSetting({ data: { key: "models", value: { chat: chatModel, image: imageModel } } });
+      await saveSetting({ data: { key: "models", value: { chat, image } } });
       await saveSetting({
         data: { key: "features", value: { images: imagesEnabled, github: githubEnabled } },
       });
       await saveSetting({ data: { key: "limits", value: { signup_credits: freeCredits } } });
-      toast.success("Platform settings saved.");
+      toast.success("Platform settings saved. Chat now uses the saved model.");
       await qc.invalidateQueries({ queryKey: ["admin-overview"] });
+      await qc.invalidateQueries({ queryKey: ["chat-models"] });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save settings");
     } finally {
@@ -399,7 +411,7 @@ function AdminPage() {
               <TabsContent value="settings" className="mt-5 space-y-5">
                 <Section
                   title="Default AI models"
-                  description="Used when a customer does not pick a specific model. Requests use the API keys saved in the API keys tab."
+                  description="Saved to Supabase and used by chat and image generation. The chat model picker shows exactly this value — nothing is invented when it is empty."
                 >
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-1.5">
@@ -408,7 +420,14 @@ function AdminPage() {
                         id="chat-model"
                         value={chatModel}
                         onChange={(e) => setChatModel(e.target.value)}
+                        placeholder="e.g. google/gemini-3.7-flash"
+                        aria-describedby="chat-model-hint"
                       />
+                      <p id="chat-model-hint" className="text-xs text-muted-foreground">
+                        {chatModel.trim()
+                          ? "Chat uses this model until a customer picks another one."
+                          : "Not configured — chat will show a setup message until you save a model."}
+                      </p>
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="image-model">Image model</Label>
@@ -416,7 +435,14 @@ function AdminPage() {
                         id="image-model"
                         value={imageModel}
                         onChange={(e) => setImageModel(e.target.value)}
+                        placeholder="e.g. google/gemini-3.1-flash-image"
+                        aria-describedby="image-model-hint"
                       />
+                      <p id="image-model-hint" className="text-xs text-muted-foreground">
+                        {imageModel.trim()
+                          ? "Image and logo generation use this model."
+                          : "Not configured — image generation will report a setup error."}
+                      </p>
                     </div>
                   </div>
                 </Section>

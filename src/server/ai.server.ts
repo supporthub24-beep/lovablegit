@@ -19,8 +19,8 @@ export async function getPlatformSettings() {
   }
   return {
     models: {
-      chat: (out['models']?.['chat'] as string) ?? "google/gemini-3.7-flash",
-      image: (out['models']?.['image'] as string) ?? "google/gemini-3.1-flash-image",
+      chat: (out['models']?.['chat'] as string) ?? "",
+      image: (out['models']?.['image'] as string) ?? "",
     },
     features: {
       github: out['features']?.['github'] !== false,
@@ -86,6 +86,9 @@ export async function chatCompletion(model: string, messages: ChatMessage[]): Pr
 }
 
 export async function generateImage(model: string, prompt: string): Promise<string> {
+  if (!model) {
+    throw new Error("No image model is configured. An administrator must save one in the admin console.");
+  }
   const isGemini = model.includes("gemini");
   const body = isGemini
     ? { model, messages: [{ role: "user", content: prompt }], modalities: ["image", "text"] }
@@ -148,11 +151,24 @@ export async function resolveChatTarget(
   fallbackModel: string,
 ): Promise<{ provider: ProviderRow | null; model: string }> {
   if (!modelId || modelId.startsWith("gateway::")) {
-    return { provider: null, model: modelId?.split("::").slice(1).join("::") || fallbackModel };
+    const model = modelId?.split("::").slice(1).join("::") || fallbackModel;
+    if (!model) {
+      throw new Error(
+        "No AI model is configured. An administrator must save a provider and model in the admin console.",
+      );
+    }
+    return { provider: null, model };
   }
   const [providerId, ...rest] = modelId.split("::");
   const model = rest.join("::");
-  if (!providerId || !model) return { provider: null, model: fallbackModel };
+  if (!providerId || !model) {
+    if (!fallbackModel) {
+      throw new Error(
+        "No AI model is configured. An administrator must save a provider and model in the admin console.",
+      );
+    }
+    return { provider: null, model: fallbackModel };
+  }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin

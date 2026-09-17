@@ -68,6 +68,8 @@ export function ChatPanel({
   }
 
   const modelOptions = models.data?.options ?? [];
+  const noModelsConfigured =
+    !models.isPending && !models.isError && modelOptions.length === 0;
 
   return (
     <div className="flex h-full min-h-0 flex-col rounded-2xl border border-border bg-surface shadow-lg">
@@ -88,7 +90,11 @@ export function ChatPanel({
         >
           {modelOptions.length === 0 && (
             <option value="">
-              {models.isError ? "Models unavailable" : "No AI provider configured"}
+              {models.isPending
+                ? "Loading models…"
+                : models.isError
+                  ? "Models unavailable"
+                  : "No AI provider configured"}
             </option>
           )}
           {modelOptions.map((o) => (
@@ -106,6 +112,16 @@ export function ChatPanel({
         >
           Could not load AI models. Check that an OpenAI or Google Gemini API key is saved in the
           admin console.
+        </div>
+      )}
+
+      {noModelsConfigured && (
+        <div
+          role="status"
+          className="border-b border-border bg-muted/40 px-5 py-3 text-xs text-muted-foreground"
+        >
+          No AI provider or model has been saved yet. An administrator must add a provider and its
+          models in the admin console before chat can run.
         </div>
       )}
 
