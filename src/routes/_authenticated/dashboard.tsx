@@ -31,6 +31,7 @@ import {
   listRepoTree,
   importRepoFiles,
 } from "@/lib/github.functions";
+import { getWorkspaceOverview } from "@/lib/workspaces.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -56,6 +57,7 @@ function Dashboard() {
   const fetchAccount = useServerFn(getMyAccount);
   const fetchGithub = useServerFn(getGithubStatus);
   const fetchRepos = useServerFn(listRepos);
+  const fetchWorkspace = useServerFn(getWorkspaceOverview);
   const create = useServerFn(createProject);
   const remove = useServerFn(deleteProject);
 
@@ -74,6 +76,11 @@ function Dashboard() {
 
   const projects = useQuery({ queryKey: ["projects"], queryFn: () => fetchProjects() });
   const account = useQuery({ queryKey: ["account"], queryFn: () => fetchAccount() });
+  const workspace = useQuery({
+    queryKey: ["workspace-overview"],
+    queryFn: () => fetchWorkspace(),
+    retry: false,
+  });
   const github = useQuery({ queryKey: ["github-status"], queryFn: () => fetchGithub() });
   const repos = useQuery({
     queryKey: ["repos"],
@@ -225,6 +232,73 @@ function Dashboard() {
             </Dialog>
           </div>
         </div>
+
+        <section aria-label="Workspace overview" className="mt-10">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Workspace
+              </p>
+              <p className="mt-2 truncate text-lg font-bold tracking-tight">
+                {workspace.isPending
+                  ? "Loading…"
+                  : workspace.isError
+                    ? "Unavailable"
+                    : (workspace.data?.workspace.name ?? "—")}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {workspace.data?.workspace.slug
+                  ? `/${workspace.data.workspace.slug}`
+                  : "Personal workspace"}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Plan
+              </p>
+              <p className="mt-2 truncate text-lg font-bold tracking-tight">
+                {workspace.isPending
+                  ? "Loading…"
+                  : workspace.isError
+                    ? "Unavailable"
+                    : (workspace.data?.plan.name ?? "Free")}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {workspace.data?.subscription.status === "not_configured"
+                  ? "Billing not configured"
+                  : (workspace.data?.subscription.status ?? "Billing not configured")}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Members
+              </p>
+              <p className="mt-2 text-lg font-bold tracking-tight">
+                {workspace.isPending
+                  ? "Loading…"
+                  : workspace.isError
+                    ? "Unavailable"
+                    : (workspace.data?.members.length ?? 0)}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">Active workspace members</p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Projects
+              </p>
+              <p className="mt-2 text-lg font-bold tracking-tight">
+                {projects.isPending ? "Loading…" : (projects.data?.length ?? 0)}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">In this workspace</p>
+            </div>
+          </div>
+          {workspace.isError && (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Workspace details could not be loaded. Projects and repositories below are still
+              available.
+            </p>
+          )}
+        </section>
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {(projects.data ?? []).map((p) => (

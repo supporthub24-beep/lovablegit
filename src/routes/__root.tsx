@@ -21,7 +21,7 @@ function NotFoundComponent() {
       <div className="relative max-w-md text-center">
         <img
           src="/generated/f78323f2-055-supporthub24-logo.jpg"
-          alt="Lovable Git"
+          alt="Forge"
           width={72}
           height={72}
           className="mx-auto size-18 rounded-2xl border border-border/60 object-cover shadow-lg shadow-primary/20"
@@ -62,7 +62,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <div className="relative max-w-md text-center">
         <img
           src="/generated/f78323f2-055-supporthub24-logo.jpg"
-          alt="Lovable Git"
+          alt="Forge"
           width={72}
           height={72}
           className="mx-auto size-18 rounded-2xl border border-border/60 object-cover shadow-lg shadow-destructive/20"
@@ -100,14 +100,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable Git — AI development workspace" },
+      { title: "Forge — AI development workspace" },
       {
         name: "description",
         content:
           "Chat with AI, generate code, preview instantly and push to your own GitHub repository.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Lovable Git — AI development workspace" },
+      { property: "og:title", content: "Forge — AI development workspace" },
       {
         property: "og:description",
         content:

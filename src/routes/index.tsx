@@ -30,15 +30,15 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Lovable Git — Chat with AI, generate code, preview instantly" },
+      { title: "Forge — Chat with AI, generate code, preview instantly" },
       {
         name: "description",
         content:
-          "Connect your GitHub account, describe what you want, and Lovable Git writes the code, shows a live preview and commits it back — powered by AI.",
+          "Connect your GitHub account, describe what you want, and Forge writes the code, shows a live preview and commits it back — powered by AI.",
       },
       {
         property: "og:title",
-        content: "Lovable Git — Chat with AI, generate code, preview instantly",
+        content: "Forge — Chat with AI, generate code, preview instantly",
       },
       {
         property: "og:description",
@@ -231,11 +231,11 @@ const FAQ_ITEMS = [
     value: "github",
     question: "Do I need a GitHub account?",
     answer:
-      "Yes. Lovable Git connects to your own GitHub account so every project you build lives in a repository you control.",
+      "Yes. Forge connects to your own GitHub account so every project you build lives in a repository you control.",
   },
   {
     value: "hosting",
-    question: "Does Lovable Git host my app?",
+    question: "Does Forge host my app?",
     answer:
       "No. The preview runs in a sandbox so you can see your changes instantly. When you are ready to ship, deploy the repository with any host you like.",
   },
@@ -323,7 +323,7 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
             to="/"
-            aria-label="Lovable Git home"
+            aria-label="Forge home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <LovableGitLogo className="h-7 w-auto text-foreground" />
@@ -453,7 +453,7 @@ function Landing() {
         <section aria-label="Trusted by" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
             <p className="text-center font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Teams ship faster with Lovable Git
+              Teams ship faster with Forge
             </p>
             <div className="relative mt-5 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
               <div className="marquee-track flex w-max items-center gap-12">
@@ -574,7 +574,7 @@ function Landing() {
         </section>
 
         {/* Stats */}
-        <section aria-label="Lovable Git in numbers" className="border-b border-border bg-surface">
+        <section aria-label="Forge in numbers" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
             <dl className="grid grid-cols-2 gap-8 sm:grid-cols-4">
               {STATS.map((stat, index) => (
@@ -645,7 +645,7 @@ function Landing() {
           </div>
         </section>
 
-        {/* Why Lovable Git */}
+        {/* Why Forge */}
         <section className="border-b border-border">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center">
             <Reveal>
@@ -656,7 +656,7 @@ function Landing() {
                 Your code stays yours
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                Everything Lovable Git generates lands in your own GitHub repository. No lock-in, no
+                Everything Forge generates lands in your own GitHub repository. No lock-in, no
                 hidden hosting, no surprises.
               </p>
               <ul className="mt-8 space-y-3">
@@ -766,13 +766,13 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
           <Link
             to="/"
-            aria-label="Lovable Git home"
+            aria-label="Forge home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <LovableGitLogo className="h-6 w-auto text-foreground" />
           </Link>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Lovable Git. Built for people who ship.
+            © {new Date().getFullYear()} Forge. Built for people who ship.
           </p>
         </div>
       </footer>
