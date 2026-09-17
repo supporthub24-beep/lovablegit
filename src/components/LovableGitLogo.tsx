@@ -51,7 +51,7 @@ export function LovableGitLogo({
           fill="currentColor"
           fontFamily="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
           fontSize="26"
-          fontWeight="600"
+          fontWeight="700"
           letterSpacing="-0.5"
         >
           Lovable Git

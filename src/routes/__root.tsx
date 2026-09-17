@@ -20,8 +20,10 @@ function NotFoundComponent() {
       <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)] blur-3xl" />
       <div className="relative max-w-md text-center">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary">Error 404</p>
-        <h1 className="mt-3 text-7xl font-semibold tracking-tight text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold tracking-tight text-foreground">
+        <h1 className="mt-3 text-7xl font-bold tracking-tight text-foreground sm:text-8xl">
+          404
+        </h1>
+        <h2 className="mt-4 text-xl font-bold tracking-tight text-foreground">
           Page not found
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -30,7 +32,7 @@ function NotFoundComponent() {
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            className="cta-primary inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:cta-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Go home
           </Link>
@@ -51,7 +53,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="grid-noise relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
       <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-[color-mix(in_oklch,var(--color-destructive)_12%,transparent)] blur-3xl" />
       <div className="relative max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-xl font-bold tracking-tight text-foreground">
           This page didn't load
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -63,13 +65,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            className="cta-primary inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:cta-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-full border border-input bg-background px-5 py-2.5 text-sm font-semibold text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-accent/60 hover:shadow-lg hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Go home
           </a>
