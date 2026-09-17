@@ -19,7 +19,7 @@ import {
   Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LovableGitLogo } from "@/components/LovableGitLogo";
+import { SupportHub24Logo } from "@/components/LovableGitLogo";
 import {
   Accordion,
   AccordionContent,
@@ -323,10 +323,10 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
             to="/"
-            aria-label="lovablegit home"
+            aria-label="SupportHub24 home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
-            <LovableGitLogo className="h-7 w-auto text-foreground" />
+            <SupportHub24Logo className="h-7 w-auto text-foreground" />
           </Link>
           <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
             <a
@@ -766,10 +766,10 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
           <Link
             to="/"
-            aria-label="lovablegit home"
+            aria-label="SupportHub24 home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
-            <LovableGitLogo className="h-6 w-auto text-foreground" />
+            <SupportHub24Logo className="h-6 w-auto text-foreground" />
           </Link>
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} SupportHub24. Built for people who ship.

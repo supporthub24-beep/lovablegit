@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "lovablegit — AI development workspace" },
+      { title: "SupportHub24 — AI development workspace" },
       {
         name: "description",
         content:
@@ -102,8 +102,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
       },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/favicon.svg" },
+      { rel: "icon", href: "/generated/18a5b797-05e-supporthub24-logo.jpg", type: "image/jpeg" },
+      { rel: "apple-touch-icon", href: "/generated/18a5b797-05e-supporthub24-logo.jpg" },
     ],
   }),
   shellComponent: RootShell,

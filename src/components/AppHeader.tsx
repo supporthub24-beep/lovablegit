@@ -33,10 +33,10 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           <img
-            src="/generated/supporthub24-logo-1789314077899.png"
+            src="/generated/18a5b797-05e-supporthub24-logo.jpg"
             alt=""
             aria-hidden="true"
-            className="h-7 w-7 shrink-0 object-contain"
+            className="h-7 w-7 shrink-0 rounded-md object-contain"
           />
           <span className="text-sm font-bold tracking-tight text-foreground">
             SupportHub24
