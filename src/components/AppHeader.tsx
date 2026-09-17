@@ -34,12 +34,9 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           className="group flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           <LovableGitLogo
-            showWordmark={false}
+            showWordmark
             className="transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_color-mix(in_oklch,var(--color-primary)_55%,transparent)] group-focus-visible:scale-110"
           />
-          <span className="text-sm font-bold tracking-tight text-foreground">
-            Forge
-          </span>
         </Link>
         <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
           <Link
