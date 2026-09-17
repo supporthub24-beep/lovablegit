@@ -20,7 +20,7 @@ function NotFoundComponent() {
       <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)] blur-3xl" />
       <div className="relative max-w-md text-center">
         <img
-          src="/generated/a2e9c3c5-2df-supporthub24-logo.jpg"
+          src="/generated/f78323f2-055-supporthub24-logo.jpg"
           alt="Lovable Git"
           width={72}
           height={72}
@@ -61,7 +61,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-[color-mix(in_oklch,var(--color-destructive)_12%,transparent)] blur-3xl" />
       <div className="relative max-w-md text-center">
         <img
-          src="/generated/a2e9c3c5-2df-supporthub24-logo.jpg"
+          src="/generated/f78323f2-055-supporthub24-logo.jpg"
           alt="Lovable Git"
           width={72}
           height={72}
@@ -113,9 +113,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Chat with AI, generate code, preview instantly and push to your own GitHub repository.",
       },
-      { property: "og:image", content: "/generated/a2e9c3c5-2df-supporthub24-logo.jpg" },
+      { property: "og:image", content: "/generated/f78323f2-055-supporthub24-logo.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "/generated/a2e9c3c5-2df-supporthub24-logo.jpg" },
+      { name: "twitter:image", content: "/generated/f78323f2-055-supporthub24-logo.jpg" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -124,8 +124,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
       },
-      { rel: "icon", href: "/generated/a2e9c3c5-2df-supporthub24-logo.jpg", type: "image/jpeg" },
-      { rel: "apple-touch-icon", href: "/generated/a2e9c3c5-2df-supporthub24-logo.jpg" },
+      { rel: "icon", href: "/generated/f78323f2-055-supporthub24-favicon-2.jpg", type: "image/jpeg" },
+      { rel: "apple-touch-icon", href: "/generated/f78323f2-055-supporthub24-favicon-2.jpg" },
     ],
   }),
   shellComponent: RootShell,

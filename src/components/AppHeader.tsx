@@ -35,7 +35,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
         >
           <LovableGitLogo
             showWordmark={false}
-            className="text-primary transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_color-mix(in_oklch,var(--color-primary)_55%,transparent)] group-focus-visible:scale-110"
+            className="transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_color-mix(in_oklch,var(--color-primary)_55%,transparent)] group-focus-visible:scale-110"
           />
           <span className="text-sm font-bold tracking-tight text-foreground">
             Lovable Git
