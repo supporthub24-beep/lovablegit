@@ -19,7 +19,14 @@ function NotFoundComponent() {
     <div className="grid-noise relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
       <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)] blur-3xl" />
       <div className="relative max-w-md text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.3em] text-primary">Error 404</p>
+        <img
+          src="/generated/a2e9c3c5-2df-supporthub24-logo.jpg"
+          alt="Lovable Git"
+          width={72}
+          height={72}
+          className="mx-auto size-18 rounded-2xl border border-border/60 object-cover shadow-lg shadow-primary/20"
+        />
+        <p className="mt-4 font-mono text-xs uppercase tracking-[0.3em] text-primary">Error 404</p>
         <h1 className="mt-3 text-7xl font-bold tracking-tight text-foreground sm:text-8xl">
           404
         </h1>
@@ -53,7 +60,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="grid-noise relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
       <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-[color-mix(in_oklch,var(--color-destructive)_12%,transparent)] blur-3xl" />
       <div className="relative max-w-md text-center">
-        <h1 className="text-xl font-bold tracking-tight text-foreground">
+        <img
+          src="/generated/a2e9c3c5-2df-supporthub24-logo.jpg"
+          alt="Lovable Git"
+          width={72}
+          height={72}
+          className="mx-auto size-18 rounded-2xl border border-border/60 object-cover shadow-lg shadow-destructive/20"
+        />
+        <h1 className="mt-4 text-xl font-bold tracking-tight text-foreground">
           This page didn't load
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -99,7 +113,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Chat with AI, generate code, preview instantly and push to your own GitHub repository.",
       },
+      { property: "og:image", content: "/generated/a2e9c3c5-2df-supporthub24-logo.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "/generated/a2e9c3c5-2df-supporthub24-logo.jpg" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -108,8 +124,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
       },
-      { rel: "icon", href: "/generated/f8f9b697-c57-supporthub24-logo.jpg", type: "image/jpeg" },
-      { rel: "apple-touch-icon", href: "/generated/f8f9b697-c57-supporthub24-logo.jpg" },
+      { rel: "icon", href: "/generated/a2e9c3c5-2df-supporthub24-logo.jpg", type: "image/jpeg" },
+      { rel: "apple-touch-icon", href: "/generated/a2e9c3c5-2df-supporthub24-logo.jpg" },
     ],
   }),
   shellComponent: RootShell,
