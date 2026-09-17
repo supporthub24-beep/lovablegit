@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -71,8 +72,8 @@ export type WorkspaceOverview = {
     slug: string;
     monthly_price_cents: number;
     currency: string;
-    limits: Record<string, unknown>;
-    features: Record<string, unknown>;
+    limits: Record<string, string | number | boolean | null>;
+    features: Record<string, string | number | boolean | null>;
   };
   subscription: {
     id: string | null;
@@ -89,8 +90,11 @@ export type WorkspaceOverview = {
  * Ensures the signed-in user has a profile row and a personal workspace.
  * Idempotent: safe to call on every dashboard load.
  */
-export const ensureWorkspace = createServerFn({ method: "POST" }).handler(async ({ context }) => {
-  const { supabase, userId, claims } = context;
+export const ensureWorkspace = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+  const { supabase: authenticatedSupabase, userId, claims } = context;
+  const supabase = authenticatedSupabase as SupabaseClient<any>;
 
   const email = typeof claims?.email === "string" ? claims.email : null;
 
@@ -104,7 +108,7 @@ export const ensureWorkspace = createServerFn({ method: "POST" }).handler(async 
     await supabase.from("profiles").insert({
       id: userId,
       email,
-      display_name: email ? email.split("@")[0] : null,
+      display_name: email ? (email.split("@")[0] ?? null) : null,
       credits: 0,
     });
   }
@@ -140,12 +144,14 @@ export const ensureWorkspace = createServerFn({ method: "POST" }).handler(async 
   });
 
   return { workspaceId: created.id as string };
-});
+  });
 
 export const getWorkspaceOverview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => workspaceIdSchema.parse(input ?? {}))
   .handler(async ({ data, context }): Promise<WorkspaceOverview> => {
-    const { supabase, userId } = context;
+    const { supabase: authenticatedSupabase, userId } = context;
+    const supabase = authenticatedSupabase as SupabaseClient<any>;
 
     const { data: isAdmin } = await supabase.rpc("has_role", {
       _user_id: userId,
@@ -203,7 +209,7 @@ export const getWorkspaceOverview = createServerFn({ method: "POST" })
       .eq("workspace_id", workspace.id)
       .order("created_at", { ascending: true });
 
-    const memberIds = (memberRows ?? []).map((m) => m.user_id);
+    const memberIds = (memberRows ?? []).map((m: { user_id: string }) => m.user_id);
     const { data: profileRows } = memberIds.length
       ? await supabase
           .from("profiles")
@@ -211,9 +217,21 @@ export const getWorkspaceOverview = createServerFn({ method: "POST" })
           .in("id", memberIds)
       : { data: [] as { id: string; email: string | null; display_name: string | null; avatar_url: string | null }[] };
 
-    const profileById = new Map((profileRows ?? []).map((p) => [p.id, p]));
+    const profileById = new Map(
+      (profileRows ?? []).map(
+        (p: { id: string; email: string | null; display_name: string | null; avatar_url: string | null }) => [p.id, p],
+      ),
+    );
 
-    const members: WorkspaceMemberRow[] = (memberRows ?? []).map((m) => ({
+    const members: WorkspaceMemberRow[] = (memberRows ?? []).map((m: {
+      id: string;
+      workspace_id: string;
+      user_id: string;
+      role: string;
+      status: string;
+      created_at: string;
+      updated_at: string;
+    }) => ({
       id: m.id,
       workspace_id: m.workspace_id,
       user_id: m.user_id,
@@ -232,8 +250,10 @@ export const getWorkspaceOverview = createServerFn({ method: "POST" })
         slug: planRow?.slug ?? "free",
         monthly_price_cents: planRow?.monthly_price_cents ?? 0,
         currency: planRow?.currency ?? "usd",
-        limits: (planRow?.limits_json as Record<string, unknown> | null) ?? {},
-        features: (planRow?.features_json as Record<string, unknown> | null) ?? {},
+        limits:
+          (planRow?.limits_json as Record<string, string | number | boolean | null> | null) ?? {},
+        features:
+          (planRow?.features_json as Record<string, string | number | boolean | null> | null) ?? {},
       },
       subscription: {
         id: subscriptionRow?.id ?? null,
@@ -248,9 +268,11 @@ export const getWorkspaceOverview = createServerFn({ method: "POST" })
   });
 
 export const createWorkspace = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => createWorkspaceSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase: authenticatedSupabase, userId } = context;
+    const supabase = authenticatedSupabase as SupabaseClient<any>;
 
     const slug = `${slugify(data.name)}-${userId.slice(0, 8)}`;
 
@@ -273,9 +295,11 @@ export const createWorkspace = createServerFn({ method: "POST" })
   });
 
 export const inviteWorkspaceMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => inviteMemberSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase: authenticatedSupabase, userId } = context;
+    const supabase = authenticatedSupabase as SupabaseClient<any>;
 
     const { data: workspace } = await supabase
       .from("workspaces")
@@ -346,9 +370,11 @@ export const inviteWorkspaceMember = createServerFn({ method: "POST" })
   });
 
 export const updateWorkspaceMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => updateMemberSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase: authenticatedSupabase, userId } = context;
+    const supabase = authenticatedSupabase as SupabaseClient<any>;
 
     const { data: member } = await supabase
       .from("workspace_members")
@@ -412,9 +438,11 @@ export const updateWorkspaceMember = createServerFn({ method: "POST" })
   });
 
 export const removeWorkspaceMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => removeMemberSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase: authenticatedSupabase, userId } = context;
+    const supabase = authenticatedSupabase as SupabaseClient<any>;
 
     const { data: member } = await supabase
       .from("workspace_members")

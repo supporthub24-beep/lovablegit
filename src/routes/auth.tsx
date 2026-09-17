@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Terminal, ArrowLeft, Sparkles, ShieldCheck, GitBranch } from "lucide-react";
+import { ArrowLeft, Sparkles, ShieldCheck, GitBranch } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LovableGitLogo } from "@/components/LovableGitLogo";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -112,11 +113,12 @@ function AuthPage() {
 
       <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-6 sm:py-10">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="flex size-8 items-center justify-center rounded bg-primary text-primary-foreground">
-              <Terminal className="size-4" />
-            </span>
-            <span className="text-lg font-semibold tracking-tight">Forge</span>
+          <Link
+            to="/"
+            aria-label="Forge home"
+            className="rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <LovableGitLogo className="[&_span]:text-base" />
           </Link>
           <Button asChild variant="ghost" size="sm">
             <Link to="/">

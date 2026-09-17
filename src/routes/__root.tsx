@@ -13,18 +13,16 @@ import { useEffect, type ReactNode } from "react";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { LovableGitLogo } from "@/components/LovableGitLogo";
 
 function NotFoundComponent() {
   return (
     <div className="grid-noise relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
       <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)] blur-3xl" />
       <div className="relative max-w-md text-center">
-        <img
-          src="/generated/f78323f2-055-supporthub24-logo.jpg"
-          alt="Forge"
-          width={72}
-          height={72}
-          className="mx-auto size-18 rounded-2xl border border-border/60 object-cover shadow-lg shadow-primary/20"
+        <LovableGitLogo
+          showWordmark={false}
+          className="mx-auto [&_img]:size-18"
         />
         <p className="mt-4 font-mono text-xs uppercase tracking-[0.3em] text-primary">Error 404</p>
         <h1 className="mt-3 text-7xl font-bold tracking-tight text-foreground sm:text-8xl">
@@ -60,12 +58,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="grid-noise relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
       <div className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-[color-mix(in_oklch,var(--color-destructive)_12%,transparent)] blur-3xl" />
       <div className="relative max-w-md text-center">
-        <img
-          src="/generated/f78323f2-055-supporthub24-logo.jpg"
-          alt="Forge"
-          width={72}
-          height={72}
-          className="mx-auto size-18 rounded-2xl border border-border/60 object-cover shadow-lg shadow-destructive/20"
+        <LovableGitLogo
+          showWordmark={false}
+          className="mx-auto [&_img]:size-18"
         />
         <h1 className="mt-4 text-xl font-bold tracking-tight text-foreground">
           This page didn't load
@@ -113,9 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Chat with AI, generate code, preview instantly and push to your own GitHub repository.",
       },
-      { property: "og:image", content: "/generated/f78323f2-055-supporthub24-logo.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "/generated/f78323f2-055-supporthub24-logo.jpg" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -124,8 +117,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
       },
-      { rel: "icon", href: "/generated/f78323f2-055-supporthub24-favicon-2.jpg", type: "image/jpeg" },
-      { rel: "apple-touch-icon", href: "/generated/f78323f2-055-supporthub24-favicon-2.jpg" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,

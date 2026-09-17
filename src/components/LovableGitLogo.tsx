@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import forgeLogo from "@/assets/forge-logo.png";
 
 type LovableGitLogoProps = {
   className?: string;
@@ -7,16 +8,12 @@ type LovableGitLogoProps = {
 };
 
 /**
- * Brand mark for Lovable Git.
- *
- * Renders the transparent PNG version of the mark so the artwork stays
- * identical to the original SVG design at every size. The product name is
- * always rendered as live text next to the mark, never baked into the image.
+ * Forge brand mark and wordmark.
  */
 export function LovableGitLogo({
   className,
   showWordmark = true,
-  title = "Lovable Git",
+  title = "Forge",
 }: LovableGitLogoProps) {
   return (
     <span
@@ -25,17 +22,17 @@ export function LovableGitLogo({
       aria-label={title}
     >
       <img
-        src="/generated/f78323f2-055-supporthub24-logo.jpg"
+        src={forgeLogo}
         alt=""
         width={28}
         height={28}
-        className="h-7 w-7 shrink-0 object-contain"
+        className="h-7 w-7 shrink-0 object-contain drop-shadow-[0_0_8px_color-mix(in_oklch,var(--color-primary)_28%,transparent)]"
         aria-hidden="true"
         draggable={false}
       />
       {showWordmark ? (
         <span className="text-sm font-bold tracking-tight text-foreground">
-          Lovable Git
+          Forge
         </span>
       ) : null}
     </span>
