@@ -108,9 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Chat with AI, generate code, preview instantly and push to your own GitHub repository.",
       },
-      { property: "og:image", content: "/generated/f78323f2-055-supporthub24-logo.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "/generated/f78323f2-055-supporthub24-logo.jpg" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

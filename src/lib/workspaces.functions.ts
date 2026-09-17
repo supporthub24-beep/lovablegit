@@ -71,8 +71,8 @@ export type WorkspaceOverview = {
     slug: string;
     monthly_price_cents: number;
     currency: string;
-    limits: Record<string, unknown>;
-    features: Record<string, unknown>;
+    limits: Record<string, string | number | boolean | null>;
+    features: Record<string, string | number | boolean | null>;
   };
   subscription: {
     id: string | null;
@@ -89,7 +89,9 @@ export type WorkspaceOverview = {
  * Ensures the signed-in user has a profile row and a personal workspace.
  * Idempotent: safe to call on every dashboard load.
  */
-export const ensureWorkspace = createServerFn({ method: "POST" }).handler(async ({ context }) => {
+export const ensureWorkspace = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
   const { supabase, userId, claims } = context;
 
   const email = typeof claims?.email === "string" ? claims.email : null;
@@ -140,9 +142,10 @@ export const ensureWorkspace = createServerFn({ method: "POST" }).handler(async 
   });
 
   return { workspaceId: created.id as string };
-});
+  });
 
 export const getWorkspaceOverview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => workspaceIdSchema.parse(input ?? {}))
   .handler(async ({ data, context }): Promise<WorkspaceOverview> => {
     const { supabase, userId } = context;
@@ -232,8 +235,10 @@ export const getWorkspaceOverview = createServerFn({ method: "POST" })
         slug: planRow?.slug ?? "free",
         monthly_price_cents: planRow?.monthly_price_cents ?? 0,
         currency: planRow?.currency ?? "usd",
-        limits: (planRow?.limits_json as Record<string, unknown> | null) ?? {},
-        features: (planRow?.features_json as Record<string, unknown> | null) ?? {},
+        limits:
+          (planRow?.limits_json as Record<string, string | number | boolean | null> | null) ?? {},
+        features:
+          (planRow?.features_json as Record<string, string | number | boolean | null> | null) ?? {},
       },
       subscription: {
         id: subscriptionRow?.id ?? null,
@@ -248,6 +253,7 @@ export const getWorkspaceOverview = createServerFn({ method: "POST" })
   });
 
 export const createWorkspace = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => createWorkspaceSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -273,6 +279,7 @@ export const createWorkspace = createServerFn({ method: "POST" })
   });
 
 export const inviteWorkspaceMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => inviteMemberSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -346,6 +353,7 @@ export const inviteWorkspaceMember = createServerFn({ method: "POST" })
   });
 
 export const updateWorkspaceMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => updateMemberSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -412,6 +420,7 @@ export const updateWorkspaceMember = createServerFn({ method: "POST" })
   });
 
 export const removeWorkspaceMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => removeMemberSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
