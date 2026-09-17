@@ -6,58 +6,70 @@ type LovableGitLogoProps = {
   title?: string;
 };
 
+/**
+ * Bold, symbol-only mark for Lovable Git.
+ *
+ * The silhouette is a sharp angular "L" fused with a git branch node — a
+ * high-contrast geometric shape that stays legible down to favicon size.
+ * Everything is drawn with `currentColor` so the mark inherits the
+ * surrounding text colour and keeps contrast on both light and dark
+ * backgrounds. No lettering is baked into the artwork; the product name is
+ * always rendered as live text next to the mark.
+ */
 export function LovableGitLogo({
   className,
   showWordmark = true,
   title = "Lovable Git",
 }: LovableGitLogoProps) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox={showWordmark ? "0 0 240 64" : "0 0 64 64"}
+    <span
+      className={cn("inline-flex items-center gap-2", className)}
       role="img"
       aria-label={title}
-      className={cn("h-8 w-auto text-foreground", className)}
     >
-      <title>{title}</title>
-      <defs>
-        <linearGradient id="lovableGitMark" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0.65" />
-        </linearGradient>
-      </defs>
-      <g
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 64 64"
+        className="h-7 w-7 shrink-0"
+        aria-hidden="true"
+        focusable="false"
       >
-        <path d="M32 8c-6 0-10 4-10 9 0 3 1 5 3 7-4 1-7 4-7 9v3" />
-        <path d="M32 8c6 0 10 4 10 9 0 3-1 5-3 7 4 1 7 4 7 9v3" />
-        <circle cx="32" cy="17" r="3.5" fill="currentColor" stroke="none" />
-        <circle cx="18" cy="40" r="4" fill="currentColor" stroke="none" />
-        <circle cx="46" cy="40" r="4" fill="currentColor" stroke="none" />
-        <path d="M18 40h28" />
-      </g>
-      <path
-        d="M32 26c-3.5 0-6 2.5-6 6 0 2 1 3.5 2.5 4.5L32 44l3.5-7.5C37 35.5 38 34 38 32c0-3.5-2.5-6-6-6Z"
-        fill="url(#lovableGitMark)"
-      />
+        <title>{title}</title>
+        <defs>
+          <linearGradient id="lovableGitMark" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0.7" />
+          </linearGradient>
+        </defs>
+        {/* Angular plate — aggressive chamfered silhouette */}
+        <path
+          d="M32 2 58 16v32L32 62 6 48V16L32 2Z"
+          fill="url(#lovableGitMark)"
+        />
+        {/* Bold "L" stroke carved out of the plate */}
+        <path
+          d="M22 18v22h20"
+          fill="none"
+          stroke="var(--color-background)"
+          strokeWidth="7"
+          strokeLinecap="square"
+          strokeLinejoin="miter"
+        />
+        {/* Git branch node — high-contrast accent dot */}
+        <circle
+          cx="42"
+          cy="40"
+          r="6"
+          fill="var(--color-background)"
+        />
+        <circle cx="42" cy="40" r="3" fill="currentColor" />
+      </svg>
       {showWordmark ? (
-        <text
-          x="72"
-          y="41"
-          fill="currentColor"
-          fontFamily="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-          fontSize="26"
-          fontWeight="700"
-          letterSpacing="-0.5"
-        >
+        <span className="text-sm font-bold tracking-tight text-foreground">
           Lovable Git
-        </text>
+        </span>
       ) : null}
-    </svg>
+    </span>
   );
 }
 

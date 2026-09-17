@@ -5,6 +5,7 @@ import { LogOut, Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AdminLogo } from "@/components/AdminLogo";
+import { LovableGitLogo } from "@/components/LovableGitLogo";
 import { ProjectDrawer } from "@/components/ProjectDrawer";
 import { getCreditOverview } from "@/lib/payments.functions";
 
@@ -32,12 +33,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           aria-label="Lovable Git home"
           className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
-          <img
-            src="/generated/lovable-git-logo-1789313316959.png"
-            alt=""
-            aria-hidden="true"
-            className="h-7 w-7 shrink-0 rounded-md object-contain"
-          />
+          <LovableGitLogo showWordmark={false} className="text-primary" />
           <span className="text-sm font-bold tracking-tight text-foreground">
             Lovable Git
           </span>
