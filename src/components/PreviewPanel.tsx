@@ -1,6 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Monitor, Smartphone, RefreshCw, Info, Loader2, FileX2, AlertTriangle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  Monitor,
+  Smartphone,
+  RefreshCw,
+  Info,
+  Loader2,
+  FileX2,
+  AlertTriangle,
+  Github,
+  GitBranch,
+} from "lucide-react";
 import { buildPreviewDocument, type GeneratedFile, type PreviewDbConfig } from "@/lib/codegen";
+import { getGithubStatus } from "@/lib/github.functions";
 import { Button } from "@/components/ui/button";
 
 const PREVIEW_DEBOUNCE_MS = 400;
@@ -22,6 +35,12 @@ export function PreviewPanel({ files, db }: { files: GeneratedFile[]; db?: Previ
   const [debouncedDb, setDebouncedDb] = useState<PreviewDbConfig | null | undefined>(db);
   const [renderError, setRenderError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchConnection = useServerFn(getGithubStatus);
+  const connection = useQuery({
+    queryKey: ["github-status"],
+    queryFn: () => fetchConnection(),
+  });
 
   const signature = useMemo(() => filesSignature(files), [files]);
   const dbSignature = useMemo(
@@ -63,6 +82,11 @@ export function PreviewPanel({ files, db }: { files: GeneratedFile[]; db?: Previ
 
   const hasFiles = debouncedFiles.length > 0;
   const showError = renderError !== null || (hasFiles && doc.trim().length === 0);
+
+  const repoContext = connection.data ?? null;
+  const repoContextLoading = connection.isPending;
+  const repoContextError = connection.isError;
+  const repoConnected = repoContext?.connected === true;
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -108,6 +132,38 @@ export function PreviewPanel({ files, db }: { files: GeneratedFile[]; db?: Previ
             <RefreshCw className="size-4" aria-hidden="true" />
           </Button>
         </div>
+      </div>
+
+      <div className="border-b border-border bg-muted/30 px-4 py-2.5">
+        {repoContextLoading ? (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Loader2 className="size-3 animate-spin" aria-hidden="true" />
+            Loading repository context…
+          </div>
+        ) : repoContextError ? (
+          <div className="flex items-center gap-2 text-xs text-destructive">
+            <Github className="size-3" aria-hidden="true" />
+            Repository context unavailable.
+          </div>
+        ) : repoConnected ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <Github className="size-3" aria-hidden="true" />
+              <span className="font-medium text-foreground">
+                {repoContext?.account ?? "GitHub account"}
+              </span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <GitBranch className="size-3" aria-hidden="true" />
+              Connected
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Github className="size-3" aria-hidden="true" />
+            No repository connected. Add one in Settings to give the preview repo context.
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 items-start justify-center overflow-auto bg-surface p-4">

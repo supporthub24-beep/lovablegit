@@ -2,7 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listChatModels } from "@/lib/providers.functions";
-import { Send, Sparkles, Image as ImageIcon, Loader2, Bot, User, X } from "lucide-react";
+import { getGithubStatus } from "@/lib/github.functions";
+import {
+  Send,
+  Sparkles,
+  Image as ImageIcon,
+  Loader2,
+  Bot,
+  User,
+  X,
+  Github,
+  GitBranch,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +36,12 @@ export function ChatPanel({
   const [modelId, setModelId] = useState<string>("");
   const fetchModels = useServerFn(listChatModels);
   const models = useQuery({ queryKey: ["chat-models"], queryFn: () => fetchModels() });
+
+  const fetchConnection = useServerFn(getGithubStatus);
+  const connection = useQuery({
+    queryKey: ["github-status"],
+    queryFn: () => fetchConnection(),
+  });
 
   useEffect(() => {
     if (!modelId && models.data?.defaultId) setModelId(models.data.defaultId);
@@ -71,6 +88,11 @@ export function ChatPanel({
   const noModelsConfigured =
     !models.isPending && !models.isError && modelOptions.length === 0;
 
+  const repoContext = connection.data ?? null;
+  const repoContextLoading = connection.isPending;
+  const repoContextError = connection.isError;
+  const repoConnected = repoContext?.connected === true;
+
   return (
     <div className="flex h-full min-h-0 flex-col rounded-2xl border border-border bg-surface shadow-lg">
       <div className="flex items-center gap-2 border-b border-border px-5 py-4">
@@ -103,6 +125,38 @@ export function ChatPanel({
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="border-b border-border bg-muted/30 px-5 py-2.5">
+        {repoContextLoading ? (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Loader2 className="size-3 animate-spin" aria-hidden="true" />
+            Loading repository context…
+          </div>
+        ) : repoContextError ? (
+          <div className="flex items-center gap-2 text-xs text-destructive">
+            <Github className="size-3" aria-hidden="true" />
+            Repository context unavailable.
+          </div>
+        ) : repoConnected ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <Github className="size-3" aria-hidden="true" />
+              <span className="font-medium text-foreground">
+                {repoContext?.account ?? "GitHub account"}
+              </span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <GitBranch className="size-3" aria-hidden="true" />
+              Connected
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Github className="size-3" aria-hidden="true" />
+            No repository connected. Add one in Settings to give the AI repo context.
+          </div>
+        )}
       </div>
 
       {models.isError && (
