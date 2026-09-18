@@ -33,19 +33,20 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Forge — Chat with AI, generate code, preview instantly" },
+      { title: "bolt.diy — Open-source AI web development agent" },
       {
         name: "description",
         content:
-          "Connect your GitHub account, describe what you want, and Forge writes the code, shows a live preview and commits it back — powered by AI.",
+          "bolt.diy is an open-source AI agent that builds, edits and previews full-stack web apps in your browser. Bring your own model, run it locally, deploy anywhere.",
       },
       {
         property: "og:title",
-        content: "Forge — Chat with AI, generate code, preview instantly",
+        content: "bolt.diy — Open-source AI web development agent",
       },
       {
         property: "og:description",
-        content: "GitHub-connected AI development workspace with live preview and image generation.",
+        content:
+          "Prompt, run, edit and deploy full-stack web apps with any LLM. Self-hosted, open source, no lock-in.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -62,72 +63,72 @@ const IDEAS = [
 ];
 
 const LOGOS = [
-  "Vercel",
-  "Supabase",
-  "Stripe",
-  "GitHub",
-  "Linear",
-  "Figma",
-  "Notion",
-  "Shopify",
-  "Railway",
-  "Resend",
+  "OpenAI",
+  "Anthropic",
+  "Google Gemini",
+  "Ollama",
+  "Groq",
+  "Mistral",
+  "OpenRouter",
+  "DeepSeek",
+  "xAI",
+  "LM Studio",
 ];
 
 const STATS = [
-  { value: "12k+", label: "apps prototyped" },
-  { value: "48s", label: "median first preview" },
-  { value: "3.4M", label: "AI messages handled" },
-  { value: "99.9%", label: "preview uptime" },
+  { value: "20+", label: "LLM providers supported" },
+  { value: "100%", label: "open source, MIT licensed" },
+  { value: "1-click", label: "deploy to Netlify or Vercel" },
+  { value: "Local", label: "runs on your own machine" },
 ];
 
 const PLANS = [
   {
-    id: "free",
-    name: "Free",
+    id: "self-host",
+    name: "Self-hosted",
     price: "$0",
     cadence: "forever",
-    tagline: "For trying ideas and small side projects.",
+    tagline: "Run bolt.diy on your own machine with your own API keys.",
     features: [
-      "1 workspace",
-      "3 projects",
-      "50 AI messages / month",
-      "Live preview and code editor",
-      "GitHub import and push",
+      "Full source code, MIT licensed",
+      "Bring your own LLM provider and keys",
+      "Local Ollama and LM Studio support",
+      "WebContainer preview in the browser",
+      "Docker and pnpm install paths",
     ],
-    cta: "Start free",
-    highlight: false,
+    cta: "Read the docs",
+    highlight: true,
   },
   {
-    id: "pro",
-    name: "Pro",
-    price: "$20",
-    cadence: "per month",
-    tagline: "For solo builders shipping real products.",
+    id: "cloud",
+    name: "Cloud",
+    price: "Usage",
+    cadence: "based",
+    tagline: "Skip the setup and run bolt.diy from a hosted instance.",
     features: [
-      "Unlimited projects",
-      "2,000 AI messages / month",
-      "Image and logo generation",
-      "Version history and rollback",
-      "Priority AI model access",
+      "No local install required",
+      "Managed model routing",
+      "Shared project workspaces",
+      "Deploy to Netlify, Vercel or GitHub Pages",
+      "Community and email support",
     ],
-    cta: "Upgrade to Pro",
-    highlight: true,
+    cta: "Try the cloud",
+    highlight: false,
   },
   {
     id: "team",
     name: "Team",
-    price: "$60",
-    cadence: "per month",
-    tagline: "For teams building together in one workspace.",
+    price: "Custom",
+    cadence: "per workspace",
+    tagline: "For teams that want bolt.diy wired into their own stack.",
     features: [
-      "Everything in Pro",
-      "Up to 10 workspace members",
-      "Shared billing and invoices",
-      "Role-based access control",
-      "Usage reporting per member",
+      "Everything in Cloud",
+      "Private model endpoints",
+      "Single sign-on and role access",
+      "Self-hosted deployment support",
+      "Priority issue triage",
     ],
-    cta: "Upgrade to Team",
+    cta: "Talk to us",
     highlight: false,
   },
 ];
@@ -135,18 +136,18 @@ const PLANS = [
 const BILLING_POINTS = [
   {
     icon: <CreditCard className="size-5 text-primary" />,
-    title: "Workspace billing",
-    body: "Every plan, subscription and invoice is scoped to a workspace, so a team shares one bill and one usage meter.",
+    title: "Bring your own keys",
+    body: "bolt.diy never resells model access. Point it at OpenAI, Anthropic, Gemini, Groq, OpenRouter or a local Ollama server and pay those providers directly.",
   },
   {
     icon: <Gauge className="size-5 text-primary" />,
     title: "Usage you can see",
-    body: "Token and project limits are metered per workspace, with a live meter that warns you before you hit the ceiling.",
+    body: "Token usage and context limits are surfaced per provider, so you always know which model is doing the work and what it costs.",
   },
   {
     icon: <Users className="size-5 text-primary" />,
-    title: "Roles and access",
-    body: "Owners, admins, members and viewers each get the right level of access, enforced by database policies.",
+    title: "Open source, no lock-in",
+    body: "The whole agent is MIT licensed. Fork it, extend the provider list, or run it entirely offline — nothing is hidden behind a paywall.",
   },
 ];
 
@@ -300,28 +301,28 @@ function Point({ icon, text }: { icon: ReactNode; text: string }) {
 
 const FAQ_ITEMS = [
   {
-    value: "github",
-    question: "Do I need a GitHub account?",
+    value: "models",
+    question: "Which AI models can I use?",
     answer:
-      "Yes. Forge connects to your own GitHub account so every project you build lives in a repository you control.",
+      "Any provider you have a key for — OpenAI, Anthropic, Google Gemini, Groq, Mistral, OpenRouter, DeepSeek, xAI — plus local models through Ollama or LM Studio. You can switch models per project.",
   },
   {
     value: "hosting",
-    question: "Does Forge host my app?",
+    question: "Where does bolt.diy run?",
     answer:
-      "No. The preview runs in a sandbox so you can see your changes instantly. When you are ready to ship, deploy the repository with any host you like.",
+      "On your own machine or server. It is a self-hosted web app: clone the repository, install dependencies, start the dev server and open it in your browser.",
   },
   {
-    value: "database",
-    question: "Can I connect my own database?",
+    value: "preview",
+    question: "How does the live preview work?",
     answer:
-      "Yes. Plug your own Supabase project into the preview and query real data from the generated app.",
+      "Generated projects run inside a WebContainer in your browser, so you get a real dev server and terminal without any remote build step.",
   },
   {
-    value: "rollback",
-    question: "What if I do not like a change?",
+    value: "deploy",
+    question: "Can I deploy what I build?",
     answer:
-      "Every AI edit is snapshotted. Open the version history and restore any earlier version with one click.",
+      "Yes. Push the generated project to GitHub and deploy it to Netlify, Vercel or any static host — the code is plain, portable web output.",
   },
 ];
 
@@ -395,7 +396,7 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
             to="/"
-            aria-label="Forge home"
+            aria-label="bolt.diy home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <LovableGitLogo className="h-7 w-auto text-foreground" />
@@ -455,14 +456,14 @@ function Landing() {
           <div className="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 sm:py-32">
             <Reveal>
               <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur">
-                <Github className="size-3.5" /> Connect all your tools
+                <Github className="size-3.5" /> Open source · MIT licensed
                 <ArrowRight className="size-3.5" />
               </p>
             </Reveal>
 
             <Reveal delay={60}>
               <h1 className="mx-auto mt-8 max-w-3xl text-balance text-4xl font-bold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
-                What&apos;s on your <span className="text-gradient">mind?</span>
+                Prompt, run, edit and <span className="text-gradient">deploy</span> web apps
               </h1>
             </Reveal>
 
@@ -531,7 +532,7 @@ function Landing() {
         <section aria-label="Trusted by" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
             <p className="text-center font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Teams ship faster with Forge
+              Works with the models you already use
             </p>
             <div className="relative mt-5 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
               <div className="marquee-track flex w-max items-center gap-12">
@@ -560,29 +561,29 @@ function Landing() {
                 Three simple steps
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                No installs, no configuration. If you can write a message, you can build an app.
+                Self-host it, pick a model, and start building. No account required.
               </p>
             </Reveal>
             <ol className="mt-12 grid gap-5 md:grid-cols-3">
               <Reveal delay={0} className="h-full">
                 <Step
                   n={1}
-                  title="Connect GitHub"
-                  body="Link your GitHub account to create a new repository or import an existing project."
+                  title="Run it locally"
+                  body="Clone the bolt.diy repository, install dependencies with pnpm, and start the dev server on your own machine."
                 />
               </Reveal>
               <Reveal delay={60} className="h-full">
                 <Step
                   n={2}
-                  title="Chat with AI"
-                  body="Describe what you want in plain language. The AI writes code, generates assets, and updates files."
+                  title="Pick your model"
+                  body="Add an API key for any supported provider, or point bolt.diy at a local Ollama or LM Studio server."
                 />
               </Reveal>
               <Reveal delay={120} className="h-full">
                 <Step
                   n={3}
-                  title="Preview & commit"
-                  body="See a live preview instantly. When ready, commit and push the generated code to your repository."
+                  title="Prompt, preview, deploy"
+                  body="Describe the app you want, watch it run in the browser preview, then push it to GitHub and deploy."
                 />
               </Reveal>
             </ol>
@@ -600,37 +601,36 @@ function Landing() {
                 Everything in one workspace
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                Chat, preview, code, assets, history and data — side by side on desktop, tabbed on
-                mobile.
+                Chat, code, terminal and live preview — side by side on desktop, tabbed on mobile.
               </p>
             </Reveal>
             <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               <Reveal delay={0} className="h-full">
                 <Feature
                   icon={<GitBranch className="size-5 text-primary" />}
-                  title="GitHub integration"
-                  body="Import existing files, let the AI edit them, and push commits back to your own account."
+                  title="Any LLM provider"
+                  body="OpenAI, Anthropic, Gemini, Groq, Mistral, OpenRouter, DeepSeek, xAI, Ollama and LM Studio — switch models per project."
                 />
               </Reveal>
               <Reveal delay={60} className="h-full">
                 <Feature
                   icon={<MessageSquareCode className="size-5 text-primary" />}
                   title="AI chat that writes code"
-                  body="Every message returns real files, versioned inside your project. Pick the AI model you prefer."
+                  body="Every message returns real files, versioned inside your project. Diff, revert or keep each change."
                 />
               </Reveal>
               <Reveal delay={120} className="h-full">
                 <Feature
                   icon={<MonitorPlay className="size-5 text-primary" />}
-                  title="Instant live preview"
-                  body="Multi-file React or plain HTML renders in a sandbox while you work. Nothing is hosted — preview only."
+                  title="In-browser preview"
+                  body="Generated projects run in a WebContainer with a real dev server and terminal — no remote build step."
                 />
               </Reveal>
               <Reveal delay={0} className="h-full">
                 <Feature
                   icon={<ImageIcon className="size-5 text-primary" />}
-                  title="Logos and images"
-                  body="Generate logos, icons, banners and illustrations from chat and drop them into the build."
+                  title="Attach images and files"
+                  body="Drop screenshots, designs or existing files into the chat and let the agent work from them."
                 />
               </Reveal>
               <Reveal delay={60} className="h-full">
@@ -643,8 +643,8 @@ function Landing() {
               <Reveal delay={120} className="h-full">
                 <Feature
                   icon={<Database className="size-5 text-primary" />}
-                  title="Connect your database"
-                  body="Plug your own Supabase project into the preview and query real data from the generated app."
+                  title="Deploy anywhere"
+                  body="Push the generated project to GitHub and ship it to Netlify, Vercel or any static host you like."
                 />
               </Reveal>
             </div>
@@ -652,7 +652,7 @@ function Landing() {
         </section>
 
         {/* Stats */}
-        <section aria-label="Forge in numbers" className="border-b border-border bg-surface">
+        <section aria-label="bolt.diy in numbers" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
             <dl className="grid grid-cols-2 gap-8 sm:grid-cols-4">
               {STATS.map((stat, index) => (
@@ -734,8 +734,8 @@ function Landing() {
                 Your code stays yours
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                Everything Forge generates lands in your own GitHub repository. No lock-in, no
-                hidden hosting, no surprises.
+                bolt.diy is MIT licensed and self-hosted. Everything it generates lands in your own
+                repository — no lock-in, no hidden hosting, no surprises.
               </p>
               <ul className="mt-8 space-y-3">
                 <li className="flex items-start gap-3">
@@ -743,7 +743,7 @@ function Landing() {
                     <Check className="size-3 text-primary" />
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    Commit history you control, on your own account.
+                    Full source code you can read, fork and extend.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -751,7 +751,7 @@ function Landing() {
                     <Check className="size-3 text-primary" />
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    Bring your own Supabase project for real data.
+                    Bring your own API keys, or run models locally.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -776,7 +776,7 @@ function Landing() {
                 />
                 <Point
                   icon={<Database className="size-4 text-primary" />}
-                  text="Query real data from your own Supabase project."
+                  text="Deploy the finished project to any host you choose."
                 />
                 <Point
                   icon={<History className="size-4 text-primary" />}
@@ -795,11 +795,11 @@ function Landing() {
                 <CreditCard className="size-3" /> Pricing
               </span>
               <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
-                Plans that scale with your workspace
+                Free to self-host, cloud when you want it
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                Start free, upgrade when your team needs more projects, more AI messages and shared
-                billing. Every plan is billed per workspace.
+                Run bolt.diy yourself at no cost, or use a hosted instance when you would rather
+                skip the setup. You always bring your own model keys.
               </p>
             </Reveal>
 
@@ -815,7 +815,7 @@ function Landing() {
                   >
                     {plan.highlight && (
                       <span className="absolute right-5 top-5 rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground">
-                        Most popular
+                        Recommended
                       </span>
                     )}
                     <h3 className="text-lg font-bold tracking-tight">{plan.name}</h3>
@@ -866,7 +866,7 @@ function Landing() {
                 Frequently asked questions
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                Everything you need to know before you start building.
+                Everything you need to know before you self-host bolt.diy.
               </p>
             </Reveal>
             <Accordion type="single" collapsible className="mt-10 w-full">
@@ -892,7 +892,7 @@ function Landing() {
                 Start building in <span className="text-gradient">seconds</span>
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
-                Describe your idea, watch it come to life, and push it to GitHub — all in one
+                Describe your idea, watch it run in the browser, and push it to GitHub — all in one
                 workspace.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -915,13 +915,13 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
           <Link
             to="/"
-            aria-label="Forge home"
+            aria-label="bolt.diy home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <LovableGitLogo className="h-6 w-auto text-foreground" />
           </Link>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Forge. Built for people who ship.
+            © {new Date().getFullYear()} bolt.diy. Open source, MIT licensed.
           </p>
         </div>
       </footer>
