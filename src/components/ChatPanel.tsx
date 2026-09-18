@@ -39,11 +39,13 @@ export function ChatPanel({
   busy,
   onSend,
   onGenerateImage,
+  onOpenFile,
 }: {
   messages: ChatMsg[];
   busy: boolean;
   onSend: (prompt: string, modelId?: string) => Promise<ChatSendResult>;
   onGenerateImage: (prompt: string, kind: "image" | "logo" | "icon" | "banner") => Promise<void>;
+  onOpenFile?: (path: string) => void;
 }) {
   const [value, setValue] = useState("");
   const [imageMode, setImageMode] = useState<null | "image" | "logo" | "icon" | "banner">(null);
@@ -221,7 +223,17 @@ export function ChatPanel({
                 ) : (
                   <FileCode2 className="size-3 text-muted-foreground" aria-hidden="true" />
                 )}
-                <span className="font-mono">{action.path}</span>
+                {onOpenFile && action.type !== "delete" ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenFile(action.path)}
+                    className="truncate rounded font-mono text-left text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {action.path}
+                  </button>
+                ) : (
+                  <span className="truncate font-mono">{action.path}</span>
+                )}
                 <span className="text-muted-foreground">— {action.type}</span>
               </li>
             ))}

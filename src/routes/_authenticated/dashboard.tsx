@@ -2,7 +2,20 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Plus, Github, Trash2, FolderGit2, Coins, CreditCard, Gauge } from "lucide-react";
+import {
+  Plus,
+  Github,
+  Trash2,
+  FolderGit2,
+  Coins,
+  CreditCard,
+  Gauge,
+  MessageSquare,
+  Loader2,
+  AlertTriangle,
+  RefreshCw,
+  Wallet,
+} from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
@@ -33,6 +46,7 @@ import {
 } from "@/lib/github.functions";
 import { getWorkspaceOverview } from "@/lib/workspaces.functions";
 import { getBillingOverview } from "@/lib/payments.functions";
+import { listProjects as listProjectsForHistory } from "@/lib/projects.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -60,6 +74,7 @@ function Dashboard() {
   const fetchRepos = useServerFn(listRepos);
   const fetchWorkspace = useServerFn(getWorkspaceOverview);
   const fetchBilling = useServerFn(getBillingOverview);
+  const fetchHistory = useServerFn(listProjectsForHistory);
   const create = useServerFn(createProject);
   const remove = useServerFn(deleteProject);
 
@@ -86,6 +101,11 @@ function Dashboard() {
   const billing = useQuery({
     queryKey: ["billing-overview"],
     queryFn: () => fetchBilling(),
+    retry: false,
+  });
+  const history = useQuery({
+    queryKey: ["projects"],
+    queryFn: () => fetchHistory(),
     retry: false,
   });
   const github = useQuery({ queryKey: ["github-status"], queryFn: () => fetchGithub() });
@@ -303,6 +323,26 @@ function Dashboard() {
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <p className="flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                <Wallet className="size-3.5 text-primary" aria-hidden="true" /> Credit wallet
+              </p>
+              <p className="mt-2 text-lg font-bold tracking-tight tabular-nums">
+                {account.isPending
+                  ? "Loading…"
+                  : account.isError
+                    ? "Unavailable"
+                    : `${account.data?.profile?.credits ?? 0} credits`}
+              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {account.data?.profile?.credits === 0
+                  ? "No credits left — top up to keep building."
+                  : "Available for AI chat and image generation."}
+              </p>
+              <Button asChild size="sm" variant="outline" className="mt-3">
+                <Link to="/payments">Top up credits</Link>
+              </Button>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 <Gauge className="size-3.5 text-primary" aria-hidden="true" /> Token usage
               </p>
               <p className="mt-2 text-lg font-bold tracking-tight tabular-nums">
@@ -393,6 +433,72 @@ function Dashboard() {
               </Button>
             </div>
           </div>
+
+          <div className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  <MessageSquare className="size-3.5 text-primary" aria-hidden="true" /> Chat history
+                </p>
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  Recent AI conversations across your projects.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void history.refetch()}
+                disabled={history.isFetching}
+              >
+                <RefreshCw
+                  className={`size-4 ${history.isFetching ? "animate-spin" : ""}`}
+                  aria-hidden="true"
+                />
+                Refresh
+              </Button>
+            </div>
+
+            {history.isPending ? (
+              <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                Loading chat history…
+              </div>
+            ) : history.isError ? (
+              <div
+                role="alert"
+                className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+              >
+                <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <span>
+                  Chat history could not be loaded.{" "}
+                  {history.error instanceof Error ? history.error.message : "Unknown error"}
+                </span>
+              </div>
+            ) : (history.data ?? []).length === 0 ? (
+              <p className="mt-4 rounded-lg border border-dashed border-border bg-surface px-4 py-6 text-center text-sm text-muted-foreground">
+                No conversations yet. Open a project and ask the AI to build something.
+              </p>
+            ) : (
+              <ul className="mt-4 divide-y divide-border">
+                {(history.data ?? []).slice(0, 5).map((p) => (
+                  <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                    <Link
+                      to="/workspace/$projectId"
+                      params={{ projectId: p.id }}
+                      className="truncate text-sm font-medium text-foreground hover:text-primary hover:underline"
+                    >
+                      {p.name}
+                    </Link>
+                    <span className="text-xs text-muted-foreground">
+                      {p.repo_full_name ?? "No repository"} ·{" "}
+                      {new Date(p.updated_at).toLocaleDateString()}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           {workspace.isError && (
             <p className="mt-3 text-xs text-muted-foreground">
               Workspace details could not be loaded. Projects and repositories below are still

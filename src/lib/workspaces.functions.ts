@@ -554,6 +554,33 @@ const applyActionsSchema = z.object({
   label: z.string().trim().max(120).optional(),
 });
 
+const applyFileActionsSchema = z.object({
+  projectId: z.string().uuid(),
+  actions: z
+    .array(
+      z.union([
+        z.object({
+          kind: z.enum(["create", "update"]),
+          path: z.string().trim().min(1).max(400),
+          content: z.string().max(400_000),
+        }),
+        z.object({
+          kind: z.literal("delete"),
+          path: z.string().trim().min(1).max(400),
+        }),
+      ]),
+    )
+    .min(1)
+    .max(60),
+  label: z.string().trim().max(120).optional(),
+});
+
+const saveFileSchema = z.object({
+  projectId: z.string().uuid(),
+  path: z.string().trim().min(1).max(400),
+  content: z.string().max(400_000),
+});
+
 export type ProjectFileRow = { path: string; content: string };
 
 export type FileAction =
@@ -693,6 +720,123 @@ export const applyFileActions = createServerFn({ method: "POST" })
       changedFiles: writes.map((file) => file.path),
       deletedFiles: deletes.map((file) => file.path),
     };
+  });
+
+/**
+ * Applies an explicit list of file actions (create / update / delete) coming
+ * from the workspace editor or the chat artifact layer. This is the same
+ * contract as `applyFileActions`, but the caller supplies the actions directly
+ * instead of a raw model response.
+ */
+export const applyExplicitFileActions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => applyFileActionsSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as SupabaseClient<any>;
+    await assertProjectAccess(supabase, data.projectId, context.userId);
+
+    const actions: FileAction[] = data.actions.map((action) =>
+      action.kind === "delete"
+        ? { kind: "delete" as const, path: normalizePath(action.path) }
+        : {
+            kind: action.kind,
+            path: normalizePath(action.path),
+            content: action.content,
+          },
+    );
+
+    const writes = actions.filter(
+      (action): action is Extract<FileAction, { kind: "create" | "update" }> =>
+        action.kind !== "delete",
+    );
+    const deletes = actions.filter(
+      (action): action is Extract<FileAction, { kind: "delete" }> => action.kind === "delete",
+    );
+
+    if (writes.length === 0 && deletes.length === 0) {
+      return { changedFiles: [] as string[], deletedFiles: [] as string[] };
+    }
+
+    const { data: existing } = await supabase
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", data.projectId);
+
+    await supabase.from("project_versions").insert({
+      project_id: data.projectId,
+      user_id: context.userId,
+      label: (data.label ?? "Workspace edit").slice(0, 80),
+      files: (existing ?? []) as unknown as never,
+    });
+
+    if (writes.length) {
+      const { error } = await supabase.from("project_files").upsert(
+        writes.map((file) => ({
+          project_id: data.projectId,
+          user_id: context.userId,
+          path: file.path,
+          content: file.content,
+          updated_at: new Date().toISOString(),
+        })),
+        { onConflict: "project_id,path" },
+      );
+      if (error) throw new Error(error.message);
+    }
+
+    if (deletes.length) {
+      const { error } = await supabase
+        .from("project_files")
+        .delete()
+        .eq("project_id", data.projectId)
+        .in(
+          "path",
+          deletes.map((file) => file.path),
+        );
+      if (error) throw new Error(error.message);
+    }
+
+    return {
+      changedFiles: writes.map((file) => file.path),
+      deletedFiles: deletes.map((file) => file.path),
+    };
+  });
+
+/** Saves a single file from the workspace editor. */
+export const saveProjectFile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => saveFileSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as SupabaseClient<any>;
+    await assertProjectAccess(supabase, data.projectId, context.userId);
+
+    const path = normalizePath(data.path);
+    if (!path) throw new Error("A file path is required.");
+
+    const { data: existing } = await supabase
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", data.projectId);
+
+    await supabase.from("project_versions").insert({
+      project_id: data.projectId,
+      user_id: context.userId,
+      label: `Edit ${path}`.slice(0, 80),
+      files: (existing ?? []) as unknown as never,
+    });
+
+    const { error } = await supabase.from("project_files").upsert(
+      {
+        project_id: data.projectId,
+        user_id: context.userId,
+        path,
+        content: data.content,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "project_id,path" },
+    );
+    if (error) throw new Error(error.message);
+
+    return { ok: true, path };
   });
 
 /** Writes one or more files directly (editor saves, imports, scaffolding). */

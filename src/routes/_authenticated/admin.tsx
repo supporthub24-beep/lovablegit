@@ -37,6 +37,8 @@ import {
   setCustomerCredits,
   saveAiKey,
   getAiKeyStatus,
+  claimAdminRole,
+  adminExists,
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -71,6 +73,8 @@ function AdminPage() {
   const fetchOverview = useServerFn(getAdminOverview);
   const saveSetting = useServerFn(updatePlatformSetting);
   const saveCredits = useServerFn(setCustomerCredits);
+  const fetchAdminExists = useServerFn(adminExists);
+  const claimAdmin = useServerFn(claimAdminRole);
 
   const account = useQuery({ queryKey: ["account"], queryFn: () => fetchAccount() });
   const overview = useQuery({
@@ -78,6 +82,27 @@ function AdminPage() {
     queryFn: () => fetchOverview(),
     retry: false,
   });
+  const adminStatus = useQuery({
+    queryKey: ["admin-exists"],
+    queryFn: () => fetchAdminExists(),
+    retry: false,
+  });
+  const [claiming, setClaiming] = useState(false);
+
+  async function handleClaimAdmin() {
+    setClaiming(true);
+    try {
+      await claimAdmin();
+      toast.success("You are now the platform administrator.");
+      await qc.invalidateQueries({ queryKey: ["admin-exists"] });
+      await qc.invalidateQueries({ queryKey: ["admin-overview"] });
+      await qc.invalidateQueries({ queryKey: ["account"] });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not claim the admin role");
+    } finally {
+      setClaiming(false);
+    }
+  }
 
   const [chatModel, setChatModel] = useState("");
   const [imageModel, setImageModel] = useState("");
@@ -119,6 +144,7 @@ function AdminPage() {
   }, [usage]);
 
   if (overview.isError) {
+    const noAdminYet = adminStatus.isSuccess && !adminStatus.data.exists;
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <AppHeader isAdmin={false} />
@@ -127,6 +153,23 @@ function AdminPage() {
           <p className="mt-4 text-sm text-muted-foreground">
             You do not have administrator access to this platform.
           </p>
+          {noAdminYet && (
+            <div className="mt-6 rounded-2xl border-2 border-dashed border-border bg-card/50 p-5 text-left">
+              <p className="text-sm font-bold uppercase tracking-wide">First-time setup</p>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                No administrator exists yet. The first signed-in account can claim the admin role
+                and configure AI providers, models and customer credits.
+              </p>
+              <Button
+                className="mt-4 font-bold uppercase tracking-wide"
+                onClick={() => void handleClaimAdmin()}
+                disabled={claiming}
+              >
+                <ShieldCheck className="size-4" />
+                {claiming ? "Claiming…" : "Claim admin role"}
+              </Button>
+            </div>
+          )}
         </main>
       </div>
     );
@@ -337,46 +380,63 @@ function AdminPage() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search by email"
+                        aria-label="Search customers by email"
                         className="h-9 pl-8"
                       />
                     </div>
                   }
                 >
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead className="text-left text-xs uppercase text-muted-foreground">
-                        <tr>
-                          <th className="py-2">Email</th>
-                          <th className="py-2">Joined</th>
-                          <th className="py-2">Credits</th>
-                          <th className="py-2" />
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredCustomers.map((c) => (
-                          <CustomerRow
-                            key={c.id}
-                            customer={c}
-                            onSave={async (credits) => {
-                              await saveCredits({ data: { userId: c.id, credits } });
-                              toast.success("Credits updated.");
-                              await qc.invalidateQueries({ queryKey: ["admin-overview"] });
-                            }}
-                          />
-                        ))}
-                      </tbody>
-                    </table>
-                    {filteredCustomers.length === 0 && !loading ? (
-                      <Empty text="No customers match this search." />
-                    ) : null}
-                  </div>
+                  {loading ? (
+                    <div className="space-y-2">
+                      {[0, 1, 2].map((index) => (
+                        <Skeleton key={index} className="h-10 w-full" />
+                      ))}
+                    </div>
+                  ) : customers.length === 0 ? (
+                    <Empty text="No customers yet. Accounts appear here after the first sign-up." />
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="text-left text-xs uppercase text-muted-foreground">
+                          <tr>
+                            <th className="py-2">Email</th>
+                            <th className="py-2">Joined</th>
+                            <th className="py-2">Credits</th>
+                            <th className="py-2" />
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredCustomers.map((c) => (
+                            <CustomerRow
+                              key={c.id}
+                              customer={c}
+                              onSave={async (credits) => {
+                                await saveCredits({ data: { userId: c.id, credits } });
+                                toast.success("Credits updated.");
+                                await qc.invalidateQueries({ queryKey: ["admin-overview"] });
+                              }}
+                            />
+                          ))}
+                        </tbody>
+                      </table>
+                      {filteredCustomers.length === 0 ? (
+                        <Empty text="No customers match this search." />
+                      ) : null}
+                    </div>
+                  )}
                 </Section>
               </TabsContent>
 
               <TabsContent value="usage" className="mt-5">
                 <Section title="Recent activity" description="Latest AI and platform events.">
-                  {usage.length === 0 ? (
-                    <Empty text="No activity yet." />
+                  {loading ? (
+                    <div className="space-y-2">
+                      {[0, 1, 2, 3].map((index) => (
+                        <Skeleton key={index} className="h-9 w-full" />
+                      ))}
+                    </div>
+                  ) : usage.length === 0 ? (
+                    <Empty text="No activity yet. AI messages and image generations appear here." />
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
@@ -714,6 +774,7 @@ function CustomerRow({
           type="number"
           value={credits}
           onChange={(e) => setCredits(Number(e.target.value))}
+          aria-label={`Credits for ${customer.email ?? customer.id.slice(0, 8)}`}
           className="h-8 w-24"
         />
       </td>

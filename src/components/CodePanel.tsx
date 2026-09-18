@@ -1,9 +1,135 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileCode, Save, Loader2, Plus, Trash2, X } from "lucide-react";
+import { FileCode, Save, Loader2, Plus, Trash2, X, FolderTree, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import type { GeneratedFile } from "@/lib/codegen";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+type TreeNode = {
+  name: string;
+  path: string;
+  isFile: boolean;
+  children: TreeNode[];
+};
+
+/**
+ * Builds a nested folder tree from flat file paths so the workspace shows a
+ * bolt.diy-style file explorer instead of a flat list.
+ */
+function buildTree(files: GeneratedFile[]): TreeNode[] {
+  const root: TreeNode = { name: "", path: "", isFile: false, children: [] };
+
+  for (const file of files) {
+    const segments = file.path.split("/").filter(Boolean);
+    let cursor = root;
+    segments.forEach((segment, index) => {
+      const isFile = index === segments.length - 1;
+      const path = segments.slice(0, index + 1).join("/");
+      let next = cursor.children.find((child) => child.name === segment && child.isFile === isFile);
+      if (!next) {
+        next = { name: segment, path, isFile, children: [] };
+        cursor.children.push(next);
+      }
+      cursor = next;
+    });
+  }
+
+  const sortNodes = (nodes: TreeNode[]): TreeNode[] => {
+    nodes.sort((a, b) => {
+      if (a.isFile !== b.isFile) return a.isFile ? 1 : -1;
+      return a.name.localeCompare(b.name);
+    });
+    for (const node of nodes) sortNodes(node.children);
+    return nodes;
+  };
+
+  return sortNodes(root.children);
+}
+
+function TreeBranch({
+  nodes,
+  activePath,
+  onSelect,
+  onDelete,
+  canDelete,
+  depth,
+}: {
+  nodes: TreeNode[];
+  activePath: string | null;
+  onSelect: (path: string) => void;
+  onDelete?: ((path: string) => void) | undefined;
+  canDelete: boolean;
+  depth: number;
+}) {
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
+  return (
+    <ul className="space-y-0.5">
+      {nodes.map((node) => {
+        const isCollapsed = collapsed[node.path] === true;
+        if (node.isFile) {
+          const isActive = activePath === node.path;
+          return (
+            <li key={node.path} className="group flex items-center">
+              <button
+                type="button"
+                onClick={() => onSelect(node.path)}
+                style={{ paddingLeft: `${depth * 12 + 8}px` }}
+                className={
+                  isActive
+                    ? "flex min-w-0 flex-1 items-center gap-2 rounded bg-secondary px-2 py-1.5 text-left text-xs text-foreground"
+                    : "flex min-w-0 flex-1 items-center gap-2 rounded px-2 py-1.5 text-left text-xs text-muted-foreground hover:bg-secondary/60"
+                }
+              >
+                <FileCode className="size-3.5 shrink-0" aria-hidden="true" />
+                <span className="truncate font-mono">{node.name}</span>
+              </button>
+              {canDelete && onDelete && (
+                <button
+                  type="button"
+                  onClick={() => onDelete(node.path)}
+                  className="ml-1 hidden size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:inline-flex"
+                  aria-label={`Delete ${node.path}`}
+                >
+                  <Trash2 className="size-3" />
+                </button>
+              )}
+            </li>
+          );
+        }
+
+        return (
+          <li key={node.path}>
+            <button
+              type="button"
+              onClick={() => setCollapsed((prev) => ({ ...prev, [node.path]: !isCollapsed }))}
+              aria-expanded={!isCollapsed}
+              style={{ paddingLeft: `${depth * 12 + 8}px` }}
+              className="flex w-full items-center gap-1.5 rounded px-2 py-1.5 text-left text-xs font-medium text-foreground hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ChevronRight
+                className={`size-3 shrink-0 transition-transform ${isCollapsed ? "" : "rotate-90"}`}
+                aria-hidden="true"
+              />
+              <FolderTree className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+              <span className="truncate font-mono">{node.name}</span>
+            </button>
+            {!isCollapsed && node.children.length > 0 && (
+              <TreeBranch
+                nodes={node.children}
+                activePath={activePath}
+                onSelect={onSelect}
+                onDelete={onDelete}
+                canDelete={canDelete}
+                depth={depth + 1}
+              />
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export function CodePanel({
   files,
@@ -26,6 +152,8 @@ export function CodePanel({
     () => [...files].sort((a, b) => a.path.localeCompare(b.path)),
     [files],
   );
+
+  const tree = useMemo(() => buildTree(sorted), [sorted]);
 
   const current = useMemo(
     () => sorted.find((f) => f.path === activePath) ?? sorted[0] ?? null,
@@ -168,37 +296,17 @@ export function CodePanel({
           </div>
         )}
         <div className="flex-1 overflow-y-auto p-2">
-          {sorted.map((f) => {
-            const isActive = current?.path === f.path;
-            return (
-              <div key={f.path} className="group flex items-center">
-                <button
-                  onClick={() => {
-                    setActivePath(f.path);
-                    setDirty(false);
-                  }}
-                  className={
-                    isActive
-                      ? "flex min-w-0 flex-1 items-center gap-2 rounded bg-secondary px-2 py-1.5 text-left text-xs text-foreground"
-                      : "flex min-w-0 flex-1 items-center gap-2 rounded px-2 py-1.5 text-left text-xs text-muted-foreground hover:bg-secondary/60"
-                  }
-                >
-                  <FileCode className="size-3.5 shrink-0" aria-hidden="true" />
-                  <span className="truncate font-mono">{f.path}</span>
-                </button>
-                {onDelete && (
-                  <button
-                    type="button"
-                    onClick={() => void handleDelete(f.path)}
-                    className="ml-1 hidden size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:inline-flex"
-                    aria-label={`Delete ${f.path}`}
-                  >
-                    <Trash2 className="size-3" />
-                  </button>
-                )}
-              </div>
-            );
-          })}
+          <TreeBranch
+            nodes={tree}
+            activePath={current?.path ?? null}
+            onSelect={(path) => {
+              setActivePath(path);
+              setDirty(false);
+            }}
+            onDelete={onDelete ? (path) => void handleDelete(path) : undefined}
+            canDelete={Boolean(onDelete)}
+            depth={0}
+          />
         </div>
       </aside>
 

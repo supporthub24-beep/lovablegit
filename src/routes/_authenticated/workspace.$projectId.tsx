@@ -35,11 +35,11 @@ import { pushProjectToGithub, listRepoTree, importRepoFiles } from "@/lib/github
 import { getProjectIntegration } from "@/lib/integrations.functions";
 import { getWorkspaceOverview } from "@/lib/workspaces.functions";
 import {
-  applyFileActions,
+  listProjectFiles,
+  writeProjectFiles,
   deleteProjectFile,
-  saveProjectFile,
-  type FileAction,
-} from "@/lib/projects.functions";
+  type ProjectFileRow,
+} from "@/lib/workspaces.functions";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
@@ -274,8 +274,8 @@ function Workspace() {
   const push = useServerFn(pushProjectToGithub);
   const tree = useServerFn(listRepoTree);
   const importFiles = useServerFn(importRepoFiles);
-  const applyActions = useServerFn(applyFileActions);
-  const saveFile = useServerFn(saveProjectFile);
+  const fetchFiles = useServerFn(listProjectFiles);
+  const writeFiles = useServerFn(writeProjectFiles);
   const removeFile = useServerFn(deleteProjectFile);
   const [busy, setBusy] = useState(false);
   const [importReport, setImportReport] = useState<ImportReport | null>(null);
@@ -293,6 +293,10 @@ function Workspace() {
   const assets = useQuery({
     queryKey: ["assets", projectId],
     queryFn: () => fetchAssets({ data: { projectId } }),
+  });
+  const projectFiles = useQuery({
+    queryKey: ["project-files", projectId],
+    queryFn: () => fetchFiles({ data: { projectId } }),
   });
   const workspace = useQuery({
     queryKey: ["workspace-overview"],
@@ -427,6 +431,7 @@ function Workspace() {
     try {
       const result = await chat({ data: { projectId, prompt, ...(modelId ? { modelId } : {}) } });
       await qc.invalidateQueries({ queryKey: ["project", projectId] });
+      await qc.invalidateQueries({ queryKey: ["project-files", projectId] });
       await qc.invalidateQueries({ queryKey: ["versions", projectId] });
       await qc.invalidateQueries({ queryKey: ["account"] });
       await qc.invalidateQueries({ queryKey: ["credit-overview"] });
@@ -436,32 +441,16 @@ function Workspace() {
     }
   }
 
-  /**
-   * Applies a batch of file actions (create / update / delete) to the project
-   * file store — the single source of truth shared by the editor and preview.
-   */
-  async function onApplyFileActions(actions: FileAction[], label?: string) {
-    if (actions.length === 0) return;
-    setBusy(true);
-    try {
-      await applyActions({
-        data: { projectId, actions, ...(label ? { label } : {}) },
-      });
-      await qc.invalidateQueries({ queryKey: ["project", projectId] });
-      await qc.invalidateQueries({ queryKey: ["versions", projectId] });
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function onSaveFile(path: string, content: string) {
-    await saveFile({ data: { projectId, path, content } });
-    await qc.invalidateQueries({ queryKey: ["project", projectId] });
+    await writeFiles({ data: { projectId, files: [{ path, content }], label: `Edit ${path}` } });
+    await qc.invalidateQueries({ queryKey: ["project-files", projectId] });
+    await qc.invalidateQueries({ queryKey: ["versions", projectId] });
   }
 
   async function onDeleteFile(path: string) {
     await removeFile({ data: { projectId, path } });
-    await qc.invalidateQueries({ queryKey: ["project", projectId] });
+    await qc.invalidateQueries({ queryKey: ["project-files", projectId] });
+    await qc.invalidateQueries({ queryKey: ["versions", projectId] });
   }
 
   async function onGenerateImage(prompt: string, kind: "image" | "logo" | "icon" | "banner") {
@@ -477,7 +466,7 @@ function Workspace() {
     }
   }
 
-  const files = useMemo(() => project.data?.files ?? [], [project.data?.files]);
+  const files = useMemo<ProjectFileRow[]>(() => projectFiles.data ?? [], [projectFiles.data]);
   const repo = project.data?.project.repo_full_name;
 
   // Snapshot the files the first time they load so the diff view has a real
@@ -498,6 +487,8 @@ function Workspace() {
   const messageLimit =
     typeof limits.messages === "number" ? limits.messages : Number(limits.messages ?? 0) || null;
   const messageCount = project.data?.messages?.length ?? 0;
+  const filesLoading = projectFiles.isPending;
+  const filesError = projectFiles.isError;
   const usagePercent =
     messageLimit && messageLimit > 0
       ? Math.min(100, Math.round((messageCount / messageLimit) * 100))
@@ -634,10 +625,26 @@ function Workspace() {
             />
           </TabsContent>
           <TabsContent value="preview" className="m-0 min-h-0 flex-1 overflow-hidden">
-            {project.isFetching && files.length === 0 ? (
+            {filesLoading ? (
               <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                 Loading project files…
+              </div>
+            ) : filesError ? (
+              <div className="flex h-full items-center justify-center p-6">
+                <div className="max-w-md rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  <p className="font-medium">Project files could not be loaded.</p>
+                  <p className="mt-1">{describeError(projectFiles.error)}</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3"
+                    onClick={() => void projectFiles.refetch()}
+                    disabled={projectFiles.isFetching}
+                  >
+                    Try again
+                  </Button>
+                </div>
               </div>
             ) : (
               <PreviewPanel files={files} db={integration.data ?? null} />
@@ -686,10 +693,26 @@ function Workspace() {
                 <TabsTrigger value="data">Data</TabsTrigger>
               </TabsList>
               <TabsContent value="preview" className="m-0 flex-1 overflow-hidden">
-                {project.isFetching && files.length === 0 ? (
+                {filesLoading ? (
                   <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                     Loading project files…
+                  </div>
+                ) : filesError ? (
+                  <div className="flex h-full items-center justify-center p-6">
+                    <div className="max-w-md rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                      <p className="font-medium">Project files could not be loaded.</p>
+                      <p className="mt-1">{describeError(projectFiles.error)}</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3"
+                        onClick={() => void projectFiles.refetch()}
+                        disabled={projectFiles.isFetching}
+                      >
+                        Try again
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <PreviewPanel files={files} db={integration.data ?? null} />
