@@ -439,7 +439,7 @@ function Workspace() {
     }
   }
 
-  const files = project.data?.files ?? [];
+  const files = useMemo(() => project.data?.files ?? [], [project.data?.files]);
   const repo = project.data?.project.repo_full_name;
 
   // Snapshot the files the first time they load so the diff view has a real
@@ -596,7 +596,14 @@ function Workspace() {
             />
           </TabsContent>
           <TabsContent value="preview" className="m-0 min-h-0 flex-1 overflow-hidden">
-            <PreviewPanel files={files} db={integration.data ?? null} />
+            {project.isFetching && files.length === 0 ? (
+              <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                Loading project files…
+              </div>
+            ) : (
+              <PreviewPanel files={files} db={integration.data ?? null} />
+            )}
           </TabsContent>
           <TabsContent value="code" className="m-0 min-h-0 flex-1 overflow-hidden">
             <CodePanel files={files} />
@@ -636,7 +643,14 @@ function Workspace() {
                 <TabsTrigger value="data">Data</TabsTrigger>
               </TabsList>
               <TabsContent value="preview" className="m-0 flex-1 overflow-hidden">
-                <PreviewPanel files={files} db={integration.data ?? null} />
+                {project.isFetching && files.length === 0 ? (
+                  <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                    Loading project files…
+                  </div>
+                ) : (
+                  <PreviewPanel files={files} db={integration.data ?? null} />
+                )}
               </TabsContent>
               <TabsContent value="code" className="m-0 flex-1 overflow-hidden">
                 <CodePanel files={files} />

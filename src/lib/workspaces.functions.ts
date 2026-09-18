@@ -153,7 +153,7 @@ export const ensureWorkspace = createServerFn({ method: "POST" })
   return { workspaceId: created.id as string };
   });
 
-export const getWorkspaceOverview = createServerFn({ method: "POST" })
+export const getWorkspaceOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => workspaceIdSchema.parse(input ?? {}))
   .handler(async ({ data, context }): Promise<WorkspaceOverview> => {
