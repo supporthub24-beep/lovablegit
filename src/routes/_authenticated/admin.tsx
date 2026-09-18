@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
@@ -17,6 +17,23 @@ import {
   ShieldCheck,
   KeyRound,
   CheckCircle2,
+  ArrowRight,
+  BookOpen,
+  LifeBuoy,
+  Mail,
+  MessageSquareCode,
+  MonitorPlay,
+  GitBranch,
+  History,
+  Database,
+  Wand2,
+  Image as ImageIcon,
+  Terminal,
+  Rocket,
+  Layers,
+  Gauge,
+  CreditCard,
+  Mic,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
@@ -30,6 +47,12 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { getMyAccount } from "@/lib/projects.functions";
 import {
   getAdminOverview,
@@ -44,12 +67,13 @@ import {
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Admin console — Forge" },
+      { title: "Admin console — SupportHub24" },
       {
         name: "description",
-        content: "Configure AI models, feature toggles, customer credits and platform usage.",
+        content:
+          "Configure AI models, feature toggles, customer credits and platform usage for SupportHub24.",
       },
-      { property: "og:title", content: "Admin console — Forge" },
+      { property: "og:title", content: "Admin console — SupportHub24" },
       { property: "og:description", content: "Platform configuration and customer management." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -58,6 +82,65 @@ export const Route = createFileRoute("/_authenticated/admin")({
   }),
   component: AdminPage,
 });
+
+const ADMIN_NAV = [
+  { href: "#overview", label: "Overview" },
+  { href: "#keys", label: "API keys" },
+  { href: "#providers", label: "AI providers" },
+  { href: "#customers", label: "Customers" },
+  { href: "#usage", label: "Usage" },
+  { href: "#settings", label: "Settings" },
+];
+
+const ADMIN_HIGHLIGHTS = [
+  {
+    icon: <KeyRound className="size-5 text-primary" />,
+    title: "Server-side keys",
+    body: "Provider API keys are stored server-side and never returned to the browser, so customers can chat without ever seeing a secret.",
+  },
+  {
+    icon: <Sparkles className="size-5 text-primary" />,
+    title: "Model routing",
+    body: "Pick the default chat and image models once. Every workspace uses that value until a customer chooses a different model.",
+  },
+  {
+    icon: <Coins className="size-5 text-primary" />,
+    title: "Credit control",
+    body: "Set signup credits and top up individual accounts. Usage is recorded per event so you can see exactly where credits go.",
+  },
+  {
+    icon: <ShieldCheck className="size-5 text-primary" />,
+    title: "Role-gated access",
+    body: "Only the platform administrator can open this console. The first signed-in account can claim the role during setup.",
+  },
+];
+
+const ADMIN_FAQ = [
+  {
+    value: "keys",
+    question: "Where are the AI provider keys stored?",
+    answer:
+      "Keys are written to the server-side platform settings table and are never sent back to the browser. The console only shows whether a provider is connected and when it was last updated.",
+  },
+  {
+    value: "models",
+    question: "What happens if I leave the model fields empty?",
+    answer:
+      "Nothing is invented. Chat and image generation show a clear setup message until you save a model, so customers never receive placeholder output.",
+  },
+  {
+    value: "credits",
+    question: "How do credits work?",
+    answer:
+      "Every AI message and image generation records a usage event with a credit cost. You can set the signup allowance and adjust any customer balance from the Customers tab.",
+  },
+  {
+    value: "access",
+    question: "Who can open the admin console?",
+    answer:
+      "Only accounts with the administrator role. If no administrator exists yet, the first signed-in account can claim the role from this page.",
+  },
+];
 
 type UsageRow = {
   kind: string;
@@ -170,6 +253,16 @@ function AdminPage() {
               </Button>
             </div>
           )}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Button asChild variant="outline" className="font-bold uppercase tracking-wide">
+              <Link to="/">
+                <ArrowRight className="size-4" /> Back to home
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="font-bold uppercase tracking-wide">
+              <Link to="/auth">Sign in with another account</Link>
+            </Button>
+          </div>
         </main>
       </div>
     );
@@ -276,7 +369,22 @@ function AdminPage() {
               />
             </div>
 
-            <Tabs defaultValue="overview" className="mt-6 w-full">
+            <nav
+              aria-label="Admin sections"
+              className="mt-6 flex flex-wrap gap-2 rounded-xl border-2 border-border bg-surface p-2"
+            >
+              {ADMIN_NAV.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-lg px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground transition-colors hover:bg-primary/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+
+            <Tabs defaultValue="overview" className="mt-4 w-full">
               <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-xl border-2 border-border bg-surface p-1.5">
                 <TabsTrigger
                   value="overview"
@@ -317,6 +425,30 @@ function AdminPage() {
               </TabsList>
 
               <TabsContent value="overview" className="mt-5 space-y-5">
+                <Section
+                  title="What this console controls"
+                  description="Everything customers see in the workspace is configured from here."
+                >
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {ADMIN_HIGHLIGHTS.map((item) => (
+                      <div
+                        key={item.title}
+                        className="flex items-start gap-3 rounded-xl border-2 border-border bg-surface p-4 transition-colors hover:border-primary/60"
+                      >
+                        <span className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-inset ring-primary/30">
+                          {item.icon}
+                        </span>
+                        <div>
+                          <p className="text-sm font-bold uppercase tracking-wide">{item.title}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                            {item.body}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+
                 <Section
                   title="Platform health"
                   description="A quick snapshot of the last 200 recorded activity events."
@@ -544,6 +676,65 @@ function AdminPage() {
                 </div>
               </TabsContent>
             </Tabs>
+
+            <section className="mt-8 border-t border-border pt-8">
+              <h2 className="text-2xl font-bold uppercase tracking-tighter">
+                Admin console FAQ
+              </h2>
+              <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
+                The questions that come up most often while configuring a SupportHub24 workspace.
+              </p>
+              <Accordion type="single" collapsible className="mt-5 w-full">
+                {ADMIN_FAQ.map((item) => (
+                  <AccordionItem key={item.value} value={item.value}>
+                    <AccordionTrigger>{item.question}</AccordionTrigger>
+                    <AccordionContent>{item.answer}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </section>
+
+            <section className="mt-8 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border-2 border-border bg-card p-5 transition-colors hover:border-primary/60">
+                <BookOpen className="size-5 text-primary" />
+                <p className="mt-3 text-sm font-bold uppercase tracking-wide">Documentation</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  Read how the workspace, providers and credits fit together before you change
+                  platform defaults.
+                </p>
+                <Button asChild variant="outline" size="sm" className="mt-4 font-bold uppercase tracking-wide">
+                  <Link to="/">
+                    <ArrowRight className="size-4" /> Open the guide
+                  </Link>
+                </Button>
+              </div>
+              <div className="rounded-2xl border-2 border-border bg-card p-5 transition-colors hover:border-primary/60">
+                <LifeBuoy className="size-5 text-primary" />
+                <p className="mt-3 text-sm font-bold uppercase tracking-wide">Support</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  Something not behaving as expected? Reach the team and include the affected
+                  customer email.
+                </p>
+                <Button asChild variant="outline" size="sm" className="mt-4 font-bold uppercase tracking-wide">
+                  <a href="mailto:support@supporthub24.com">
+                    <Mail className="size-4" /> Contact support
+                  </a>
+                </Button>
+              </div>
+              <div className="rounded-2xl border-2 border-border bg-card p-5 transition-colors hover:border-primary/60">
+                <Gauge className="size-5 text-primary" />
+                <p className="mt-3 text-sm font-bold uppercase tracking-wide">Usage limits</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  Keep an eye on credits used per customer so a single workspace cannot exhaust the
+                  shared provider quota.
+                </p>
+                <Button asChild variant="outline" size="sm" className="mt-4 font-bold uppercase tracking-wide">
+                  <a href="#usage">
+                    <Activity className="size-4" /> View usage
+                  </a>
+                </Button>
+              </div>
+            </section>
           </div>
 
           {/* Sidebar */}

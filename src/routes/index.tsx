@@ -33,15 +33,15 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "bolt.diy — Open-source AI web development agent" },
+      { title: "SupportHub24 — AI web development workspace" },
       {
         name: "description",
         content:
-          "bolt.diy is an open-source AI agent that builds, edits and previews full-stack web apps in your browser. Bring your own model, run it locally, deploy anywhere.",
+          "SupportHub24 is an AI agent that builds, edits and previews full-stack web apps in your browser. Bring your own model, run it locally, deploy anywhere.",
       },
       {
         property: "og:title",
-        content: "bolt.diy — Open-source AI web development agent",
+        content: "SupportHub24 — AI web development workspace",
       },
       {
         property: "og:description",
@@ -88,7 +88,7 @@ const PLANS = [
     name: "Self-hosted",
     price: "$0",
     cadence: "forever",
-    tagline: "Run bolt.diy on your own machine with your own API keys.",
+    tagline: "Run SupportHub24 on your own machine with your own API keys.",
     features: [
       "Full source code, MIT licensed",
       "Bring your own LLM provider and keys",
@@ -104,7 +104,7 @@ const PLANS = [
     name: "Cloud",
     price: "Usage",
     cadence: "based",
-    tagline: "Skip the setup and run bolt.diy from a hosted instance.",
+    tagline: "Skip the setup and run SupportHub24 from a hosted instance.",
     features: [
       "No local install required",
       "Managed model routing",
@@ -120,7 +120,7 @@ const PLANS = [
     name: "Team",
     price: "Custom",
     cadence: "per workspace",
-    tagline: "For teams that want bolt.diy wired into their own stack.",
+    tagline: "For teams that want SupportHub24 wired into their own stack.",
     features: [
       "Everything in Cloud",
       "Private model endpoints",
@@ -137,7 +137,7 @@ const BILLING_POINTS = [
   {
     icon: <CreditCard className="size-5 text-primary" />,
     title: "Bring your own keys",
-    body: "bolt.diy never resells model access. Point it at OpenAI, Anthropic, Gemini, Groq, OpenRouter or a local Ollama server and pay those providers directly.",
+    body: "SupportHub24 never resells model access. Point it at OpenAI, Anthropic, Gemini, Groq, OpenRouter or a local Ollama server and pay those providers directly.",
   },
   {
     icon: <Gauge className="size-5 text-primary" />,
@@ -308,7 +308,7 @@ const FAQ_ITEMS = [
   },
   {
     value: "hosting",
-    question: "Where does bolt.diy run?",
+    question: "Where does SupportHub24 run?",
     answer:
       "On your own machine or server. It is a self-hosted web app: clone the repository, install dependencies, start the dev server and open it in your browser.",
   },
@@ -396,7 +396,7 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
             to="/"
-            aria-label="bolt.diy home"
+            aria-label="SupportHub24 home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <LovableGitLogo className="h-7 w-auto text-foreground" />
@@ -569,14 +569,14 @@ function Landing() {
                 <Step
                   n={1}
                   title="Run it locally"
-                  body="Clone the bolt.diy repository, install dependencies with pnpm, and start the dev server on your own machine."
+                  body="Clone the SupportHub24 repository, install dependencies with pnpm, and start the dev server on your own machine."
                 />
               </Reveal>
               <Reveal delay={60} className="h-full">
                 <Step
                   n={2}
                   title="Pick your model"
-                  body="Add an API key for any supported provider, or point bolt.diy at a local Ollama or LM Studio server."
+                  body="Add an API key for any supported provider, or point SupportHub24 at a local Ollama or LM Studio server."
                 />
               </Reveal>
               <Reveal delay={120} className="h-full">
@@ -652,7 +652,7 @@ function Landing() {
         </section>
 
         {/* Stats */}
-        <section aria-label="bolt.diy in numbers" className="border-b border-border bg-surface">
+        <section aria-label="SupportHub24 in numbers" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
             <dl className="grid grid-cols-2 gap-8 sm:grid-cols-4">
               {STATS.map((stat, index) => (
@@ -734,8 +734,8 @@ function Landing() {
                 Your code stays yours
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                bolt.diy is MIT licensed and self-hosted. Everything it generates lands in your own
-                repository — no lock-in, no hidden hosting, no surprises.
+                SupportHub24 is MIT licensed and self-hosted. Everything it generates lands in your
+                own repository — no lock-in, no hidden hosting, no surprises.
               </p>
               <ul className="mt-8 space-y-3">
                 <li className="flex items-start gap-3">
@@ -798,8 +798,8 @@ function Landing() {
                 Free to self-host, cloud when you want it
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                Run bolt.diy yourself at no cost, or use a hosted instance when you would rather
-                skip the setup. You always bring your own model keys.
+                Run SupportHub24 yourself at no cost, or use a hosted instance when you would
+                rather skip the setup. You always bring your own model keys.
               </p>
             </Reveal>
 
@@ -866,7 +866,7 @@ function Landing() {
                 Frequently asked questions
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
-                Everything you need to know before you self-host bolt.diy.
+                Everything you need to know before you self-host SupportHub24.
               </p>
             </Reveal>
             <Accordion type="single" collapsible className="mt-10 w-full">
@@ -915,13 +915,13 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
           <Link
             to="/"
-            aria-label="bolt.diy home"
+            aria-label="SupportHub24 home"
             className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <LovableGitLogo className="h-6 w-auto text-foreground" />
           </Link>
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} bolt.diy. Open source, MIT licensed.
+            © {new Date().getFullYear()} SupportHub24. Open source, MIT licensed.
           </p>
         </div>
       </footer>
