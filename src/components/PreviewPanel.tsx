@@ -35,9 +35,6 @@ export function PreviewPanel({ files, db }: { files: GeneratedFile[]; db?: Previ
   const [debouncedDb, setDebouncedDb] = useState<PreviewDbConfig | null | undefined>(db);
   const [renderError, setRenderError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [wsConnected, setWsConnected] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchConnection = useServerFn(getGithubStatus);
   const connection = useQuery({
@@ -53,65 +50,6 @@ export function PreviewPanel({ files, db }: { files: GeneratedFile[]; db?: Previ
 
   const lastSignature = useRef(signature);
   const lastDbSignature = useRef(dbSignature);
-
-  // Initialize WebSocket connection
-  useEffect(() => {
-    const connectWebSocket = () => {
-      try {
-        // In a real implementation, this would connect to a file watcher service
-        // For now we'll simulate the connection
-        const wsUrl = `ws://${window.location.host}/api/ws`;
-        const ws = new WebSocket(wsUrl);
-        
-        ws.onopen = () => {
-          setWsConnected(true);
-          console.log('Live preview WebSocket connected');
-        };
-        
-        ws.onclose = () => {
-          setWsConnected(false);
-          console.log('Live preview WebSocket disconnected');
-          // Attempt to reconnect after delay
-          if (reconnectTimeoutRef.current) {
-            clearTimeout(reconnectTimeoutRef.current);
-          }
-          reconnectTimeoutRef.current = setTimeout(connectWebSocket, 3000);
-        };
-        
-        ws.onerror = (error) => {
-          console.error('WebSocket error:', error);
-          setWsConnected(false);
-        };
-        
-        ws.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-            if (data.type === 'fileChange') {
-              // Trigger a refresh when files change
-              setNonce(prev => prev + 1);
-            }
-          } catch (err) {
-            console.error('Error parsing WebSocket message:', err);
-          }
-        };
-        
-        wsRef.current = ws;
-      } catch (error) {
-        console.error('Failed to initialize WebSocket:', error);
-      }
-    };
-
-    connectWebSocket();
-
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-    };
-  }, []);
 
   // Debounce live updates so a burst of saves does not reload the iframe on
   // every keystroke, but a real content change still refreshes the preview.
@@ -160,12 +98,6 @@ export function PreviewPanel({ files, db }: { files: GeneratedFile[]; db?: Previ
             <span className="inline-flex items-center gap-1 text-xs text-primary">
               <Loader2 className="size-3 animate-spin" aria-hidden="true" />
               Updating…
-            </span>
-          )}
-          {wsConnected && (
-            <span className="inline-flex items-center gap-1 text-xs text-green-600">
-              <div className="size-2 rounded-full bg-green-500" aria-hidden="true" />
-              Live sync
             </span>
           )}
         </div>

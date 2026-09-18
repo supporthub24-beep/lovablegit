@@ -34,6 +34,12 @@ import { sendChatMessage, generateAsset, listAssets } from "@/lib/ai.functions";
 import { pushProjectToGithub, listRepoTree, importRepoFiles } from "@/lib/github.functions";
 import { getProjectIntegration } from "@/lib/integrations.functions";
 import { getWorkspaceOverview } from "@/lib/workspaces.functions";
+import {
+  applyFileActions,
+  deleteProjectFile,
+  saveProjectFile,
+  type FileAction,
+} from "@/lib/projects.functions";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
@@ -268,6 +274,9 @@ function Workspace() {
   const push = useServerFn(pushProjectToGithub);
   const tree = useServerFn(listRepoTree);
   const importFiles = useServerFn(importRepoFiles);
+  const applyActions = useServerFn(applyFileActions);
+  const saveFile = useServerFn(saveProjectFile);
+  const removeFile = useServerFn(deleteProjectFile);
   const [busy, setBusy] = useState(false);
   const [importReport, setImportReport] = useState<ImportReport | null>(null);
   const [baseline, setBaseline] = useState<Map<string, string>>(new Map());
@@ -416,14 +425,43 @@ function Workspace() {
   async function onSend(prompt: string, modelId?: string) {
     setBusy(true);
     try {
-      await chat({ data: { projectId, prompt, ...(modelId ? { modelId } : {}) } });
+      const result = await chat({ data: { projectId, prompt, ...(modelId ? { modelId } : {}) } });
       await qc.invalidateQueries({ queryKey: ["project", projectId] });
       await qc.invalidateQueries({ queryKey: ["versions", projectId] });
       await qc.invalidateQueries({ queryKey: ["account"] });
       await qc.invalidateQueries({ queryKey: ["credit-overview"] });
+      return { changedFiles: result?.changedFiles ?? [] };
     } finally {
       setBusy(false);
     }
+  }
+
+  /**
+   * Applies a batch of file actions (create / update / delete) to the project
+   * file store — the single source of truth shared by the editor and preview.
+   */
+  async function onApplyFileActions(actions: FileAction[], label?: string) {
+    if (actions.length === 0) return;
+    setBusy(true);
+    try {
+      await applyActions({
+        data: { projectId, actions, ...(label ? { label } : {}) },
+      });
+      await qc.invalidateQueries({ queryKey: ["project", projectId] });
+      await qc.invalidateQueries({ queryKey: ["versions", projectId] });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onSaveFile(path: string, content: string) {
+    await saveFile({ data: { projectId, path, content } });
+    await qc.invalidateQueries({ queryKey: ["project", projectId] });
+  }
+
+  async function onDeleteFile(path: string) {
+    await removeFile({ data: { projectId, path } });
+    await qc.invalidateQueries({ queryKey: ["project", projectId] });
   }
 
   async function onGenerateImage(prompt: string, kind: "image" | "logo" | "icon" | "banner") {
@@ -606,7 +644,12 @@ function Workspace() {
             )}
           </TabsContent>
           <TabsContent value="code" className="m-0 min-h-0 flex-1 overflow-hidden">
-            <CodePanel files={files} />
+            <CodePanel
+              files={files}
+              onSave={onSaveFile}
+              onDelete={onDeleteFile}
+              saving={busy}
+            />
           </TabsContent>
           <TabsContent value="assets" className="m-0 min-h-0 flex-1 overflow-hidden">
             <AssetPanel assets={assets.data ?? []} />
@@ -653,7 +696,12 @@ function Workspace() {
                 )}
               </TabsContent>
               <TabsContent value="code" className="m-0 flex-1 overflow-hidden">
-                <CodePanel files={files} />
+                <CodePanel
+                  files={files}
+                  onSave={onSaveFile}
+                  onDelete={onDeleteFile}
+                  saving={busy}
+                />
               </TabsContent>
               <TabsContent value="assets" className="m-0 flex-1 overflow-hidden">
                 <AssetPanel assets={assets.data ?? []} />

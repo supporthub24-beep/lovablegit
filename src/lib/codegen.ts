@@ -237,4 +237,3 @@ Rules:
 - When the user asks a question rather than a change, answer in prose with no file blocks.
 - Outside the file blocks, write a SHORT summary (1-3 sentences) of what you changed. Reply in the user's language.
 - When image assets are provided in context as data URLs, use them directly in src attributes.`;
-

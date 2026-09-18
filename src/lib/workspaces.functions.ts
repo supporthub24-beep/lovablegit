@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { parseAiResponse, type GeneratedFile } from "@/lib/codegen";
 
 const slugify = (value: string) =>
   value
@@ -519,4 +520,248 @@ export const removeWorkspaceMember = createServerFn({ method: "POST" })
     });
 
     return { ok: true };
+  });
+
+// ---------------------------------------------------------------------------
+// Project file store — the single source of truth shared by the workspace
+// shell, the code editor and the live preview.
+// ---------------------------------------------------------------------------
+
+const projectIdSchema = z.object({ projectId: z.string().uuid() });
+
+const writeFilesSchema = z.object({
+  projectId: z.string().uuid(),
+  files: z
+    .array(
+      z.object({
+        path: z.string().trim().min(1).max(400),
+        content: z.string().max(400_000),
+      }),
+    )
+    .min(1)
+    .max(60),
+  label: z.string().trim().max(120).optional(),
+});
+
+const deleteFileSchema = z.object({
+  projectId: z.string().uuid(),
+  path: z.string().trim().min(1).max(400),
+});
+
+const applyActionsSchema = z.object({
+  projectId: z.string().uuid(),
+  raw: z.string().min(1).max(400_000),
+  label: z.string().trim().max(120).optional(),
+});
+
+export type ProjectFileRow = { path: string; content: string };
+
+export type FileAction =
+  | { kind: "create" | "update"; path: string; content: string }
+  | { kind: "delete"; path: string };
+
+/**
+ * Normalises a path coming from the model or the editor so the same file is
+ * never stored twice under "./src/App.tsx" and "src/App.tsx".
+ */
+export function normalizePath(path: string): string {
+  return path
+    .trim()
+    .replace(/^\.?\//, "")
+    .replace(/\\/g, "/")
+    .replace(/\/{2,}/g, "/");
+}
+
+/**
+ * Turns a raw model response into concrete file actions. `<lov-file>` blocks
+ * become create/update actions; `<lov-delete path="…" />` blocks become
+ * delete actions. This is the artifact/file-action layer of the workspace.
+ */
+export function parseFileActions(raw: string): { message: string; actions: FileAction[] } {
+  const { message, files } = parseAiResponse(raw);
+  const actions: FileAction[] = files.map((file: GeneratedFile) => ({
+    kind: "update" as const,
+    path: normalizePath(file.path),
+    content: file.content,
+  }));
+
+  const deleteRe = /<lov-delete\s+path="([^"]+)"\s*\/?>/g;
+  let match: RegExpExecArray | null;
+  while ((match = deleteRe.exec(raw)) !== null) {
+    const path = normalizePath(match[1] ?? "");
+    if (path) actions.push({ kind: "delete", path });
+  }
+
+  return { message, actions };
+}
+
+async function assertProjectAccess(
+  supabase: SupabaseClient<any>,
+  projectId: string,
+  userId: string,
+) {
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id, user_id")
+    .eq("id", projectId)
+    .maybeSingle();
+  if (!project) throw new Error("Project not found");
+  if (project.user_id !== userId) throw new Error("You do not have access to this project");
+  return project as { id: string; user_id: string };
+}
+
+/** Reads every file of a project — the workspace's source of truth. */
+export const listProjectFiles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => projectIdSchema.parse(input))
+  .handler(async ({ data, context }): Promise<ProjectFileRow[]> => {
+    const supabase = context.supabase as SupabaseClient<any>;
+    await assertProjectAccess(supabase, data.projectId, context.userId);
+    const { data: rows, error } = await supabase
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", data.projectId)
+      .order("path");
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as ProjectFileRow[];
+  });
+
+/**
+ * Applies a batch of file actions to the project store. A version snapshot is
+ * taken before the write so the change can be rolled back from History.
+ */
+export const applyFileActions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => applyActionsSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as SupabaseClient<any>;
+    await assertProjectAccess(supabase, data.projectId, context.userId);
+
+    const { message, actions } = parseFileActions(data.raw);
+    if (actions.length === 0) {
+      return { message, changedFiles: [] as string[], deletedFiles: [] as string[] };
+    }
+
+    const { data: existing } = await supabase
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", data.projectId);
+
+    await supabase.from("project_versions").insert({
+      project_id: data.projectId,
+      user_id: context.userId,
+      label: (data.label ?? message).slice(0, 80),
+      files: (existing ?? []) as unknown as never,
+    });
+
+    const writes = actions.filter(
+      (action): action is Extract<FileAction, { kind: "create" | "update" }> =>
+        action.kind !== "delete",
+    );
+    const deletes = actions.filter(
+      (action): action is Extract<FileAction, { kind: "delete" }> => action.kind === "delete",
+    );
+
+    if (writes.length) {
+      const { error } = await supabase.from("project_files").upsert(
+        writes.map((file) => ({
+          project_id: data.projectId,
+          user_id: context.userId,
+          path: file.path,
+          content: file.content,
+          updated_at: new Date().toISOString(),
+        })),
+        { onConflict: "project_id,path" },
+      );
+      if (error) throw new Error(error.message);
+    }
+
+    if (deletes.length) {
+      const { error } = await supabase
+        .from("project_files")
+        .delete()
+        .eq("project_id", data.projectId)
+        .in(
+          "path",
+          deletes.map((file) => file.path),
+        );
+      if (error) throw new Error(error.message);
+    }
+
+    return {
+      message,
+      changedFiles: writes.map((file) => file.path),
+      deletedFiles: deletes.map((file) => file.path),
+    };
+  });
+
+/** Writes one or more files directly (editor saves, imports, scaffolding). */
+export const writeProjectFiles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => writeFilesSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as SupabaseClient<any>;
+    await assertProjectAccess(supabase, data.projectId, context.userId);
+
+    const files = data.files.map((file) => ({
+      path: normalizePath(file.path),
+      content: file.content,
+    }));
+
+    const { data: existing } = await supabase
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", data.projectId);
+
+    await supabase.from("project_versions").insert({
+      project_id: data.projectId,
+      user_id: context.userId,
+      label: (data.label ?? "Manual file edit").slice(0, 80),
+      files: (existing ?? []) as unknown as never,
+    });
+
+    const { error } = await supabase.from("project_files").upsert(
+      files.map((file) => ({
+        project_id: data.projectId,
+        user_id: context.userId,
+        path: file.path,
+        content: file.content,
+        updated_at: new Date().toISOString(),
+      })),
+      { onConflict: "project_id,path" },
+    );
+    if (error) throw new Error(error.message);
+
+    return { changedFiles: files.map((file) => file.path) };
+  });
+
+/** Deletes a single file from the project store. */
+export const deleteProjectFile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => deleteFileSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as SupabaseClient<any>;
+    await assertProjectAccess(supabase, data.projectId, context.userId);
+
+    const path = normalizePath(data.path);
+    const { data: existing } = await supabase
+      .from("project_files")
+      .select("path, content")
+      .eq("project_id", data.projectId);
+
+    await supabase.from("project_versions").insert({
+      project_id: data.projectId,
+      user_id: context.userId,
+      label: `Delete ${path}`.slice(0, 80),
+      files: (existing ?? []) as unknown as never,
+    });
+
+    const { error } = await supabase
+      .from("project_files")
+      .delete()
+      .eq("project_id", data.projectId)
+      .eq("path", path);
+    if (error) throw new Error(error.message);
+
+    return { ok: true, path };
   });

@@ -13,12 +13,26 @@ import {
   X,
   Github,
   GitBranch,
+  FileCode2,
+  FilePlus2,
+  FileMinus2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 export type ChatMsg = { id: string; role: string; content: string; created_at?: string };
+
+/**
+ * A file action emitted by the AI and applied to the project file store.
+ * Mirrors bolt.diy's artifact/file-action model: create / update / delete.
+ */
+export type ChatFileAction = {
+  type: "create" | "update" | "delete";
+  path: string;
+};
+
+export type ChatSendResult = { changedFiles?: string[] } | void;
 
 export function ChatPanel({
   messages,
@@ -28,12 +42,13 @@ export function ChatPanel({
 }: {
   messages: ChatMsg[];
   busy: boolean;
-  onSend: (prompt: string, modelId?: string) => Promise<void>;
+  onSend: (prompt: string, modelId?: string) => Promise<ChatSendResult>;
   onGenerateImage: (prompt: string, kind: "image" | "logo" | "icon" | "banner") => Promise<void>;
 }) {
   const [value, setValue] = useState("");
   const [imageMode, setImageMode] = useState<null | "image" | "logo" | "icon" | "banner">(null);
   const [modelId, setModelId] = useState<string>("");
+  const [lastActions, setLastActions] = useState<ChatFileAction[]>([]);
   const fetchModels = useServerFn(listChatModels);
   const models = useQuery({ queryKey: ["chat-models"], queryFn: () => fetchModels() });
 
@@ -77,7 +92,14 @@ export function ChatPanel({
         await onGenerateImage(prompt, imageMode);
         setImageMode(null);
       } else {
-        await onSend(prompt, modelId || undefined);
+        const result = await onSend(prompt, modelId || undefined);
+        const changed = result && "changedFiles" in result ? result.changedFiles ?? [] : [];
+        setLastActions(
+          changed.map((path) => ({
+            type: /(^|\/)(index|main)\.(html|tsx|jsx|ts|js)$/.test(path) ? "create" : "update",
+            path,
+          })),
+        );
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
@@ -176,6 +198,34 @@ export function ChatPanel({
         >
           No AI provider or model has been saved yet. An administrator must add a provider and its
           models in the admin console before chat can run.
+        </div>
+      )}
+
+      {lastActions.length > 0 && (
+        <div
+          role="status"
+          className="border-b border-border bg-muted/30 px-5 py-2.5 text-xs text-muted-foreground"
+        >
+          <p className="flex items-center gap-1.5 font-medium text-foreground">
+            <FileCode2 className="size-3.5 text-primary" aria-hidden="true" />
+            {lastActions.length} file action{lastActions.length === 1 ? "" : "s"} applied to the
+            project store
+          </p>
+          <ul className="mt-1.5 space-y-0.5">
+            {lastActions.map((action) => (
+              <li key={`${action.type}:${action.path}`} className="flex items-center gap-1.5">
+                {action.type === "delete" ? (
+                  <FileMinus2 className="size-3 text-destructive" aria-hidden="true" />
+                ) : action.type === "create" ? (
+                  <FilePlus2 className="size-3 text-primary" aria-hidden="true" />
+                ) : (
+                  <FileCode2 className="size-3 text-muted-foreground" aria-hidden="true" />
+                )}
+                <span className="font-mono">{action.path}</span>
+                <span className="text-muted-foreground">— {action.type}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
