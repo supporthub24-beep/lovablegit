@@ -214,14 +214,14 @@ function Feature({
   body: string;
 }) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary hover:shadow-2xl hover:shadow-primary/20 focus-within:border-primary focus-within:shadow-2xl focus-within:shadow-primary/20 sm:p-7">
-      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      <div className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_18%,transparent)] opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-border bg-card p-6 transition-all duration-300 hover:-translate-y-2 hover:border-primary hover:shadow-2xl hover:shadow-primary/40 focus-within:border-primary focus-within:shadow-2xl focus-within:shadow-primary/40 sm:p-7">
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full bg-[color-mix(in_oklch,var(--color-primary)_30%,transparent)] opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
       <div className="relative flex flex-1 flex-col">
-        <span className="inline-flex size-11 items-center justify-center rounded-xl border border-border bg-surface shadow-sm transition-colors duration-300 group-hover:border-primary group-hover:bg-primary/10">
+        <span className="inline-flex size-11 items-center justify-center rounded-xl border-2 border-border bg-surface shadow-sm transition-colors duration-300 group-hover:border-primary group-hover:bg-primary/15">
           {icon}
         </span>
-        <h3 className="mt-5 text-lg font-bold tracking-tight text-balance sm:text-xl">
+        <h3 className="mt-5 text-lg font-black tracking-tight text-balance sm:text-xl">
           {title}
         </h3>
         <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground text-pretty">{body}</p>
@@ -232,12 +232,12 @@ function Feature({
 
 function Step({ n, title, body }: { n: number; title: string; body: string }) {
   return (
-    <li className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary hover:shadow-2xl hover:shadow-primary/20 focus-within:border-primary focus-within:shadow-2xl focus-within:shadow-primary/20 sm:p-7">
-      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      <span className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground shadow-lg shadow-primary/30 ring-1 ring-inset ring-primary/40">
+    <li className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-border bg-card p-6 transition-all duration-300 hover:-translate-y-2 hover:border-primary hover:shadow-2xl hover:shadow-primary/40 focus-within:border-primary focus-within:shadow-2xl focus-within:shadow-primary/40 sm:p-7">
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <span className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-base font-black text-primary-foreground shadow-lg shadow-primary/50 ring-2 ring-inset ring-primary/50">
         {n}
       </span>
-      <h3 className="mt-5 text-lg font-bold tracking-tight text-balance sm:text-xl">
+      <h3 className="mt-5 text-lg font-black tracking-tight text-balance sm:text-xl">
         {title}
       </h3>
       <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground text-pretty">{body}</p>
@@ -261,8 +261,8 @@ function ShowcaseCard({
   accent: string;
 }) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:-translate-y-1.5 hover:border-primary hover:shadow-2xl hover:shadow-primary/20 focus-within:border-primary focus-within:shadow-2xl focus-within:shadow-primary/20">
-      <div className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-border bg-card transition-all duration-300 hover:-translate-y-2 hover:border-primary hover:shadow-2xl hover:shadow-primary/40 focus-within:border-primary focus-within:shadow-2xl focus-within:shadow-primary/40">
+      <div className="pointer-events-none absolute inset-x-0 -top-px h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div
         className={`relative aspect-[16/10] overflow-hidden bg-gradient-to-br ${accent} to-transparent`}
       >
@@ -276,10 +276,10 @@ function ShowcaseCard({
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-card/80 via-card/10 to-transparent" />
       </div>
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+        <span className="font-mono text-[11px] font-bold uppercase tracking-[0.25em] text-primary">
           {label}
         </span>
-        <h3 className="mt-2 text-lg font-bold tracking-tight text-balance">{title}</h3>
+        <h3 className="mt-2 text-lg font-black tracking-tight text-balance">{title}</h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground text-pretty">
           {description}
         </p>
@@ -290,8 +290,8 @@ function ShowcaseCard({
 
 function Point({ icon, text }: { icon: ReactNode; text: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-border bg-card/60 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-card hover:shadow-lg hover:shadow-primary/10 focus-within:border-primary">
-      <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-inset ring-primary/30">
+    <div className="flex items-start gap-3 rounded-xl border-2 border-border bg-card/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:bg-card hover:shadow-xl hover:shadow-primary/25 focus-within:border-primary">
+      <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/20 ring-1 ring-inset ring-primary/40">
         {icon}
       </span>
       <p className="text-sm leading-relaxed text-muted-foreground text-pretty">{text}</p>
@@ -447,29 +447,29 @@ function Landing() {
       <main>
         {/* Hero */}
         <section className="relative overflow-hidden border-b border-border bg-background">
-          {/* Lovable-style gradient wash */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%]">
-            <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_120%,#ff7a18_0%,#ff2d7a_38%,#a855f7_62%,#2563eb_82%,transparent_100%)] opacity-90 blur-[2px]" />
+          {/* Aggressive gradient wash */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[80%]">
+            <div className="absolute inset-0 bg-[radial-gradient(130%_90%_at_50%_125%,#ff3d00_0%,#ff0066_32%,#c026d3_58%,#4f46e5_80%,transparent_100%)] opacity-100 blur-[1px]" />
             <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background to-transparent" />
           </div>
 
           <div className="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 sm:py-32">
             <Reveal>
-              <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur">
-                <Github className="size-3.5" /> Open source · MIT licensed
-                <ArrowRight className="size-3.5" />
+              <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/50 bg-card/90 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-lg shadow-primary/25 backdrop-blur">
+                <Github className="size-3.5 text-primary" /> Open source · MIT licensed
+                <ArrowRight className="size-3.5 text-primary" />
               </p>
             </Reveal>
 
             <Reveal delay={60}>
-              <h1 className="mx-auto mt-8 max-w-3xl text-balance text-4xl font-bold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
+              <h1 className="mx-auto mt-8 max-w-3xl text-balance text-5xl font-black uppercase leading-[0.95] tracking-tighter sm:text-7xl lg:text-8xl">
                 Prompt, run, edit and <span className="text-gradient">deploy</span> web apps
               </h1>
             </Reveal>
 
             {/* Prompt box */}
             <Reveal delay={140}>
-              <div className="glow-primary mx-auto mt-10 max-w-2xl rounded-3xl border border-border bg-card/95 p-3 text-left shadow-xl shadow-foreground/5 backdrop-blur transition-all duration-300 focus-within:border-primary/60 focus-within:shadow-[0_0_0_4px_color-mix(in_oklch,var(--color-primary)_18%,transparent)]">
+              <div className="glow-primary mx-auto mt-10 max-w-2xl rounded-3xl border-2 border-primary/40 bg-card/95 p-3 text-left shadow-2xl shadow-primary/25 backdrop-blur transition-all duration-300 focus-within:border-primary focus-within:shadow-[0_0_0_5px_color-mix(in_oklch,var(--color-primary)_28%,transparent)]">
                 <label htmlFor="idea" className="sr-only">
                   Describe what you want to build
                 </label>
@@ -500,7 +500,7 @@ function Landing() {
                     >
                       <Mic className="size-4" />
                     </button>
-                    <Button onClick={start} size="sm" className="rounded-full font-semibold">
+                    <Button onClick={start} size="sm" className="rounded-full font-bold uppercase tracking-wide">
                       <Sparkles className="size-4" /> Start
                       <ArrowRight className="size-4" />
                     </Button>
@@ -516,7 +516,7 @@ function Landing() {
                     key={idea}
                     type="button"
                     onClick={() => setPrompt(idea)}
-                    className="rounded-full border border-border bg-card/70 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/10 hover:text-foreground hover:shadow-lg hover:shadow-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="rounded-full border border-border bg-card/70 px-3 py-1.5 text-xs font-semibold text-muted-foreground backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:bg-primary/15 hover:text-foreground hover:shadow-xl hover:shadow-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {idea}
                   </button>
@@ -557,7 +557,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Rocket className="size-3" /> How it works
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-4xl font-black uppercase tracking-tighter sm:text-6xl">
                 Three simple steps
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -597,7 +597,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Layers className="size-3" /> Capabilities
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-4xl font-black uppercase tracking-tighter sm:text-6xl">
                 Everything in one workspace
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -660,7 +660,7 @@ function Landing() {
                   <div className="text-center">
                     <dt className="sr-only">{stat.label}</dt>
                     <dd>
-                      <span className="block text-4xl font-bold tracking-tighter text-gradient sm:text-5xl">
+                      <span className="block text-5xl font-black tracking-tighter text-gradient sm:text-6xl">
                         {stat.value}
                       </span>
                       <span className="mt-1 block text-sm text-muted-foreground">
@@ -681,7 +681,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <Wand2 className="size-3" /> Showcase
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-4xl font-black uppercase tracking-tighter sm:text-6xl">
                 Made with a single prompt
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -730,7 +730,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <ShieldCheck className="size-3" /> Built for real work
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-4xl font-black uppercase tracking-tighter sm:text-6xl">
                 Your code stays yours
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -794,7 +794,7 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
                 <CreditCard className="size-3" /> Pricing
               </span>
-              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+              <h2 className="mt-4 text-balance text-4xl font-black uppercase tracking-tighter sm:text-6xl">
                 Free to self-host, cloud when you want it
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -809,21 +809,21 @@ function Landing() {
                   <article
                     className={
                       plan.highlight
-                        ? "relative flex h-full flex-col overflow-hidden rounded-2xl border border-primary bg-card p-6 shadow-2xl shadow-primary/20 sm:p-7"
-                        : "relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary hover:shadow-2xl hover:shadow-primary/20 sm:p-7"
+                        ? "relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-primary bg-card p-6 shadow-2xl shadow-primary/40 sm:p-7"
+                        : "relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-border bg-card p-6 transition-all duration-300 hover:-translate-y-2 hover:border-primary hover:shadow-2xl hover:shadow-primary/40 sm:p-7"
                     }
                   >
                     {plan.highlight && (
-                      <span className="absolute right-5 top-5 rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground">
+                      <span className="absolute right-5 top-5 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-foreground shadow-lg shadow-primary/40">
                         Recommended
                       </span>
                     )}
-                    <h3 className="text-lg font-bold tracking-tight">{plan.name}</h3>
+                    <h3 className="text-lg font-black tracking-tight">{plan.name}</h3>
                     <p className="mt-1.5 text-sm text-muted-foreground text-pretty">
                       {plan.tagline}
                     </p>
                     <p className="mt-5 flex items-baseline gap-1.5">
-                      <span className="text-4xl font-bold tracking-tighter">{plan.price}</span>
+                      <span className="text-5xl font-black tracking-tighter">{plan.price}</span>
                       <span className="text-sm text-muted-foreground">{plan.cadence}</span>
                     </p>
                     <ul className="mt-6 flex-1 space-y-2.5">
@@ -838,7 +838,7 @@ function Landing() {
                     </ul>
                     <Button
                       asChild
-                      className="mt-7 w-full font-semibold"
+                      className="mt-7 w-full font-bold uppercase tracking-wide"
                       variant={plan.highlight ? "default" : "outline"}
                     >
                       <Link to="/auth">{plan.cta}</Link>
@@ -862,7 +862,7 @@ function Landing() {
         <section id="faq" className="border-b border-border bg-surface">
           <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20">
             <Reveal className="text-center">
-              <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+              <h2 className="text-balance text-4xl font-black uppercase tracking-tighter sm:text-6xl">
                 Frequently asked questions
               </h2>
               <p className="mt-3 text-pretty text-muted-foreground">
@@ -888,7 +888,7 @@ function Landing() {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_50%_100%,color-mix(in_oklch,var(--color-primary)_16%,transparent),transparent)]" />
           <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
             <Reveal>
-              <h2 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl">
+              <h2 className="text-balance text-5xl font-black uppercase tracking-tighter sm:text-7xl">
                 Start building in <span className="text-gradient">seconds</span>
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-pretty text-muted-foreground">
@@ -896,13 +896,13 @@ function Landing() {
                 workspace.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <Button asChild size="lg" className="font-semibold">
+                <Button asChild size="lg" className="font-bold uppercase tracking-wide">
                   <Link to="/auth">
                     <Sparkles className="size-4" /> Get started free
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="font-semibold">
+                <Button asChild size="lg" variant="outline" className="font-bold uppercase tracking-wide">
                   <a href="#how">See how it works</a>
                 </Button>
               </div>

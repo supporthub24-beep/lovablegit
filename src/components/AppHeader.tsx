@@ -25,7 +25,11 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-surface/80 px-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b-2 border-border bg-surface/90 px-4 shadow-lg shadow-primary/10 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent"
+      />
       <div className="flex items-center gap-3 sm:gap-6">
         <ProjectDrawer />
         <Link
@@ -41,30 +45,30 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
         <nav aria-label="Primary" className="hidden items-center gap-1 text-sm md:flex">
           <Link
             to="/dashboard"
-            className="rounded-md px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-md px-3 py-1.5 font-semibold text-muted-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent hover:text-foreground hover:shadow-md hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             activeProps={{
               className:
-                "rounded-md px-3 py-1.5 font-semibold bg-primary/15 text-primary ring-1 ring-inset ring-primary/30",
+                "rounded-md px-3 py-1.5 font-black bg-primary/20 text-primary ring-2 ring-inset ring-primary/50 shadow-lg shadow-primary/25",
             }}
           >
             Projects
           </Link>
           <Link
             to="/payments"
-            className="rounded-md px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-md px-3 py-1.5 font-semibold text-muted-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent hover:text-foreground hover:shadow-md hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             activeProps={{
               className:
-                "rounded-md px-3 py-1.5 font-semibold bg-primary/15 text-primary ring-1 ring-inset ring-primary/30",
+                "rounded-md px-3 py-1.5 font-black bg-primary/20 text-primary ring-2 ring-inset ring-primary/50 shadow-lg shadow-primary/25",
             }}
           >
             Billing
           </Link>
           <Link
             to="/settings"
-            className="rounded-md px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-md px-3 py-1.5 font-semibold text-muted-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent hover:text-foreground hover:shadow-md hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             activeProps={{
               className:
-                "rounded-md px-3 py-1.5 font-semibold bg-primary/15 text-primary ring-1 ring-inset ring-primary/30",
+                "rounded-md px-3 py-1.5 font-black bg-primary/20 text-primary ring-2 ring-inset ring-primary/50 shadow-lg shadow-primary/25",
             }}
           >
             Settings
@@ -72,10 +76,10 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           {isAdmin && (
             <Link
               to="/admin"
-              className="rounded-md px-3 py-1.5 font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-md px-3 py-1.5 font-semibold text-muted-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent hover:text-foreground hover:shadow-md hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               activeProps={{
                 className:
-                  "rounded-md px-3 py-1.5 font-semibold bg-primary/15 text-primary ring-1 ring-inset ring-primary/30",
+                  "rounded-md px-3 py-1.5 font-black bg-primary/20 text-primary ring-2 ring-inset ring-primary/50 shadow-lg shadow-primary/25",
               }}
             >
               Admin
@@ -98,7 +102,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
           aria-label="Credit balance and top up"
           className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
-          <span className="flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-semibold text-muted-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:text-foreground hover:shadow-lg hover:shadow-primary/20">
+          <span className="flex items-center gap-1.5 rounded-full border-2 border-border bg-card px-3 py-1 text-xs font-bold text-muted-foreground shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:text-foreground hover:shadow-xl hover:shadow-primary/30">
             <Coins className="size-3.5 text-primary" aria-hidden="true" />
             {credits.isPending
               ? "…"
@@ -107,7 +111,12 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
                 : `${credits.data?.wallet.balance ?? 0} credits`}
           </span>
         </Link>
-        <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="hidden font-bold uppercase tracking-wide sm:inline-flex"
+        >
           <Link to="/payments">
             <CreditCard className="size-4" aria-hidden="true" />
             Plans

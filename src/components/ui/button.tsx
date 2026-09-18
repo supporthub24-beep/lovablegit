@@ -5,19 +5,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold cursor-pointer transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-black uppercase tracking-wide cursor-pointer transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-lg shadow-primary/25 ring-1 ring-inset ring-primary/40 hover:bg-primary/90 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 active:translate-y-0",
+          "bg-primary text-primary-foreground shadow-xl shadow-primary/40 ring-2 ring-inset ring-primary/50 hover:bg-primary/90 hover:shadow-2xl hover:shadow-primary/60 hover:-translate-y-1 active:translate-y-0 active:shadow-lg active:shadow-primary/30",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-lg shadow-destructive/25 ring-1 ring-inset ring-destructive/40 hover:bg-destructive/90 hover:shadow-2xl hover:shadow-destructive/40 hover:-translate-y-1 active:translate-y-0",
+          "bg-destructive text-destructive-foreground shadow-xl shadow-destructive/40 ring-2 ring-inset ring-destructive/50 hover:bg-destructive/90 hover:shadow-2xl hover:shadow-destructive/60 hover:-translate-y-1 active:translate-y-0 active:shadow-lg active:shadow-destructive/30",
         outline:
-          "border border-input bg-background/80 shadow-sm hover:border-primary hover:bg-accent/60 hover:text-accent-foreground hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0",
+          "border-2 border-border bg-background shadow-sm hover:border-primary hover:bg-accent hover:text-accent-foreground hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 active:translate-y-0 active:shadow-md",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-lg hover:shadow-primary/15 hover:-translate-y-0.5 active:translate-y-0",
-        ghost: "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
+          "bg-secondary text-secondary-foreground shadow-md shadow-primary/20 ring-1 ring-inset ring-border hover:bg-secondary/80 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 active:translate-y-0 active:shadow-md",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground hover:shadow-md hover:shadow-primary/20",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -35,7 +36,8 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
@@ -43,7 +45,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
-      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
     );
   },
 );
