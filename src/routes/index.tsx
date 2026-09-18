@@ -17,6 +17,9 @@ import {
   Rocket,
   Wand2,
   Mic,
+  CreditCard,
+  Users,
+  Gauge,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LovableGitLogo } from "@/components/LovableGitLogo";
@@ -76,6 +79,75 @@ const STATS = [
   { value: "48s", label: "median first preview" },
   { value: "3.4M", label: "AI messages handled" },
   { value: "99.9%", label: "preview uptime" },
+];
+
+const PLANS = [
+  {
+    id: "free",
+    name: "Free",
+    price: "$0",
+    cadence: "forever",
+    tagline: "For trying ideas and small side projects.",
+    features: [
+      "1 workspace",
+      "3 projects",
+      "50 AI messages / month",
+      "Live preview and code editor",
+      "GitHub import and push",
+    ],
+    cta: "Start free",
+    highlight: false,
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: "$20",
+    cadence: "per month",
+    tagline: "For solo builders shipping real products.",
+    features: [
+      "Unlimited projects",
+      "2,000 AI messages / month",
+      "Image and logo generation",
+      "Version history and rollback",
+      "Priority AI model access",
+    ],
+    cta: "Upgrade to Pro",
+    highlight: true,
+  },
+  {
+    id: "team",
+    name: "Team",
+    price: "$60",
+    cadence: "per month",
+    tagline: "For teams building together in one workspace.",
+    features: [
+      "Everything in Pro",
+      "Up to 10 workspace members",
+      "Shared billing and invoices",
+      "Role-based access control",
+      "Usage reporting per member",
+    ],
+    cta: "Upgrade to Team",
+    highlight: false,
+  },
+];
+
+const BILLING_POINTS = [
+  {
+    icon: <CreditCard className="size-5 text-primary" />,
+    title: "Workspace billing",
+    body: "Every plan, subscription and invoice is scoped to a workspace, so a team shares one bill and one usage meter.",
+  },
+  {
+    icon: <Gauge className="size-5 text-primary" />,
+    title: "Usage you can see",
+    body: "Token and project limits are metered per workspace, with a live meter that warns you before you hit the ceiling.",
+  },
+  {
+    icon: <Users className="size-5 text-primary" />,
+    title: "Roles and access",
+    body: "Owners, admins, members and viewers each get the right level of access, enforced by database policies.",
+  },
 ];
 
 /**
@@ -346,6 +418,12 @@ function Landing() {
               className="rounded-full px-3.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Showcase
+            </a>
+            <a
+              href="#pricing"
+              className="rounded-full px-3.5 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Pricing
             </a>
             <a
               href="#faq"
@@ -706,6 +784,77 @@ function Landing() {
                 />
               </div>
             </Reveal>
+          </div>
+        </section>
+
+        {/* Pricing */}
+        <section id="pricing" className="border-b border-border">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+            <Reveal className="mx-auto max-w-2xl text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+                <CreditCard className="size-3" /> Pricing
+              </span>
+              <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-5xl">
+                Plans that scale with your workspace
+              </h2>
+              <p className="mt-3 text-pretty text-muted-foreground">
+                Start free, upgrade when your team needs more projects, more AI messages and shared
+                billing. Every plan is billed per workspace.
+              </p>
+            </Reveal>
+
+            <div className="mt-12 grid gap-5 lg:grid-cols-3">
+              {PLANS.map((plan, index) => (
+                <Reveal key={plan.id} delay={index * 60} className="h-full">
+                  <article
+                    className={
+                      plan.highlight
+                        ? "relative flex h-full flex-col overflow-hidden rounded-2xl border border-primary bg-card p-6 shadow-2xl shadow-primary/20 sm:p-7"
+                        : "relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary hover:shadow-2xl hover:shadow-primary/20 sm:p-7"
+                    }
+                  >
+                    {plan.highlight && (
+                      <span className="absolute right-5 top-5 rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary-foreground">
+                        Most popular
+                      </span>
+                    )}
+                    <h3 className="text-lg font-bold tracking-tight">{plan.name}</h3>
+                    <p className="mt-1.5 text-sm text-muted-foreground text-pretty">
+                      {plan.tagline}
+                    </p>
+                    <p className="mt-5 flex items-baseline gap-1.5">
+                      <span className="text-4xl font-bold tracking-tighter">{plan.price}</span>
+                      <span className="text-sm text-muted-foreground">{plan.cadence}</span>
+                    </p>
+                    <ul className="mt-6 flex-1 space-y-2.5">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2.5">
+                          <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-1 ring-inset ring-primary/20">
+                            <Check className="size-3 text-primary" />
+                          </span>
+                          <span className="text-sm text-muted-foreground">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      asChild
+                      className="mt-7 w-full font-semibold"
+                      variant={plan.highlight ? "default" : "outline"}
+                    >
+                      <Link to="/auth">{plan.cta}</Link>
+                    </Button>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+
+            <div className="mt-12 grid gap-5 md:grid-cols-3">
+              {BILLING_POINTS.map((point, index) => (
+                <Reveal key={point.title} delay={index * 60} className="h-full">
+                  <Feature icon={point.icon} title={point.title} body={point.body} />
+                </Reveal>
+              ))}
+            </div>
           </div>
         </section>
 

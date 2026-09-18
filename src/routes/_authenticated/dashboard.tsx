@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Plus, Github, Trash2, FolderGit2, Coins } from "lucide-react";
+import { Plus, Github, Trash2, FolderGit2, Coins, CreditCard, Gauge } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ import {
   importRepoFiles,
 } from "@/lib/github.functions";
 import { getWorkspaceOverview } from "@/lib/workspaces.functions";
+import { getBillingOverview } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -58,6 +59,7 @@ function Dashboard() {
   const fetchGithub = useServerFn(getGithubStatus);
   const fetchRepos = useServerFn(listRepos);
   const fetchWorkspace = useServerFn(getWorkspaceOverview);
+  const fetchBilling = useServerFn(getBillingOverview);
   const create = useServerFn(createProject);
   const remove = useServerFn(deleteProject);
 
@@ -79,6 +81,11 @@ function Dashboard() {
   const workspace = useQuery({
     queryKey: ["workspace-overview"],
     queryFn: () => fetchWorkspace(),
+    retry: false,
+  });
+  const billing = useQuery({
+    queryKey: ["billing-overview"],
+    queryFn: () => fetchBilling(),
     retry: false,
   });
   const github = useQuery({ queryKey: ["github-status"], queryFn: () => fetchGithub() });
@@ -290,6 +297,100 @@ function Dashboard() {
                 {projects.isPending ? "Loading…" : (projects.data?.length ?? 0)}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">In this workspace</p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                <Gauge className="size-3.5 text-primary" aria-hidden="true" /> Token usage
+              </p>
+              <p className="mt-2 text-lg font-bold tracking-tight tabular-nums">
+                {billing.isPending
+                  ? "Loading…"
+                  : billing.isError
+                    ? "Unavailable"
+                    : `${billing.data?.usage.tokensUsed ?? 0} / ${
+                        billing.data?.usage.tokenLimit ?? 0
+                      }`}
+              </p>
+              <div
+                className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary"
+                role="progressbar"
+                aria-label="Token usage this period"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={
+                  billing.data && billing.data.usage.tokenLimit > 0
+                    ? Math.min(
+                        100,
+                        Math.round(
+                          (billing.data.usage.tokensUsed / billing.data.usage.tokenLimit) * 100,
+                        ),
+                      )
+                    : 0
+                }
+              >
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-500"
+                  style={{
+                    width:
+                      billing.data && billing.data.usage.tokenLimit > 0
+                        ? `${Math.min(
+                            100,
+                            Math.round(
+                              (billing.data.usage.tokensUsed / billing.data.usage.tokenLimit) *
+                                100,
+                            ),
+                          )}%`
+                        : "0%",
+                  }}
+                />
+              </div>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {billing.data?.usage.periodLabel ?? "This billing period"}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                <CreditCard className="size-3.5 text-primary" aria-hidden="true" /> Project limit
+              </p>
+              <p className="mt-2 text-lg font-bold tracking-tight tabular-nums">
+                {billing.isPending
+                  ? "Loading…"
+                  : billing.isError
+                    ? "Unavailable"
+                    : `${billing.data?.usage.projectsUsed ?? 0} / ${
+                        billing.data?.usage.projectLimit ?? 0
+                      }`}
+              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {billing.data?.usage.projectLimit === -1
+                  ? "Unlimited projects on this plan"
+                  : "Projects included in your plan"}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Billing
+              </p>
+              <p className="mt-2 text-lg font-bold tracking-tight">
+                {billing.isPending
+                  ? "Loading…"
+                  : billing.isError
+                    ? "Unavailable"
+                    : billing.data?.configured
+                      ? "Stripe connected"
+                      : "Not configured"}
+              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {billing.data?.configured
+                  ? "Checkout and invoices are live for this workspace."
+                  : "Add Stripe keys to enable checkout and invoices."}
+              </p>
+              <Button asChild size="sm" variant="outline" className="mt-3">
+                <Link to="/payments">Manage billing</Link>
+              </Button>
             </div>
           </div>
           {workspace.isError && (

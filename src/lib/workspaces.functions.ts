@@ -81,6 +81,13 @@ export type WorkspaceOverview = {
     current_period_end: string | null;
     cancel_at_period_end: boolean;
   };
+  usage: {
+    messages_used: number;
+    projects_used: number;
+    members_used: number;
+    period_start: string | null;
+    period_end: string | null;
+  };
   members: WorkspaceMemberRow[];
   role: "owner" | "admin" | "member" | "viewer";
   isAdmin: boolean;
@@ -209,6 +216,19 @@ export const getWorkspaceOverview = createServerFn({ method: "POST" })
       .eq("workspace_id", workspace.id)
       .order("created_at", { ascending: true });
 
+    const { data: usageRow } = await supabase
+      .from("workspace_usage")
+      .select("messages_used, projects_used, members_used, period_start, period_end")
+      .eq("workspace_id", workspace.id)
+      .order("period_start", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { count: projectCount } = await supabase
+      .from("projects")
+      .select("id", { count: "exact", head: true })
+      .eq("workspace_id", workspace.id);
+
     const memberIds = (memberRows ?? []).map((m: { user_id: string }) => m.user_id);
     const { data: profileRows } = memberIds.length
       ? await supabase
@@ -260,6 +280,13 @@ export const getWorkspaceOverview = createServerFn({ method: "POST" })
         status: subscriptionRow?.status ?? "not_configured",
         current_period_end: subscriptionRow?.current_period_end ?? null,
         cancel_at_period_end: subscriptionRow?.cancel_at_period_end ?? false,
+      },
+      usage: {
+        messages_used: usageRow?.messages_used ?? 0,
+        projects_used: usageRow?.projects_used ?? projectCount ?? 0,
+        members_used: usageRow?.members_used ?? members.length,
+        period_start: usageRow?.period_start ?? null,
+        period_end: usageRow?.period_end ?? null,
       },
       members,
       role,

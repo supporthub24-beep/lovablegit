@@ -1,7 +1,7 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LogOut, Coins } from "lucide-react";
+import { LogOut, Coins, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AdminLogo } from "@/components/AdminLogo";
@@ -57,7 +57,7 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
                 "rounded-md px-3 py-1.5 font-semibold bg-primary/15 text-primary ring-1 ring-inset ring-primary/30",
             }}
           >
-            Credits
+            Billing
           </Link>
           <Link
             to="/settings"
@@ -107,6 +107,12 @@ export function AppHeader({ isAdmin }: { isAdmin?: boolean | undefined }) {
                 : `${credits.data?.wallet.balance ?? 0} credits`}
           </span>
         </Link>
+        <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+          <Link to="/payments">
+            <CreditCard className="size-4" aria-hidden="true" />
+            Plans
+          </Link>
+        </Button>
         <Button variant="ghost" size="sm" onClick={signOut}>
           <LogOut className="size-4" aria-hidden="true" />
           Sign out

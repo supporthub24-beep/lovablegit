@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Github,
   Upload,
@@ -10,6 +10,9 @@ import {
   AlertTriangle,
   Loader2,
   FileX2,
+  GitCompareArrows,
+  Gauge,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
@@ -30,6 +33,7 @@ import { getProject, getMyAccount } from "@/lib/projects.functions";
 import { sendChatMessage, generateAsset, listAssets } from "@/lib/ai.functions";
 import { pushProjectToGithub, listRepoTree, importRepoFiles } from "@/lib/github.functions";
 import { getProjectIntegration } from "@/lib/integrations.functions";
+import { getWorkspaceOverview } from "@/lib/workspaces.functions";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/_authenticated/workspace/$projectId")({
@@ -66,6 +70,113 @@ type ImportReport = {
   failed: FileStatusEntry[];
   requested: number;
 };
+
+type DiffEntry = {
+  path: string;
+  status: "added" | "changed" | "unchanged";
+  before: string;
+  after: string;
+};
+
+/**
+ * Compares the files currently in the project against the snapshot taken when
+ * the workspace was opened, so the diff view reflects real client state.
+ */
+function buildDiff(baseline: Map<string, string>, files: { path: string; content: string }[]): DiffEntry[] {
+  const entries: DiffEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const file of files) {
+    seen.add(file.path);
+    const before = baseline.get(file.path);
+    if (before === undefined) {
+      entries.push({ path: file.path, status: "added", before: "", after: file.content });
+    } else if (before !== file.content) {
+      entries.push({ path: file.path, status: "changed", before, after: file.content });
+    } else {
+      entries.push({ path: file.path, status: "unchanged", before, after: file.content });
+    }
+  }
+
+  for (const [path, before] of baseline) {
+    if (seen.has(path)) continue;
+    entries.push({ path, status: "changed", before, after: "" });
+  }
+
+  return entries.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+function DiffPanel({ entries }: { entries: DiffEntry[] }) {
+  const changed = entries.filter((entry) => entry.status !== "unchanged");
+
+  if (entries.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center bg-surface p-6 text-center text-sm text-muted-foreground">
+        No files in this project yet. Ask the AI to generate the project, then review the changes
+        here.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-col bg-surface">
+      <div className="flex items-center gap-2 border-b border-border px-4 py-2 text-xs text-muted-foreground">
+        <GitCompareArrows className="size-3.5" aria-hidden="true" />
+        <span>
+          {changed.length === 0
+            ? "No changes since this workspace was opened."
+            : `${changed.length} file(s) changed since this workspace was opened.`}
+        </span>
+      </div>
+      <div className="flex-1 overflow-auto p-4">
+        <ul className="space-y-4">
+          {entries.map((entry) => (
+            <li key={entry.path} className="overflow-hidden rounded-lg border border-border bg-background">
+              <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
+                <span className="truncate font-mono text-xs">{entry.path}</span>
+                <span
+                  className={
+                    entry.status === "added"
+                      ? "rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary"
+                      : entry.status === "changed"
+                        ? "rounded-full bg-highlight/20 px-2 py-0.5 text-[11px] font-semibold text-highlight-foreground"
+                        : "rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold text-muted-foreground"
+                  }
+                >
+                  {entry.status}
+                </span>
+              </div>
+              {entry.status === "unchanged" ? (
+                <p className="px-3 py-2 text-xs text-muted-foreground">
+                  This file is identical to the version loaded into the workspace.
+                </p>
+              ) : (
+                <div className="grid gap-0 sm:grid-cols-2">
+                  <div className="border-b border-border sm:border-b-0 sm:border-r">
+                    <p className="border-b border-border bg-surface px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                      Before
+                    </p>
+                    <pre className="max-h-72 overflow-auto p-3 text-xs leading-relaxed">
+                      <code className="font-mono">{entry.before || "— empty —"}</code>
+                    </pre>
+                  </div>
+                  <div>
+                    <p className="border-b border-border bg-surface px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                      After
+                    </p>
+                    <pre className="max-h-72 overflow-auto p-3 text-xs leading-relaxed">
+                      <code className="font-mono">{entry.after || "— empty —"}</code>
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 function describeError(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -151,6 +262,7 @@ function Workspace() {
   const fetchAccount = useServerFn(getMyAccount);
   const fetchAssets = useServerFn(listAssets);
   const fetchIntegration = useServerFn(getProjectIntegration);
+  const fetchWorkspace = useServerFn(getWorkspaceOverview);
   const chat = useServerFn(sendChatMessage);
   const image = useServerFn(generateAsset);
   const push = useServerFn(pushProjectToGithub);
@@ -158,6 +270,7 @@ function Workspace() {
   const importFiles = useServerFn(importRepoFiles);
   const [busy, setBusy] = useState(false);
   const [importReport, setImportReport] = useState<ImportReport | null>(null);
+  const [baseline, setBaseline] = useState<Map<string, string>>(new Map());
 
   const project = useQuery({
     queryKey: ["project", projectId],
@@ -171,6 +284,11 @@ function Workspace() {
   const assets = useQuery({
     queryKey: ["assets", projectId],
     queryFn: () => fetchAssets({ data: { projectId } }),
+  });
+  const workspace = useQuery({
+    queryKey: ["workspace-overview"],
+    queryFn: () => fetchWorkspace(),
+    retry: false,
   });
 
   const pushMutation = useMutation({
@@ -324,6 +442,29 @@ function Workspace() {
   const files = project.data?.files ?? [];
   const repo = project.data?.project.repo_full_name;
 
+  // Snapshot the files the first time they load so the diff view has a real
+  // "before" to compare against.
+  const filesKey = files.map((file) => `${file.path}:${file.content.length}`).join("|");
+  const [snapshotKey, setSnapshotKey] = useState<string | null>(null);
+  if (snapshotKey === null && files.length > 0) {
+    setSnapshotKey(filesKey);
+    setBaseline(new Map(files.map((file) => [file.path, file.content])));
+  }
+
+  const diffEntries = useMemo(() => buildDiff(baseline, files), [baseline, files]);
+
+  const plan = workspace.data?.plan;
+  const limits = plan?.limits ?? {};
+  const projectLimit =
+    typeof limits.projects === "number" ? limits.projects : Number(limits.projects ?? 0) || null;
+  const messageLimit =
+    typeof limits.messages === "number" ? limits.messages : Number(limits.messages ?? 0) || null;
+  const messageCount = project.data?.messages?.length ?? 0;
+  const usagePercent =
+    messageLimit && messageLimit > 0
+      ? Math.min(100, Math.round((messageCount / messageLimit) * 100))
+      : null;
+
   return (
     <div className="flex h-screen flex-col bg-background">
       <AppHeader isAdmin={account.data?.isAdmin} />
@@ -379,6 +520,37 @@ function Workspace() {
         </div>
       )}
 
+      {workspace.isSuccess && (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-border bg-surface px-4 py-2 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <Sparkles className="size-3.5 text-primary" aria-hidden="true" />
+            Plan: <span className="font-semibold text-foreground">{plan?.name ?? "Free"}</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Gauge className="size-3.5 text-primary" aria-hidden="true" />
+            {messageLimit
+              ? `${messageCount} of ${messageLimit} AI messages used`
+              : `${messageCount} AI messages used`}
+            {usagePercent !== null && (
+              <span className="ml-1 inline-block h-1.5 w-24 overflow-hidden rounded-full bg-secondary align-middle">
+                <span
+                  className="block h-full rounded-full bg-primary"
+                  style={{ width: `${usagePercent}%` }}
+                />
+              </span>
+            )}
+          </span>
+          {projectLimit !== null && (
+            <span>
+              Project limit: <span className="font-semibold text-foreground">{projectLimit}</span>
+            </span>
+          )}
+          <Link to="/payments" className="ml-auto text-primary hover:underline">
+            Manage billing
+          </Link>
+        </div>
+      )}
+
       {project.isPending && (
         <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" aria-hidden="true" />
@@ -411,6 +583,7 @@ function Workspace() {
             <TabsTrigger value="preview">Preview</TabsTrigger>
             <TabsTrigger value="code">Code</TabsTrigger>
             <TabsTrigger value="assets">Assets</TabsTrigger>
+            <TabsTrigger value="diff">Diff</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
             <TabsTrigger value="data">Data</TabsTrigger>
           </TabsList>
@@ -430,6 +603,9 @@ function Workspace() {
           </TabsContent>
           <TabsContent value="assets" className="m-0 min-h-0 flex-1 overflow-hidden">
             <AssetPanel assets={assets.data ?? []} />
+          </TabsContent>
+          <TabsContent value="diff" className="m-0 min-h-0 flex-1 overflow-hidden">
+            <DiffPanel entries={diffEntries} />
           </TabsContent>
           <TabsContent value="history" className="m-0 min-h-0 flex-1 overflow-hidden">
             <HistoryPanel projectId={projectId} />
@@ -455,6 +631,7 @@ function Workspace() {
                 <TabsTrigger value="preview">Preview</TabsTrigger>
                 <TabsTrigger value="code">Code</TabsTrigger>
                 <TabsTrigger value="assets">Assets</TabsTrigger>
+                <TabsTrigger value="diff">Diff</TabsTrigger>
                 <TabsTrigger value="history">History</TabsTrigger>
                 <TabsTrigger value="data">Data</TabsTrigger>
               </TabsList>
@@ -466,6 +643,9 @@ function Workspace() {
               </TabsContent>
               <TabsContent value="assets" className="m-0 flex-1 overflow-hidden">
                 <AssetPanel assets={assets.data ?? []} />
+              </TabsContent>
+              <TabsContent value="diff" className="m-0 flex-1 overflow-hidden">
+                <DiffPanel entries={diffEntries} />
               </TabsContent>
               <TabsContent value="history" className="m-0 flex-1 overflow-hidden">
                 <HistoryPanel projectId={projectId} />

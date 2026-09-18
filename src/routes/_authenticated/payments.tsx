@@ -1,6 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Coins, CreditCard, Loader2, Receipt, Wallet } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  Check,
+  Coins,
+  CreditCard,
+  Gauge,
+  Loader2,
+  Receipt,
+  Wallet,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -21,6 +33,13 @@ import {
   getCreditOverview,
   purchaseCredits,
 } from "@/lib/payments.functions";
+import {
+  getBillingOverview,
+  startCheckout,
+  type BillingOverview,
+  type BillingPlan,
+} from "@/lib/payments.functions";
+import { getWorkspaceOverview } from "@/lib/workspaces.functions";
 
 export const Route = createFileRoute("/_authenticated/payments")({
   head: () => ({
@@ -54,18 +73,310 @@ function formatAmount(amountCents: number, currency: string) {
 }
 
 function statusVariant(status: string): "default" | "secondary" | "destructive" {
-  if (status === "paid") return "default";
-  if (status === "failed") return "destructive";
+  if (status === "paid" || status === "active") return "default";
+  if (status === "failed" || status === "past_due") return "destructive";
   return "secondary";
+}
+
+function formatPlanPrice(plan: BillingPlan) {
+  if (plan.monthly_price_cents === 0) return "Free";
+  return `${formatAmount(plan.monthly_price_cents, plan.currency)}/mo`;
+}
+
+function limitValue(limits: Record<string, unknown>, key: string): number | null {
+  const raw = limits[key];
+  if (typeof raw === "number") return raw;
+  if (typeof raw === "string" && raw.trim() !== "" && !Number.isNaN(Number(raw))) {
+    return Number(raw);
+  }
+  return null;
+}
+
+function UsageMeter({
+  label,
+  used,
+  limit,
+  hint,
+}: {
+  label: string;
+  used: number;
+  limit: number | null;
+  hint: string;
+}) {
+  const unlimited = limit === null || limit <= 0;
+  const percent = unlimited ? 0 : Math.min(100, Math.round((used / limit) * 100));
+  return (
+    <div className="space-y-2">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-muted-foreground text-xs tabular-nums">
+          {unlimited ? `${used} used · unlimited` : `${used} / ${limit} used`}
+        </p>
+      </div>
+      <Progress value={unlimited ? 0 : percent} aria-label={`${label} usage`} />
+      <p className="text-muted-foreground text-xs">{hint}</p>
+    </div>
+  );
+}
+
+function BillingSection({
+  billing,
+  workspaceName,
+  onCheckout,
+  checkoutPendingPlan,
+  checkoutConfigured,
+}: {
+  billing: BillingOverview | undefined;
+  workspaceName: string | undefined;
+  onCheckout: (planSlug: string) => void;
+  checkoutPendingPlan: string | null;
+  checkoutConfigured: boolean;
+}) {
+  const plans = billing?.plans ?? [];
+  const currentSlug = billing?.subscription.plan_slug ?? "free";
+  const limits = billing?.usage.limits ?? {};
+  const usage = billing?.usage;
+
+  return (
+    <section aria-labelledby="billing-heading" className="space-y-4">
+      <div className="space-y-1">
+        <h2 id="billing-heading" className="text-xl font-semibold tracking-tight">
+          Workspace plan
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          Plans, usage limits and invoices are scoped to{" "}
+          <span className="text-foreground font-medium">
+            {workspaceName ?? "your workspace"}
+          </span>
+          . Upgrades apply to every member of the workspace.
+        </p>
+      </div>
+
+      {!checkoutConfigured && (
+        <div className="border-highlight/40 bg-highlight/10 text-highlight-foreground flex items-start gap-3 rounded-lg border px-4 py-3 text-sm">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <div>
+            <p className="font-medium">Billing not configured</p>
+            <p className="mt-0.5 text-xs">
+              No payment provider keys are set for this deployment, so checkout is
+              disabled. Plan changes below are recorded against the workspace and
+              take effect immediately.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="grid gap-4 md:grid-cols-3">
+        {plans.map((plan) => {
+          const isCurrent = plan.slug === currentSlug;
+          const isPending = checkoutPendingPlan === plan.slug;
+          return (
+            <Card
+              key={plan.id}
+              className={
+                isCurrent
+                  ? "border-primary/60 ring-primary/20 flex flex-col ring-1"
+                  : "flex flex-col"
+              }
+            >
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between text-base">
+                  {plan.name}
+                  {isCurrent ? (
+                    <Badge>Current</Badge>
+                  ) : plan.slug === "pro" ? (
+                    <Badge variant="secondary">Popular</Badge>
+                  ) : null}
+                </CardTitle>
+                <CardDescription>{plan.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="mt-auto space-y-4">
+                <p className="text-2xl font-semibold tabular-nums">
+                  {formatPlanPrice(plan)}
+                </p>
+                <ul className="space-y-1.5 text-sm">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <Check
+                        className="text-primary mt-0.5 h-3.5 w-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  className="w-full"
+                  variant={isCurrent ? "outline" : "default"}
+                  disabled={isCurrent || checkoutPendingPlan !== null}
+                  onClick={() => onCheckout(plan.slug)}
+                >
+                  {isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : null}
+                  {isCurrent
+                    ? "Current plan"
+                    : isPending
+                      ? "Starting checkout…"
+                      : `Switch to ${plan.name}`}
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Gauge className="h-4 w-4" aria-hidden="true" />
+              Usage this period
+            </CardTitle>
+            <CardDescription>
+              Metered per workspace against your current plan limits.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {usage ? (
+              <>
+                <UsageMeter
+                  label="AI messages"
+                  used={usage.messages_used}
+                  limit={limitValue(limits, "messages_per_month")}
+                  hint="Every chat message sent from the workspace counts once."
+                />
+                <UsageMeter
+                  label="Projects"
+                  used={usage.projects_used}
+                  limit={limitValue(limits, "projects")}
+                  hint="Projects created inside this workspace."
+                />
+                <UsageMeter
+                  label="Workspace members"
+                  used={usage.members_used}
+                  limit={limitValue(limits, "members")}
+                  hint="Active members and pending invitations."
+                />
+              </>
+            ) : (
+              <div className="space-y-3">
+                {[0, 1, 2].map((index) => (
+                  <Skeleton key={index} className="h-12 w-full" />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Receipt className="h-4 w-4" aria-hidden="true" />
+              Invoice history
+            </CardTitle>
+            <CardDescription>
+              Subscription invoices issued for this workspace.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!billing ? (
+              <div className="space-y-3">
+                {[0, 1, 2].map((index) => (
+                  <Skeleton key={index} className="h-10 w-full" />
+                ))}
+              </div>
+            ) : billing.invoices.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                No invoices yet. Invoices appear here once a paid plan is active.
+              </p>
+            ) : (
+              <ul className="divide-border divide-y">
+                {billing.invoices.map((invoice) => (
+                  <li
+                    key={invoice.id}
+                    className="flex items-center justify-between gap-4 py-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">
+                        {invoice.number ?? invoice.id.slice(0, 8)}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {dateFormatter.format(new Date(invoice.created_at))}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm tabular-nums">
+                        {formatAmount(invoice.amount_cents, invoice.currency)}
+                      </span>
+                      <Badge variant={statusVariant(invoice.status)}>
+                        {invoice.status}
+                      </Badge>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
 }
 
 function PaymentsPage() {
   const queryClient = useQueryClient();
   const [pendingPackId, setPendingPackId] = useState<string | null>(null);
+  const [pendingPlanSlug, setPendingPlanSlug] = useState<string | null>(null);
+
+  const fetchBilling = useServerFn(getBillingOverview);
+  const fetchWorkspace = useServerFn(getWorkspaceOverview);
+  const checkout = useServerFn(startCheckout);
 
   const overviewQuery = useQuery({
     queryKey: ["credit-overview"],
     queryFn: () => getCreditOverview(),
+  });
+
+  const billingQuery = useQuery({
+    queryKey: ["billing-overview"],
+    queryFn: () => fetchBilling(),
+    retry: false,
+  });
+
+  const workspaceQuery = useQuery({
+    queryKey: ["workspace-overview"],
+    queryFn: () => fetchWorkspace(),
+    retry: false,
+  });
+
+  const checkoutMutation = useMutation({
+    mutationFn: (planSlug: string) => checkout({ data: { planSlug } }),
+    onMutate: (planSlug: string) => {
+      setPendingPlanSlug(planSlug);
+    },
+    onSuccess: (result) => {
+      if (result.checkoutUrl) {
+        window.location.assign(result.checkoutUrl);
+        return;
+      }
+      toast.success(
+        result.message ??
+          `Workspace moved to the ${result.plan.name} plan.`,
+      );
+      void queryClient.invalidateQueries({ queryKey: ["billing-overview"] });
+      void queryClient.invalidateQueries({ queryKey: ["workspace-overview"] });
+    },
+    onError: (error: unknown) => {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not start the plan change.",
+      );
+    },
+    onSettled: () => {
+      setPendingPlanSlug(null);
+    },
   });
 
   const purchaseMutation = useMutation({
@@ -113,6 +424,16 @@ function PaymentsPage() {
           written to your private ledger.
         </p>
       </header>
+
+      <BillingSection
+        billing={billingQuery.data}
+        workspaceName={workspaceQuery.data?.workspace.name}
+        onCheckout={(planSlug) => checkoutMutation.mutate(planSlug)}
+        checkoutPendingPlan={pendingPlanSlug}
+        checkoutConfigured={billingQuery.data?.checkout_configured ?? false}
+      />
+
+      <Separator />
 
       <section aria-labelledby="wallet-heading" className="space-y-4">
         <h2 id="wallet-heading" className="sr-only">
@@ -381,6 +702,13 @@ function PaymentsPage() {
             admin console
           </Link>
           .
+        </p>
+        <p className="text-muted-foreground text-sm">
+          Workspace plan limits are enforced per workspace.{" "}
+          <Link to="/dashboard" className="inline-flex items-center gap-1 underline underline-offset-4">
+            Back to projects
+            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </Link>
         </p>
       </section>
     </div>
