@@ -44,8 +44,67 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// WebSocket connections for live preview sync
+const livePreviewConnections = new Set<WebSocket>();
+
+// Broadcast a message to all connected clients
+function broadcastToClients(message: any) {
+  const jsonMessage = JSON.stringify(message);
+  for (const client of livePreviewConnections) {
+    try {
+      client.send(jsonMessage);
+    } catch (error) {
+      console.error('Error sending message to client:', error);
+      livePreviewConnections.delete(client);
+    }
+  }
+}
+
+// Handle WebSocket upgrade requests
+function handleWebSocketUpgrade(request: Request): Response | null {
+  const url = new URL(request.url);
+  if (url.pathname === '/api/ws') {
+    const upgradeHeader = request.headers.get('upgrade');
+    if (upgradeHeader !== 'websocket') {
+      return null;
+    }
+
+    const webSocketPair = new WebSocketPair();
+    const [client, server] = webSocketPair;
+
+    server.accept();
+    
+    // Add the new connection to our set
+    livePreviewConnections.add(server);
+    
+    // Remove the connection when it closes
+    server.addEventListener('close', () => {
+      livePreviewConnections.delete(server);
+    });
+    
+    // Handle errors
+    server.addEventListener('error', (error) => {
+      console.error('WebSocket error:', error);
+      livePreviewConnections.delete(server);
+    });
+
+    // Send welcome message
+    server.send(JSON.stringify({ type: 'connected', message: 'Live preview connected' }));
+
+    return new Response(null, { status: 101, webSocket: client });
+  }
+  
+  return null;
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // Handle WebSocket upgrade requests
+    const wsResponse = handleWebSocketUpgrade(request);
+    if (wsResponse) {
+      return wsResponse;
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
@@ -59,3 +118,8 @@ export default {
     }
   },
 };
+
+// Export function to notify clients of file changes
+export function notifyFileChange() {
+  broadcastToClients({ type: 'fileChange', timestamp: Date.now() });
+}
